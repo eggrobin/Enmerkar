@@ -316,4 +316,9 @@
   <ItemGroup>
     <CopyFileToFolders Include="Dictionary\sign_list.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="𒄑𒂅𒌋\layout.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+  </ItemGroup>
 </Project>
