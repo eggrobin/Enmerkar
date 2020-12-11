@@ -1,4 +1,4 @@
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
+﻿// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
 // ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
 // THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
@@ -8,6 +8,8 @@
 #include "Private.h"
 #include "BaseDictionaryEngine.h"
 #include "Globals.h"
+
+#include "𒄑𒂅𒌋/transcription.h"
 
 //+---------------------------------------------------------------------------
 // ctor
@@ -66,6 +68,9 @@ VOID CBaseDictionaryEngine::MergeSortByFindKeyCode(_Inout_ CSampleImeArray<CCand
             psrgLeftTemp = &pItemList->GetAt(leftRangeTemp)->_FindKeyCode;
             psrgMidTemp = &pItemList->GetAt(midTemp)->_FindKeyCode;
 
+            const std::wstring_view left_composition = pItemList->GetAt(leftRangeTemp)->full_composition;
+            const std::wstring_view mid_composition = pItemList->GetAt(midTemp)->full_composition;
+
             CCandidateListItem* pLI = nullptr;
             pLI = ListItemTemp.Append();
             if (pLI)
@@ -74,7 +79,7 @@ VOID CBaseDictionaryEngine::MergeSortByFindKeyCode(_Inout_ CSampleImeArray<CCand
                 {
                     *pLI = *pItemList->GetAt(midTemp++);
                 }
-                else if (midTemp == rightRange || CStringRange::Compare(_locale, psrgLeftTemp, psrgMidTemp) != CSTR_GREATER_THAN)
+                else if (midTemp == rightRange || 𒄑𒂅𒌋::InputsOrdered(left_composition, mid_composition))
                 {
                     *pLI = *pItemList->GetAt(leftRangeTemp++);
                 }
@@ -99,7 +104,10 @@ VOID CBaseDictionaryEngine::MergeSortByFindKeyCode(_Inout_ CSampleImeArray<CCand
         psrgLeft = &pItemList->GetAt(leftRange )->_FindKeyCode;
         psrgLeftNext = &pItemList->GetAt(leftRange+1)->_FindKeyCode;
 
-        if (CStringRange::Compare(_locale, psrgLeft, psrgLeftNext) == CSTR_GREATER_THAN)
+        const std::wstring_view left_composition = pItemList->GetAt(leftRange)->full_composition;
+        const std::wstring_view left_next_composition = pItemList->GetAt(leftRange+1)->full_composition;
+
+        if (!𒄑𒂅𒌋::InputsOrdered(left_composition, left_next_composition))
         {
             CCandidateListItem ListItem;
             ListItem = *pItemList->GetAt(leftRange);

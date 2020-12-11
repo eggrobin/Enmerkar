@@ -1,9 +1,11 @@
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
+﻿// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
 // ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
 // THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
 //
 // Copyright (c) Microsoft Corporation. All rights reserved
+
+#include <string>
 
 #include "Private.h"
 #include "Globals.h"
@@ -12,6 +14,8 @@
 #include "CompositionProcessorEngine.h"
 #include "KeyHandlerEditSession.h"
 #include "Compartment.h"
+
+#include "𒄑𒂅𒌋/latin_layout.h"
 
 // 0xF003, 0xF004 are the keys that the touch keyboard sends for next/previous
 #define THIRDPARTY_NEXTPAGE  static_cast<WORD>(0xF003)
@@ -22,7 +26,6 @@
 __inline UINT VKeyFromVKPacketAndWchar(UINT vk, WCHAR wch)
 {
     UINT vkRet = vk;
-    if (LOWORD(vk) == VK_PACKET)
     {
         if (wch == L' ')
         {
@@ -68,14 +71,6 @@ BOOL CSampleIME::_IsKeyEaten(_In_ ITfContext *pContext, UINT codeIn, _Out_ UINT 
     CCompartment CompartmentKeyboardOpen(_pThreadMgr, _tfClientId, GUID_COMPARTMENT_KEYBOARD_OPENCLOSE);
     CompartmentKeyboardOpen._GetCompartmentBOOL(isOpen);
 
-    BOOL isDoubleSingleByte = FALSE;
-    CCompartment CompartmentDoubleSingleByte(_pThreadMgr, _tfClientId, Global::SampleIMEGuidCompartmentDoubleSingleByte);
-    CompartmentDoubleSingleByte._GetCompartmentBOOL(isDoubleSingleByte);
-
-    BOOL isPunctuation = FALSE;
-    CCompartment CompartmentPunctuation(_pThreadMgr, _tfClientId, Global::SampleIMEGuidCompartmentPunctuation);
-    CompartmentPunctuation._GetCompartmentBOOL(isPunctuation);
-
     if (pKeyState)
     {
         pKeyState->Category = CATEGORY_NONE;
@@ -95,24 +90,8 @@ BOOL CSampleIME::_IsKeyEaten(_In_ ITfContext *pContext, UINT codeIn, _Out_ UINT 
     //
     // Map virtual key to character code
     //
-    BOOL isTouchKeyboardSpecialKeys = FALSE;
-    WCHAR wch = ConvertVKey(codeIn);
-    *pCodeOut = VKeyFromVKPacketAndWchar(codeIn, wch);
-    if ((wch == THIRDPARTY_NEXTPAGE) || (wch == THIRDPARTY_PREVPAGE))
-    {
-        // We always eat the above softkeyboard special keys
-        isTouchKeyboardSpecialKeys = TRUE;
-        if (pwch)
-        {
-            *pwch = wch;
-        }
-    }
-
-    // if the keyboard is closed, we don't eat keys, with the exception of the touch keyboard specials keys
-    if (!isOpen && !isDoubleSingleByte && !isPunctuation)
-    {
-        return isTouchKeyboardSpecialKeys;
-    }
+    WCHAR wch = 𒄑𒂅𒌋::LatinLayout::GetCharacter(codeIn);
+    *pCodeOut = codeIn;// VKeyFromVKPacketAndWchar(codeIn, wch);
 
     if (pwch)
     {
@@ -127,50 +106,18 @@ BOOL CSampleIME::_IsKeyEaten(_In_ ITfContext *pContext, UINT codeIn, _Out_ UINT 
 
     if (isOpen)
     {
-        //
-        // The candidate or phrase list handles the keys through ITfKeyEventSink.
-        //
-        // eat only keys that CKeyHandlerEditSession can handles.
-        //
-        if (pCompositionProcessorEngine->IsVirtualKeyNeed(*pCodeOut, pwch, _IsComposing(), _candidateMode, _isCandidateWithWildcard, pKeyState))
-        {
-            return TRUE;
-        }
+      //
+      // The candidate or phrase list handles the keys through ITfKeyEventSink.
+      //
+      // eat only keys that CKeyHandlerEditSession can handles.
+      //
+      if (pCompositionProcessorEngine->IsVirtualKeyNeed(*pCodeOut, pwch, _IsComposing(), _candidateMode, _isCandidateWithWildcard, pKeyState))
+      {
+        return TRUE;
+      }
     }
 
-    //
-    // Punctuation
-    //
-    if (pCompositionProcessorEngine->IsPunctuation(wch))
-    {
-        if ((_candidateMode == CANDIDATE_NONE) && isPunctuation)
-        {
-            if (pKeyState)
-            {
-                pKeyState->Category = CATEGORY_COMPOSING;
-                pKeyState->Function = FUNCTION_PUNCTUATION;
-            }
-            return TRUE;
-        }
-    }
-
-    //
-    // Double/Single byte
-    //
-    if (isDoubleSingleByte && pCompositionProcessorEngine->IsDoubleSingleByte(wch))
-    {
-        if (_candidateMode == CANDIDATE_NONE)
-        {
-            if (pKeyState)
-            {
-                pKeyState->Category = CATEGORY_COMPOSING;
-                pKeyState->Function = FUNCTION_DOUBLE_SINGLE_BYTE;
-            }
-            return TRUE;
-        }
-    }
-
-    return isTouchKeyboardSpecialKeys;
+    return FALSE;
 }
 
 //+---------------------------------------------------------------------------
@@ -269,6 +216,9 @@ STDAPI CSampleIME::OnSetFocus(BOOL fForeground)
     return S_OK;
 }
 
+static bool LetKeyDownThrough = false;
+static bool LetKeyUpThrough = false;
+
 //+---------------------------------------------------------------------------
 //
 // ITfKeyEventSink::OnTestKeyDown
@@ -284,6 +234,10 @@ STDAPI CSampleIME::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lPa
     WCHAR wch = '\0';
     UINT code = 0;
     *pIsEaten = _IsKeyEaten(pContext, (UINT)wParam, &code, &wch, &KeystrokeState);
+    if (!*pIsEaten && wch) {
+      *pIsEaten = !LetKeyDownThrough;
+    }
+    LetKeyDownThrough = false;
 
     if (KeystrokeState.Category == CATEGORY_INVOKE_COMPOSITION_EDIT_SESSION)
     {
@@ -345,6 +299,42 @@ STDAPI CSampleIME::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam,
         _InvokeKeyHandler(pContext, code, wch, (DWORD)lParam, KeystrokeState);
     }
 
+    if (!*pIsEaten && wch && !LetKeyDownThrough) {
+      INPUT input;
+      if (Global::ModifiersValue & (TF_MOD_CONTROL | TF_MOD_LCONTROL | TF_MOD_RCONTROL)) {
+        WORD vkey;
+        if (wch >= 'a' && wch <= 'z') {
+          vkey = 'A' + (wch - 'a');
+        } else if (wch == L'š') {
+          vkey = 'C';
+        } else if (wch == L'ḫ') {
+          vkey = 'H';
+        } else if (wch >= '0' && wch <= '9') {
+          vkey = wch;
+        } else {
+          vkey = static_cast<WORD>(wParam);
+        }
+        input = {
+            .type = INPUT_KEYBOARD,
+            .ki = {
+                .wVk = vkey,
+                .wScan = 0,
+                .dwFlags = 0}};
+        LetKeyDownThrough = true;
+      } else {
+        input = {
+          .type = INPUT_KEYBOARD,
+          .ki = {
+              .wVk = 0,
+              .wScan = wch,
+              .dwFlags = KEYEVENTF_UNICODE}};
+      }
+      SendInput(1, &input, sizeof(input));
+      *pIsEaten = true;
+    } else {
+      LetKeyDownThrough = false;
+    }
+
     return S_OK;
 }
 
@@ -368,6 +358,10 @@ STDAPI CSampleIME::OnTestKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lPara
     UINT code = 0;
 
     *pIsEaten = _IsKeyEaten(pContext, (UINT)wParam, &code, &wch, NULL);
+    if (!*pIsEaten && wch) {
+      *pIsEaten = !LetKeyUpThrough;
+    }
+    LetKeyUpThrough = false;
 
     return S_OK;
 }
@@ -388,6 +382,41 @@ STDAPI CSampleIME::OnKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam, B
     UINT code = 0;
 
     *pIsEaten = _IsKeyEaten(pContext, (UINT)wParam, &code, &wch, NULL);
+    if (!*pIsEaten && wch && !LetKeyUpThrough) {
+      INPUT input;
+      if (Global::ModifiersValue & (TF_MOD_CONTROL | TF_MOD_LCONTROL | TF_MOD_RCONTROL)) {
+        WORD vkey;
+        if (wch >= 'a' && wch <= 'z') {
+          vkey = 'A' + (wch - 'a');
+        } else if (wch == L'š') {
+          vkey = 'C';
+        } else if (wch == L'ḫ') {
+          vkey = 'H';
+        } else if (wch >= '0' && wch <= '9') {
+          vkey = wch;
+        } else {
+          vkey = static_cast<WORD>(wParam);
+        }
+        input = {
+            .type = INPUT_KEYBOARD,
+            .ki = {
+                .wVk = vkey,
+                .wScan = 0,
+                .dwFlags = KEYEVENTF_KEYUP}};
+        LetKeyUpThrough = true;
+      } else {
+        input = {
+          .type = INPUT_KEYBOARD,
+          .ki = {
+              .wVk = 0,
+              .wScan = wch,
+              .dwFlags = KEYEVENTF_KEYUP | KEYEVENTF_UNICODE}};
+      }
+      SendInput(1, &input, sizeof(input));
+      *pIsEaten = true;
+    } else {
+      LetKeyUpThrough = false;
+    }
 
     return S_OK;
 }

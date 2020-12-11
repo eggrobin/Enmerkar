@@ -65,7 +65,10 @@ enum KEYSTROKE_FUNCTION
     FUNCTION_DOUBLE_SINGLE_BYTE,
 
     // Function Punctuation
-    FUNCTION_PUNCTUATION
+    FUNCTION_PUNCTUATION,
+
+    // I have no idea what I am doing.
+    FUNCTION_FINALIZE_TEXTSTORE_AND_IMMEDIATELY_INPUT
 };
 
 //---------------------------------------------------------------------
@@ -234,11 +237,13 @@ struct CCandidateListItem
 {
     CStringRange _ItemString;
     CStringRange _FindKeyCode;
+    std::wstring full_composition;
 
 	CCandidateListItem& CCandidateListItem::operator =( const CCandidateListItem& rhs)
 	{
 		_ItemString = rhs._ItemString;
 		_FindKeyCode = rhs._FindKeyCode;
+    full_composition = rhs.full_composition;
 		return *this;
 	}
 };

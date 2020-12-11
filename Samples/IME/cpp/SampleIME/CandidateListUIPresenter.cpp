@@ -740,7 +740,7 @@ STDAPI CCandidateListUIPresenter::OnKeyDown(_In_ WPARAM wParam, _In_ LPARAM lPar
 
 STDAPI CCandidateListUIPresenter::ShowCandidateNumbers(_Out_ BOOL *pIsShow)
 {
-    *pIsShow = TRUE;
+    *pIsShow = FALSE;
     return S_OK;
 }
 
@@ -873,8 +873,10 @@ void CCandidateListUIPresenter::SetPageIndexWithScrollInfo(_In_ CSampleImeArray<
 
 void CCandidateListUIPresenter::_ClearList()
 {
+  if (_pCandidateWnd) {
     _pCandidateWnd->_ClearList();
     _pCandidateWnd->_InvalidateRect();
+  }
 }
 
 //+---------------------------------------------------------------------------

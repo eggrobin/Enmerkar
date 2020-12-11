@@ -84,6 +84,9 @@ HRESULT CKeyStateCategory::KeyStateHandler(KEYSTROKE_FUNCTION function, KeyHandl
     case FUNCTION_FINALIZE_TEXTSTORE_AND_INPUT:
         return HandleKeyFinalizeTextStoreAndInput(dto);
 
+    case FUNCTION_FINALIZE_TEXTSTORE_AND_IMMEDIATELY_INPUT:
+        return HandleKeyFinalizeTextStoreAndImmediatelyInput(dto);
+
     case FUNCTION_FINALIZE_TEXTSTORE:
         return HandleKeyFinalizeTextStore(dto);
 
@@ -152,6 +155,11 @@ HRESULT CKeyStateCategory::HandleKeyFinalizeTextStore(KeyHandlerEditSessionDTO d
 HRESULT CKeyStateCategory::HandleKeyFinalizeTextStoreAndInput(KeyHandlerEditSessionDTO dto)
 {
 	dto;
+    return E_NOTIMPL;
+}
+
+HRESULT CKeyStateCategory::HandleKeyFinalizeTextStoreAndImmediatelyInput(KeyHandlerEditSessionDTO dto)
+{
     return E_NOTIMPL;
 }
 
@@ -240,6 +248,13 @@ HRESULT CKeyStateComposing::HandleKeyFinalizeTextStoreAndInput(KeyHandlerEditSes
 {
     _pTextService->_HandleCompositionFinalize(dto.ec, dto.pContext, FALSE);
     return _pTextService->_HandleCompositionInput(dto.ec, dto.pContext, dto.wch);
+}
+
+HRESULT CKeyStateComposing::HandleKeyFinalizeTextStoreAndImmediatelyInput(KeyHandlerEditSessionDTO dto)
+{
+    _pTextService->_HandleCompositionFinalize(dto.ec, dto.pContext, FALSE);
+    _pTextService->_HandleCompositionInput(dto.ec, dto.pContext, dto.wch);
+    return _pTextService->_HandleCompositionFinalize(dto.ec, dto.pContext, FALSE);
 }
 
 HRESULT CKeyStateComposing::HandleKeyFinalizeTextStore(KeyHandlerEditSessionDTO dto)

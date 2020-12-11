@@ -5,6 +5,8 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved
 
+#include <filesystem>
+
 #include "Private.h"
 #include "SampleIME.h"
 #include "CompositionProcessorEngine.h"
@@ -15,6 +17,8 @@
 #include "Compartment.h"
 #include "LanguageBar.h"
 #include "RegKey.h"
+
+#include "𒄑𒂅𒌋/latin_layout.h"
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -229,13 +233,13 @@ BOOL CCompositionProcessorEngine::SetupLanguageProfile(LANGID langid, REFGUID gu
     _guidProfile = guidLanguageProfile;
     _tfClientId = tfClientId;
 
-    SetupPreserved(pThreadMgr, tfClientId);	
-	InitializeSampleIMECompartment(pThreadMgr, tfClientId);
+    //SetupPreserved(pThreadMgr, tfClientId);	
     SetupPunctuationPair();
-    SetupLanguageBar(pThreadMgr, tfClientId, isSecureMode);
+    //SetupLanguageBar(pThreadMgr, tfClientId, isSecureMode);
     SetupKeystroke();
     SetupConfiguration();
     SetupDictionaryFile();
+	InitializeSampleIMECompartment(pThreadMgr, tfClientId);
 
 Exit:
     return ret;
@@ -496,6 +500,7 @@ void CCompositionProcessorEngine::GetCandidateList(_Inout_ CSampleImeArray<CCand
 
 void CCompositionProcessorEngine::GetCandidateStringInConverted(CStringRange &searchString, _In_ CSampleImeArray<CCandidateListItem> *pCandidateList)
 {
+    return;  // This gives us candidates based on prefix matching once we have entered a sign, which we really do not want.
     if (!IsDictionaryAvailable())
     {
         return;
@@ -674,7 +679,7 @@ void CCompositionProcessorEngine::SetupKeystroke()
 
 void CCompositionProcessorEngine::SetKeystrokeTable(_Inout_ CSampleImeArray<_KEYSTROKE> *pKeystroke)
 {
-    for (int i = 0; i < 26; i++)
+    for (int i = 0; i < 47; i++)
     {
         _KEYSTROKE* pKS = nullptr;
 
@@ -982,25 +987,15 @@ BOOL CCompositionProcessorEngine::SetupDictionaryFile()
     // Register CFileMapping
     WCHAR wszFileName[MAX_PATH] = {'\0'};
     DWORD cchA = GetModuleFileName(Global::dllInstanceHandle, wszFileName, ARRAYSIZE(wszFileName));
-    size_t iDicFileNameLen = cchA + wcslen(TEXTSERVICE_DIC);
-    WCHAR *pwszFileName = new (std::nothrow) WCHAR[iDicFileNameLen + 1];
+
+    WCHAR wszChar = wszFileName[cchA];
+    std::wstring const sign_list_path = (std::filesystem::path(std::wstring_view(wszFileName, cchA)).parent_path().parent_path() / L"sign_list.txt").wstring();
+    WCHAR *pwszFileName = new (std::nothrow) WCHAR[sign_list_path.size() + 1];
     if (!pwszFileName)
     {
         goto ErrorExit;
     }
-    *pwszFileName = L'\0';
-
-    // find the last '/'
-    while (cchA--)
-    {
-        WCHAR wszChar = wszFileName[cchA];
-        if (wszChar == '\\' || wszChar == '/')
-        {
-            StringCchCopyN(pwszFileName, iDicFileNameLen + 1, wszFileName, cchA + 1);
-            StringCchCatN(pwszFileName, iDicFileNameLen + 1, TEXTSERVICE_DIC, wcslen(TEXTSERVICE_DIC));
-            break;
-        }
-    }
+    StringCchCopyN(pwszFileName, sign_list_path.size() + 1, sign_list_path.data(), sign_list_path.size() + 1);
 
     // create CFileMapping object
     if (_pDictionaryFile == nullptr)
@@ -1490,11 +1485,13 @@ HRESULT CSampleIME::GetComModuleName(REFGUID rclsid, _Out_writes_(cchPath)WCHAR*
 
 void CCompositionProcessorEngine::InitKeyStrokeTable()
 {
-    for (int i = 0; i < 26; i++)
+    int i = 0;
+    for (auto const key_code : 𒄑𒂅𒌋::ANSIPrintableVirtualKeyCodes)
     {
-        _keystrokeTable[i].VirtualKey = 'A' + i;
+        _keystrokeTable[i].VirtualKey = key_code;
         _keystrokeTable[i].Modifiers = 0;
         _keystrokeTable[i].Function = FUNCTION_INPUT;
+        ++i;
     }
 }
 
@@ -1532,19 +1529,21 @@ void CCompositionProcessorEngine::SetInitialCandidateListRange()
 void CCompositionProcessorEngine::SetDefaultCandidateTextFont()
 {
     // Candidate Text Font
-    if (Global::defaultlFontHandle == nullptr)
+  for(auto const [font, font_name] : std::array<std::pair<HFONT&, wchar_t const*>, 2>{{
+          {Global::CuneiformFont, L"Noto Sans Cuneiform"},
+          {Global::LatinFont, L"Segoe UI"}}}) {
+    if (font == nullptr)
     {
-		WCHAR fontName[50] = {'\0'}; 
-		LoadString(Global::dllInstanceHandle, IDS_DEFAULT_FONT, fontName, 50);
-        Global::defaultlFontHandle = CreateFont(-MulDiv(10, GetDeviceCaps(GetDC(NULL), LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, 0, 0, 0, 0, 0, 0, 0, 0, fontName);
-        if (!Global::defaultlFontHandle)
+        font = CreateFont(-MulDiv(10, GetDeviceCaps(GetDC(NULL), LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, 0, 0, 0, 0, 0, 0, 0, 0, font_name);
+        if (!font)
         {
 			LOGFONT lf;
 			SystemParametersInfo(SPI_GETICONTITLELOGFONT, sizeof(LOGFONT), &lf, 0);
             // Fall back to the default GUI font on failure.
-            Global::defaultlFontHandle = CreateFont(-MulDiv(10, GetDeviceCaps(GetDC(NULL), LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, 0, 0, 0, 0, 0, 0, 0, 0, lf.lfFaceName);
+            font = CreateFont(-MulDiv(10, GetDeviceCaps(GetDC(NULL), LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, 0, 0, 0, 0, 0, 0, 0, 0, lf.lfFaceName);
         }
     }
+  }
 }
 
 //////////////////////////////////////////////////////////////////////

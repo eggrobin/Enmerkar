@@ -1,4 +1,4 @@
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
+﻿// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
 // ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
 // THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
@@ -9,6 +9,8 @@
 #include "Globals.h"
 #include "BaseWindow.h"
 #include "CandidateWindow.h"
+
+#include "𒄑𒂅𒌋/transcription.h"
 
 //+---------------------------------------------------------------------------
 //
@@ -240,8 +242,9 @@ LRESULT CALLBACK CCandidateWindow::_WindowProcCallback(_In_ HWND wndHandle, UINT
             dcHandle = GetDC(wndHandle);
             if (dcHandle)
             {
-                HFONT hFontOld = (HFONT)SelectObject(dcHandle, Global::defaultlFontHandle);
+                HFONT hFontOld = (HFONT)SelectObject(dcHandle, Global::CuneiformFont);
                 GetTextMetrics(dcHandle, &_TextMetric);
+                _cyRow = _TextMetric.tmHeight;
 
                 _cxTitle = _TextMetric.tmMaxCharWidth * _wndWidth;
                 SelectObject(dcHandle, hFontOld);
@@ -419,7 +422,7 @@ void CCandidateWindow::_OnPaint(_In_ HDC dcHandle, _In_ PAINTSTRUCT *pPaintStruc
 {
     SetBkMode(dcHandle, TRANSPARENT);
 
-    HFONT hFontOld = (HFONT)SelectObject(dcHandle, Global::defaultlFontHandle);
+    HFONT hFontOld = (HFONT)SelectObject(dcHandle, Global::CuneiformFont);
 
     FillRect(dcHandle, &pPaintStruct->rcPaint, _brshBkColor);
 
@@ -629,12 +632,27 @@ void CCandidateWindow::_DrawList(_In_ HDC dcHandle, _In_ UINT iIndex, _In_ RECT 
         rc.left = prc->left + PageCountPosition * cxLine;
         rc.right = prc->left + StringPosition * cxLine;
 
-        // Number Font Color And BK
-        SetTextColor(dcHandle, CANDWND_NUM_COLOR);
-        SetBkColor(dcHandle, GetSysColor(COLOR_3DHIGHLIGHT));
+        pItemList = _candidateList.GetAt(iIndex);
+        std::wstring_view sign(pItemList->_ItemString.Get(), pItemList->_ItemString.GetLength());
+        std::wstring_view composition = pItemList->full_composition;
+        std::wstring_view tail(pItemList->_FindKeyCode.Get(), pItemList->_FindKeyCode.GetLength());
+        
+        if (_currentSelection != iIndex)
+        {
+            SetTextColor(dcHandle, _crTextColor);
+            SetBkColor(dcHandle, GetSysColor(COLOR_3DHIGHLIGHT));
+        }
+        else
+        {
+            SetTextColor(dcHandle, CANDWND_SELECTED_ITEM_COLOR);
+            SetBkColor(dcHandle, CANDWND_SELECTED_BK_COLOR);
+        }
 
-        StringCchPrintf(pageCountString, ARRAYSIZE(pageCountString), L"%d", (LONG)*_pIndexRange->GetAt(pageCount));
-        ExtTextOut(dcHandle, PageCountPosition * cxLine, pageCount * cyLine + cyOffset, ETO_OPAQUE, &rc, pageCountString, lenOfPageCount, NULL);
+        {
+          HFONT const old_font = (HFONT)SelectObject(dcHandle, Global::CuneiformFont);
+          ExtTextOut(dcHandle, PageCountPosition * cxLine, pageCount * cyLine + cyOffset, ETO_OPAQUE, &rc, sign.data(), sign.size(), NULL);
+          SelectObject(dcHandle, old_font);
+        }
 
         rc.left = prc->left + StringPosition * cxLine;
         rc.right = prc->right;
@@ -650,9 +668,12 @@ void CCandidateWindow::_DrawList(_In_ HDC dcHandle, _In_ UINT iIndex, _In_ RECT 
             SetTextColor(dcHandle, CANDWND_SELECTED_ITEM_COLOR);
             SetBkColor(dcHandle, CANDWND_SELECTED_BK_COLOR);
         }
-
-        pItemList = _candidateList.GetAt(iIndex);
-        ExtTextOut(dcHandle, StringPosition * cxLine, pageCount * cyLine + cyOffset, ETO_OPAQUE, &rc, pItemList->_ItemString.Get(), (DWORD)pItemList->_ItemString.GetLength(), NULL);
+        {
+          HFONT const old_font = (HFONT)SelectObject(dcHandle, Global::LatinFont);
+          std::wstring const hint = 𒄑𒂅𒌋::PrettyTranscriptionHint(composition, composition.size() - tail.size()) + Global::trace;
+          ExtTextOut(dcHandle, StringPosition * cxLine, pageCount * cyLine + cyOffset, ETO_OPAQUE, &rc, hint.data(), hint.size(), NULL);
+          SelectObject(dcHandle, old_font);
+        }
     }
     for (; (pageCount < candidateListPageCnt); pageCount++)
     {
@@ -752,6 +773,7 @@ void CCandidateWindow::_AddString(_Inout_ CCandidateListItem *pCandidateItem, _I
     if (pwchString)
     {
         pLI->_ItemString.Set(pwchString, dwItemString);
+        pLI->full_composition = pCandidateItem->full_composition;
     }
     if (pwchWildcard)
     {

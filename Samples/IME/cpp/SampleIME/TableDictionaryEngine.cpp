@@ -52,6 +52,7 @@ VOID CTableDictionaryEngine::CollectWord(_In_ CStringRange *pKeyCode, _Inout_ CS
             {
                 pLI->_ItemString.Set(*pdret->_FindPhraseList.GetAt(iIndex));
                 pLI->_FindKeyCode.Set(pdret->_FindKeyCode.Get(), pdret->_FindKeyCode.GetLength());
+                pLI->full_composition = std::wstring_view(pdret->_FindKeyCode.Get(), pdret->_FindKeyCode.GetLength());
             }
         }
 
@@ -81,6 +82,7 @@ VOID CTableDictionaryEngine::CollectWordForWildcard(_In_ CStringRange *pKeyCode,
             {
                 pLI->_ItemString.Set(*pdret->_FindPhraseList.GetAt(iIndex));
                 pLI->_FindKeyCode.Set(pdret->_FindKeyCode.Get(), pdret->_FindKeyCode.GetLength());
+                pLI->full_composition = std::wstring_view(pdret->_FindKeyCode.Get(), pdret->_FindKeyCode.GetLength());
             }
         }
 
@@ -110,6 +112,7 @@ VOID CTableDictionaryEngine::CollectWordFromConvertedStringForWildcard(_In_ CStr
             {
                 pLI->_ItemString.Set(*pdret->_FindPhraseList.GetAt(index));
                 pLI->_FindKeyCode.Set(pdret->_FindKeyCode.Get(), pdret->_FindKeyCode.GetLength());
+                pLI->full_composition = std::wstring_view(pdret->_FindKeyCode.Get(), pdret->_FindKeyCode.GetLength());
             }
         }
 

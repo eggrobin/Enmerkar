@@ -16,13 +16,16 @@
     <Filter Include="Dictionary">
       <UniqueIdentifier>{fe9b9e3e-f048-48b1-ae0b-718fc88cff49}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\𒄑𒂅𒌋">
+      <UniqueIdentifier>{fbe09fb7-c4c1-4c2b-92fe-115884252fa4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\𒄑𒂅𒌋">
+      <UniqueIdentifier>{7705bcb8-e136-4e4d-859e-5b8de67722ad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="SampleIME.def">
       <Filter>Source Files</Filter>
-    </None>
-    <None Include="Dictionary\SampleIMESimplifiedQuanPin.txt">
-      <Filter>Dictionary</Filter>
     </None>
     <None Include="image\SampleIme.ico">
       <Filter>Resource Files</Filter>
@@ -151,6 +154,12 @@
     </ClInclude>
     <ClInclude Include="define.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="𒄑𒂅𒌋\latin_layout.h">
+      <Filter>Header Files\𒄑𒂅𒌋</Filter>
+    </ClInclude>
+    <ClInclude Include="𒄑𒂅𒌋\transcription.h">
+      <Filter>Header Files\𒄑𒂅𒌋</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -292,10 +301,19 @@
     <ClCompile Include="SampleIMEBaseStructure.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="𒄑𒂅𒌋\latin_layout.cpp">
+      <Filter>Source Files\𒄑𒂅𒌋</Filter>
+    </ClCompile>
+    <ClCompile Include="𒄑𒂅𒌋\transcription.cpp">
+      <Filter>Source Files\𒄑𒂅𒌋</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SampleIME.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="Dictionary\sign_list.txt" />
   </ItemGroup>
 </Project>

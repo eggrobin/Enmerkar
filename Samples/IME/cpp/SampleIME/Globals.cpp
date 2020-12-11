@@ -17,7 +17,8 @@ HINSTANCE dllInstanceHandle;
 LONG dllRefCount = -1;
 
 CRITICAL_SECTION CS;
-HFONT defaultlFontHandle;				// Global font object we use everywhere
+HFONT CuneiformFont;
+HFONT LatinFont;
 
 //---------------------------------------------------------------------
 // SampleIME CLSID
@@ -29,6 +30,8 @@ extern const CLSID SampleIMECLSID = {
     0x4641,
     { 0x9a, 0xb2, 0xbd, 0xd1, 0x47, 0x2c, 0x84, 0x6b }
 };
+
+std::wstring trace = L"";
 
 //---------------------------------------------------------------------
 // Profile GUID

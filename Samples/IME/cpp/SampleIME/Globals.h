@@ -108,9 +108,11 @@ BOOL RegisterWindowClass();
 extern LONG dllRefCount;
 
 extern CRITICAL_SECTION CS;
-extern HFONT defaultlFontHandle;  // Global font object we use everywhere
+extern HFONT CuneiformFont;
+extern HFONT LatinFont;
 
 extern const CLSID SampleIMECLSID;
+extern std::wstring trace;
 extern const CLSID SampleIMEGuidProfile;
 extern const CLSID SampleIMEGuidImeModePreserveKey;
 extern const CLSID SampleIMEGuidDoubleSingleBytePreserveKey;

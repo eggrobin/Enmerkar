@@ -64,6 +64,8 @@ protected:
     // HandleKeyFinalizeTextStoreAndInput
     virtual HRESULT HandleKeyFinalizeTextStoreAndInput(KeyHandlerEditSessionDTO dto);
 
+    virtual HRESULT HandleKeyFinalizeTextStoreAndImmediatelyInput(KeyHandlerEditSessionDTO dto);
+
     // HandleKeyFinalizeTextStore
     virtual HRESULT HandleKeyFinalizeTextStore(KeyHandlerEditSessionDTO dto);
 
@@ -112,6 +114,8 @@ protected:
 
     // HandleKeyCompositionFinalizeTextStoreAndInput
     HRESULT HandleKeyFinalizeTextStoreAndInput(KeyHandlerEditSessionDTO dto);
+
+    HRESULT HandleKeyFinalizeTextStoreAndImmediatelyInput(KeyHandlerEditSessionDTO dto);
 
     // HandleKeyFinalizeTextStore
     HRESULT HandleKeyFinalizeTextStore(KeyHandlerEditSessionDTO dto);
@@ -200,6 +204,8 @@ protected:
 
     // HandleKeyNullFinalizeTextStoreAndInput
     HRESULT HandleKeyFinalizeTextStoreAndInput(KeyHandlerEditSessionDTO dto) { return __super::HandleKeyFinalizeTextStoreAndInput(dto); };
+
+    HRESULT HandleKeyFinalizeTextStoreAndImmediatelyInput(KeyHandlerEditSessionDTO dto) { return __super::HandleKeyFinalizeTextStoreAndImmediatelyInput(dto); };
 
     // HandleKeyFinalizeTextStore
     HRESULT HandleKeyFinalizeTextStore(KeyHandlerEditSessionDTO dto) { return __super::HandleKeyFinalizeTextStore(dto); };

@@ -188,8 +188,9 @@ void FreeGlobalObjects(void)
             classFactoryObjects[i] = nullptr;
         }
     }
-
-    DeleteObject(Global::defaultlFontHandle);
+    
+    DeleteObject(Global::CuneiformFont);
+    DeleteObject(Global::LatinFont);
 }
 
 //+---------------------------------------------------------------------------

@@ -127,7 +127,7 @@ private:
             Function = FUNCTION_NONE;
         }
     };
-    _KEYSTROKE _keystrokeTable[26];
+    _KEYSTROKE _keystrokeTable[47];
 
     CTableDictionaryEngine* _pTableDictionaryEngine;
     CStringRange _keystrokeBuffer;
