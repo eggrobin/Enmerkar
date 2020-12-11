@@ -75,7 +75,7 @@ def delete_parentheses(original, amendment):
   amended_segment = amendment.replace('[', '').replace(']', '')
   return original.replace(original_segment, amended_segment)
 
-with open(r"C:\Users\robin\Google Drive\𒄑𒂅𒌋\sign_list.csv", encoding="utf-8") as file:
+with open(r".\sign_list.csv", encoding="utf-8") as file:
   reader = csv.reader(file)
   ok_entries = 0
   erroneous_entries = 0
