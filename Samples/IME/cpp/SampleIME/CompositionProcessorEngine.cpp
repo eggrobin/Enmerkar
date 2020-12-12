@@ -18,7 +18,7 @@
 #include "LanguageBar.h"
 #include "RegKey.h"
 
-#include "𒄑𒂅𒌋/latin_layout.h"
+#include "𒄑𒂅𒌋/settings.h"
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -1529,12 +1529,12 @@ void CCompositionProcessorEngine::SetInitialCandidateListRange()
 void CCompositionProcessorEngine::SetDefaultCandidateTextFont()
 {
     // Candidate Text Font
-  for(auto const [font, font_name] : std::array<std::pair<HFONT&, wchar_t const*>, 2>{{
-          {Global::CuneiformFont, L"Segoe UI Historic"},
-          {Global::LatinFont, L"Segoe UI"}}}) {
+  for(auto const [font, font_name] : std::array<std::pair<HFONT&, std::wstring>, 2>{{
+          {Global::CuneiformFont, 𒄑𒂅𒌋::GetUserCuneiformFont()},
+          {Global::LatinFont, 𒄑𒂅𒌋::GetUserLatinFont()}}}) {
     if (font == nullptr)
     {
-        font = CreateFont(-MulDiv(10, GetDeviceCaps(GetDC(NULL), LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, 0, 0, 0, 0, 0, 0, 0, 0, font_name);
+        font = CreateFont(-MulDiv(10, GetDeviceCaps(GetDC(NULL), LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, 0, 0, 0, 0, 0, 0, 0, 0, font_name.c_str());
         if (!font)
         {
 			LOGFONT lf;

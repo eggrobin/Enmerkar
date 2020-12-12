@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include <array>
+#include <string>
 
 #include <Windows.h>
 #include <WinUser.h>
@@ -17,6 +18,9 @@ VK_OEM_3,'1','2','3','4','5','6','7','8','9','0',VK_OEM_MINUS,VK_OEM_PLUS,
                 'Z','X','C','V','B','N','M',VK_OEM_COMMA,VK_OEM_PERIOD,VK_OEM_2,
     // clang-format on
 }};
+
+std::wstring GetUserLatinFont();
+std::wstring GetUserCuneiformFont();
 
 class LatinLayout {
  public:

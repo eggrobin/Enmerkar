@@ -70,7 +70,7 @@
     <ClInclude Include="TfTextLayoutSink.h" />
     <ClInclude Include="TipCandidateList.h" />
     <ClInclude Include="TipCandidateString.h" />
-    <ClInclude Include="𒄑𒂅𒌋\latin_layout.h" />
+    <ClInclude Include="𒄑𒂅𒌋\settings.h" />
     <ClInclude Include="𒄑𒂅𒌋\transcription.h" />
   </ItemGroup>
   <ItemGroup>
@@ -120,13 +120,14 @@
     <ClCompile Include="ThreadMgrEventSink.cpp" />
     <ClCompile Include="TipCandidateList.cpp" />
     <ClCompile Include="TipCandidateString.cpp" />
-    <ClCompile Include="𒄑𒂅𒌋\latin_layout.cpp" />
+    <ClCompile Include="𒄑𒂅𒌋\settings.cpp" />
     <ClCompile Include="𒄑𒂅𒌋\transcription.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SampleIME.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="𒄑𒂅𒌋\fonts.txt" />
     <Text Include="𒄑𒂅𒌋\layout.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -15,7 +15,7 @@
 #include "KeyHandlerEditSession.h"
 #include "Compartment.h"
 
-#include "𒄑𒂅𒌋/latin_layout.h"
+#include "𒄑𒂅𒌋/settings.h"
 
 // 0xF003, 0xF004 are the keys that the touch keyboard sends for next/previous
 #define THIRDPARTY_NEXTPAGE  static_cast<WORD>(0xF003)
