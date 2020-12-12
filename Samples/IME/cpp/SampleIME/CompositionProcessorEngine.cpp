@@ -1530,7 +1530,7 @@ void CCompositionProcessorEngine::SetDefaultCandidateTextFont()
 {
     // Candidate Text Font
   for(auto const [font, font_name] : std::array<std::pair<HFONT&, wchar_t const*>, 2>{{
-          {Global::CuneiformFont, L"Noto Sans Cuneiform"},
+          {Global::CuneiformFont, L"Segoe UI Historic"},
           {Global::LatinFont, L"Segoe UI"}}}) {
     if (font == nullptr)
     {
