@@ -25,6 +25,7 @@ std::wstring GetUserCuneiformFont();
 class LatinLayout {
  public:
   static wchar_t GetCharacter(std::uint8_t virtual_key_code);
+  static wchar_t GetShiftedCharacter(std::uint8_t virtual_key_code);
 };
 
 }

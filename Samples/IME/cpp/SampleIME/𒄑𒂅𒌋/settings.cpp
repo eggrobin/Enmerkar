@@ -137,8 +137,34 @@ std::array<wchar_t, 48> GetLayoutConfiguration() {
   return result;
 }
 
+std::array<wchar_t, 48> GetShiftedLayoutConfiguration() {
+  UnicodeFile file = OpenUserLayoutFile();
+  std::array<wchar_t, 48> result{
+      L"EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"};
+  for (int i = 0; i < 47;) {
+    wchar_t const c = file.get();
+    if (c == L'\r' || c == L'\n' || c == ' ') {
+      continue;
+    }
+    ++i;
+  }
+  for (int i = 0; i < 47;) {
+    wchar_t const c = file.get();
+    if (c == L'\r' || c == L'\n' || c == ' ') {
+      continue;
+    }
+    result[i++] = c;
+  }
+  return result;
+}
+
 wchar_t LatinLayout::GetCharacter(const std::uint8_t virtual_key_code) {
   static auto layout = GetLayout(GetLayoutConfiguration());
+  return layout[virtual_key_code];
+}
+
+wchar_t LatinLayout::GetShiftedCharacter(std::uint8_t virtual_key_code) {
+  static auto layout = GetLayout(GetShiftedLayoutConfiguration());
   return layout[virtual_key_code];
 }
 

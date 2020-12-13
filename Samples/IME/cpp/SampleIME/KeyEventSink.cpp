@@ -104,6 +104,10 @@ BOOL CSampleIME::_IsKeyEaten(_In_ ITfContext *pContext, UINT codeIn, _Out_ UINT 
     CCompositionProcessorEngine *pCompositionProcessorEngine;
     pCompositionProcessorEngine = _pCompositionProcessorEngine;
 
+    if (GetKeyState(VK_CAPITAL) & 1) {
+      return FALSE;
+    }
+
     if (isOpen)
     {
       //
@@ -322,6 +326,28 @@ STDAPI CSampleIME::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam,
                 .dwFlags = 0}};
         LetKeyDownThrough = true;
       } else {
+        if (GetKeyState(VK_CAPITAL) & 1 && Global::ModifiersValue & (TF_MOD_SHIFT | TF_MOD_LSHIFT | TF_MOD_RSHIFT)) {
+          wch = 𒄑𒂅𒌋::LatinLayout::GetShiftedCharacter(code);
+        }
+        if (Global::ModifiersValue & TF_MOD_RALT) {
+          switch (wch) {
+            case L'm':
+              wch = L'ᵐ';
+              break;
+            case L'f':
+              wch = L'ᶠ';
+              break;
+            case L'd':
+              wch = L'ᵈ';
+              break;
+            default:
+              break;
+          }
+        } else {
+          if (wch >= L'0' && wch <= L'9') {
+             wch = L'₀' + wch - L'0';
+          }
+        }
         input = {
           .type = INPUT_KEYBOARD,
           .ki = {
