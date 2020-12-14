@@ -84,13 +84,33 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
   row_index = 0
 
   for row in reader:
+    meszl = row[3]
     if any(is_printable_basic_latin(c) for c in row[0] + row[1]) or row[0] != row[1]:
-      erroneous_entries += 1
-    else:
+      if meszl == '003+003\n(839+756+003+003)':
+        # A spelling of Idiqlat in the MesZL glossary.  No sign name, just type
+        # it as ḪAL.ḪAL.
+        continue
+      elif row[2].startswith('UŠUMX\n'):
+        pass  # UŠUMₓ is missing in the Sinacherib font.
+      elif row[2].startswith('ARAD x ŠE\n'):
+        continue  # Labat has ìr×še but Borger does not; it is not encoded.
+      elif (row[0] and
+            all(not is_printable_basic_latin(c) for c in row[0]) and
+            all(c in ' x' for c in row[1] if is_printable_basic_latin(c))):
+        pass  # Signs missng in the Sinacherib font.
+      elif meszl in (
+          '27',
+          '36',  # HZL 137: unbekannte Bedeutung (Gegenstand aus Holz).
+        ):
+        # Signs from https://www.unicode.org/wg2/docs/n4277.pdf.
+        pass
+      else:
+        raise ValueError(row)
+
+
       row_index += 1
       if not row[0]:
         continue
-      meszl = row[3]
       if meszl in meszl_seen:
         meszl_seen[meszl] += 1
         meszl += '/%d' % meszl_seen[meszl]
@@ -171,7 +191,21 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
       processed_readings = ''
       depth = 0
       sign = row[0]
-      sign = sign.replace('𒌋𒌋𒌋', '𒌍').replace('𒌋𒌋', '𒎙')
+      # For some reason Šašková does not use 𒌍, which was there in the initial
+      # Unicode 5.0 character set.
+      sign = sign.replace('𒌋𒌋𒌋', '𒌍')
+
+      # Use the signs from https://www.unicode.org/wg2/docs/n4277.pdf.
+      # Global substitutions: U.U and ME.EŠ are always MAN and MEŠ.
+      sign = sign.replace('𒌋𒌋', '𒎙').replace('𒈨𒌍', '𒎌')
+      # Disunification of ŠAR₂ 𒊹 and TI₂ 𒎗.
+      if meszl == '633':
+        sign = '𒎗'
+      sign = sign.replace('𒅗 x 𒌅', '𒎆')
+      sign = sign.replace('𒅗 x 𒌫', '𒎇')
+
+      if any(is_printable_basic_latin(c) for c in sign):
+        raise ValueError(sign)
 
       first_reading = Reading(sign, row_index)
       first_reading.value = row[2].split('\n')[0]
