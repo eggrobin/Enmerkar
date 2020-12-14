@@ -222,6 +222,7 @@ STDAPI CSampleIME::OnSetFocus(BOOL fForeground)
 
 static bool LetKeyDownThrough = false;
 static bool LetKeyUpThrough = false;
+static bool Received¹ = false;
 
 //+---------------------------------------------------------------------------
 //
@@ -304,7 +305,6 @@ STDAPI CSampleIME::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam,
     }
 
     if (!*pIsEaten && wch && !LetKeyDownThrough) {
-      INPUT input;
       if (Global::ModifiersValue & (TF_MOD_CONTROL | TF_MOD_LCONTROL | TF_MOD_RCONTROL)) {
         WORD vkey;
         if (wch >= 'a' && wch <= 'z') {
@@ -318,44 +318,44 @@ STDAPI CSampleIME::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam,
         } else {
           vkey = static_cast<WORD>(wParam);
         }
-        input = {
+        INPUT input = {
             .type = INPUT_KEYBOARD,
             .ki = {
                 .wVk = vkey,
                 .wScan = 0,
                 .dwFlags = 0}};
         LetKeyDownThrough = true;
+        SendInput(1, &input, sizeof(input));
       } else {
         if (GetKeyState(VK_CAPITAL) & 1 && Global::ModifiersValue & (TF_MOD_SHIFT | TF_MOD_LSHIFT | TF_MOD_RSHIFT)) {
           wch = 𒄑𒂅𒌋::LatinLayout::GetShiftedCharacter(code);
         }
-        if (Global::ModifiersValue & TF_MOD_RALT) {
-          switch (wch) {
-            case L'm':
-              wch = L'ᵐ';
-              break;
-            case L'f':
-              wch = L'ᶠ';
-              break;
-            case L'd':
-              wch = L'ᵈ';
-              break;
-            default:
-              break;
-          }
+        if (!Received¹ && wch == L'¹') {
+          Received¹ = true;
         } else {
-          if (wch >= L'0' && wch <= L'9') {
-             wch = L'₀' + wch - L'0';
+          if (Received¹) {
+            Received¹ = false;
+            wch = wch == L'd' ? L'ᵈ'
+                : wch == L'f' ? L'ᶠ'
+                : wch == L'm' ? L'ᵐ'
+                              : wch;
+          } else {
+            if (wch >= L'0' && wch <= L'9') {
+              wch = L'₀' + wch - L'0';
+            }
+            if (wch == L'x') {
+              wch = L'ₓ';
+            }
           }
+          INPUT input = {
+            .type = INPUT_KEYBOARD,
+            .ki = {
+                .wVk = 0,
+                .wScan = wch,
+                .dwFlags = KEYEVENTF_UNICODE}};
+          SendInput(1, &input, sizeof(input));
         }
-        input = {
-          .type = INPUT_KEYBOARD,
-          .ki = {
-              .wVk = 0,
-              .wScan = wch,
-              .dwFlags = KEYEVENTF_UNICODE}};
       }
-      SendInput(1, &input, sizeof(input));
       *pIsEaten = true;
     } else {
       LetKeyDownThrough = false;
