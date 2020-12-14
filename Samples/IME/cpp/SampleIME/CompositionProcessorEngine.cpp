@@ -1529,18 +1529,18 @@ void CCompositionProcessorEngine::SetInitialCandidateListRange()
 void CCompositionProcessorEngine::SetDefaultCandidateTextFont()
 {
     // Candidate Text Font
-  for(auto const [font, font_name] : std::array<std::pair<HFONT&, std::wstring>, 2>{{
+  for(auto const [font_handle, font] : std::array<std::pair<HFONT&, 𒄑𒂅𒌋::Font>, 2>{{
           {Global::CuneiformFont, 𒄑𒂅𒌋::GetUserCuneiformFont()},
           {Global::LatinFont, 𒄑𒂅𒌋::GetUserLatinFont()}}}) {
-    if (font == nullptr)
+    if (font_handle == nullptr)
     {
-        font = CreateFont(-MulDiv(10, GetDeviceCaps(GetDC(NULL), LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, 0, 0, 0, 0, 0, 0, 0, 0, font_name.c_str());
-        if (!font)
+        font_handle = CreateFont(-MulDiv(font.size_in_points, GetDeviceCaps(GetDC(NULL), LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, 0, 0, 0, 0, 0, 0, 0, 0, font.name.c_str());
+        if (!font_handle)
         {
 			LOGFONT lf;
 			SystemParametersInfo(SPI_GETICONTITLELOGFONT, sizeof(LOGFONT), &lf, 0);
             // Fall back to the default GUI font on failure.
-            font = CreateFont(-MulDiv(10, GetDeviceCaps(GetDC(NULL), LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, 0, 0, 0, 0, 0, 0, 0, 0, lf.lfFaceName);
+            font_handle = CreateFont(-MulDiv(10, GetDeviceCaps(GetDC(NULL), LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, 0, 0, 0, 0, 0, 0, 0, 0, lf.lfFaceName);
         }
     }
   }

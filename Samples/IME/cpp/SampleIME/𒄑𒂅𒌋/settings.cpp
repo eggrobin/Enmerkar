@@ -91,7 +91,7 @@ UnicodeFile OpenUserFontsFile() {
   return UnicodeFile(AppDataFile("fonts.txt"));
 }
 
-std::wstring GetUserLatinFont() {
+Font GetUserLatinFont() {
   UnicodeFile file = OpenUserFontsFile();
   for (std::wstring line; file.good(); line.clear()) {
     for (wchar_t c = file.get(); file.good(); c = file.get()) {
@@ -101,13 +101,20 @@ std::wstring GetUserLatinFont() {
       line.push_back(c);
     }
     if (line.starts_with(L"Latn:")) {
-      return line.substr(5);
+      std::wstring spec = line.substr(5);
+      auto colon = spec.find(L':');
+      return {
+          .name = spec.substr(0, colon),
+          .size_in_points = colon == std::wstring::npos
+                                ? 10
+                                : std::stoi(spec.substr(colon + 1)),
+      };
     }
   }
-  return L"Segoe UI";
+  return {.name = L"Segoe UI", .size_in_points = 10};
 }
 
-std::wstring GetUserCuneiformFont() {
+Font GetUserCuneiformFont() {
   UnicodeFile file = OpenUserFontsFile();
   for (std::wstring line; file.good(); line.clear()) {
     for (wchar_t c = file.get(); file.good(); c = file.get()) {
@@ -117,10 +124,17 @@ std::wstring GetUserCuneiformFont() {
       line.push_back(c);
     }
     if (line.starts_with(L"Xsux:")) {
-      return line.substr(5);
+      std::wstring spec = line.substr(5);
+      auto colon = spec.find(L':');
+      return {
+          .name = spec.substr(0, colon),
+          .size_in_points = colon == std::wstring::npos
+                                ? 10
+                                : std::stoi(spec.substr(colon + 1)),
+      };
     }
   }
-  return L"Segoe UI Historic";
+  return {.name = L"Segoe UI Historic", .size_in_points = 10};
 }
 
 std::array<wchar_t, 48> GetLayoutConfiguration() {

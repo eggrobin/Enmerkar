@@ -1,2 +1,2 @@
-﻿Xsux:Segoe UI Historic
-Latn:Segoe UI
+﻿Xsux:Segoe UI Historic:10
+Latn:Segoe UI:10

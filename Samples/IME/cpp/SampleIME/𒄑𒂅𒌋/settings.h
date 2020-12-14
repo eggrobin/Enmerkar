@@ -19,8 +19,13 @@ VK_OEM_3,'1','2','3','4','5','6','7','8','9','0',VK_OEM_MINUS,VK_OEM_PLUS,
     // clang-format on
 }};
 
-std::wstring GetUserLatinFont();
-std::wstring GetUserCuneiformFont();
+struct Font {
+  std::wstring name;
+  int size_in_points;
+};
+
+Font GetUserLatinFont();
+Font GetUserCuneiformFont();
 
 class LatinLayout {
  public:
@@ -28,4 +33,4 @@ class LatinLayout {
   static wchar_t GetShiftedCharacter(std::uint8_t virtual_key_code);
 };
 
-}
+}  // namespace 𒄑𒂅𒌋

@@ -5,6 +5,8 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved
 
+#include <algorithm>
+
 #include "Private.h"
 #include "Globals.h"
 #include "BaseWindow.h"
@@ -244,9 +246,15 @@ LRESULT CALLBACK CCandidateWindow::_WindowProcCallback(_In_ HWND wndHandle, UINT
             {
                 HFONT hFontOld = (HFONT)SelectObject(dcHandle, Global::CuneiformFont);
                 GetTextMetrics(dcHandle, &_TextMetric);
+                TEXTMETRIC latin_text_metric;
+                SelectObject(dcHandle, Global::LatinFont);
+                GetTextMetrics(dcHandle, &latin_text_metric);
+                _TextMetric.tmHeight =
+                    max(_TextMetric.tmHeight, latin_text_metric.tmHeight);
                 _cyRow = _TextMetric.tmHeight;
 
-                _cxTitle = _TextMetric.tmMaxCharWidth * _wndWidth;
+                _cxTitle = _TextMetric.tmMaxCharWidth +
+                           32 * latin_text_metric.tmAveCharWidth;
                 SelectObject(dcHandle, hFontOld);
                 ReleaseDC(wndHandle, dcHandle);
             }
