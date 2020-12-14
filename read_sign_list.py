@@ -97,13 +97,30 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
       elif (row[0] and
             all(not is_printable_basic_latin(c) for c in row[0]) and
             all(c in ' x' for c in row[1] if is_printable_basic_latin(c))):
-        pass  # Signs missng in the Sinacherib font.
+        pass  # Signs missing in the Sinacherib font.
+      elif meszl == '58':
+        continue  # 𒅗×𒌍 is an unencoded variant of 𒅗×𒊓 = 𒅾.
       elif meszl in (
           '27',
           '36',  # HZL 137: unbekannte Bedeutung (Gegenstand aus Holz).
+          '40',  # HZL 138: Gerät?, Behälter? aus Kupfer.
+          '41',  # HZL 139: ein Behälter aus Holz.
+          '55',
+          '67',  # HZL 150: Körperteilbezeichnung?
+          '70',  # HZL 142: u.B.
         ):
         # Signs from https://www.unicode.org/wg2/docs/n4277.pdf.
         pass
+      elif 'BAD squared' in row[2]:
+        # We unify BAD squared with IDIM over IDIM squared, since IDIM is part
+        # of BAD in both Labat and Borger, and both sign lists mention only a
+        # squared BAD, not a squared IDIM over IDIM; indeed the latter has no
+        # reading in Šašková.
+        pass
+      elif row[2].startswith('NUN crossing NUN.LAGAR over LAGAR'):
+        continue  # Unified with TUR3 over TUR3.
+      elif row[2].startswith('ŠIR over ŠIR.BUR over BUR'):
+        pass  # Sign missing in the Sinacherib font.
       else:
         raise ValueError(row)
 
@@ -191,8 +208,13 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
       processed_readings = ''
       depth = 0
       sign = row[0]
-      # For some reason Šašková does not use 𒌍, which was there in the initial
-      # Unicode 5.0 character set.
+      # Unify BAD squared and IDIM over IDIM squared, see above.
+      sign = sign.replace('.𒁁squared', '𒅄')
+      sign = sign.replace('𒁁squared', '𒅄')
+      sign = sign.replace('𒍗squared', '𒅄')
+
+      # For some reason Šašková does not always use 𒌍, which was there in the
+      # initial Unicode 5.0 character set.
       sign = sign.replace('𒌋𒌋𒌋', '𒌍')
 
       # Use the signs from https://www.unicode.org/wg2/docs/n4277.pdf.
@@ -203,6 +225,11 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         sign = '𒎗'
       sign = sign.replace('𒅗 x 𒌅', '𒎆')
       sign = sign.replace('𒅗 x 𒌫', '𒎇')
+      sign = sign.replace('𒅗 x 𒉺', '𒎄')
+      sign = sign.replace('𒅗 x 𒄑', '𒎀')
+      sign = sign.replace('𒅗 x 𒄯', '𒎂')
+      sign = sign.replace('𒅗 x 𒐋', '𒍿')
+      sign = sign.replace('𒅗 x 𒈝', '𒎃')
 
       if any(is_printable_basic_latin(c) for c in sign):
         raise ValueError(sign)
