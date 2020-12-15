@@ -108,6 +108,7 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
           '55',
           '67',  # HZL 150: Körperteilbezeichnung?
           '70',  # HZL 142: u.B.
+          '156',
         ):
         # Signs from https://www.unicode.org/wg2/docs/n4277.pdf.
         pass
@@ -118,9 +119,19 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         # reading in Šašková.
         pass
       elif row[2].startswith('NUN crossing NUN.LAGAR over LAGAR'):
-        continue  # Unified with TUR3 over TUR3.
+        continue  # Unified with TUR3 over TUR3, we keep the one with readings.
+      elif row[2].startswith('TUR3 over TUR3\n'):
+        pass  # See above.
       elif row[2].startswith('ŠIR over ŠIR.BUR over BUR'):
         pass  # Sign missing in the Sinacherib font.
+      elif ('𒊩𒌆' in row[0] and
+            row[0] in row[1] and
+            row[0].replace('𒊩𒌆', '𒊩𒈠') in row[1]
+            and 'Neo-Assyrian:' in row[1]):
+        # Prior to the encoding of NIN one had to use either MUNUS.TUG₂ or
+        # MUNUS.MA, the latter being the neo-Assyrian style.  Šašková gives
+        # both, with a note.
+        pass
       else:
         raise ValueError(row)
 
@@ -213,13 +224,25 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
       sign = sign.replace('𒁁squared', '𒅄')
       sign = sign.replace('𒍗squared', '𒅄')
 
+      if row[2].startswith('TUR3 over TUR3\n'):
+        # Borger writes, in Kap. II, entry 147:
+        #   Auch TÙR [over] TÙR, genauer [sign] =
+        #   NUN [over] NUN gekreuzt (n107) - LAGAR [over] LAGAR.
+        # Accordingly, calling this sign TUR3 over TUR3 is imprecise,
+        # and certainly it should be unified with
+        #   𒉬 NUN CROSSING NUN LAGAR OVER LAGAR,
+        # which matches the decomposition given by Borger and has no readings in
+        # Šašková.
+        sign = '𒉬'
+
       # For some reason Šašková does not always use 𒌍, which was there in the
       # initial Unicode 5.0 character set.
       sign = sign.replace('𒌋𒌋𒌋', '𒌍')
 
       # Use the signs from https://www.unicode.org/wg2/docs/n4277.pdf.
-      # Global substitutions: U.U and ME.EŠ are always MAN and MEŠ.
-      sign = sign.replace('𒌋𒌋', '𒎙').replace('𒈨𒌍', '𒎌')
+      # Global substitutions: U.U, ME.EŠ, MUNUS.TUG₂ are always MAN, MEŠ, NIN
+      # respectively.
+      sign = sign.replace('𒌋𒌋', '𒎙').replace('𒈨𒌍', '𒎌').replace('𒊩𒌆', '𒎏')
       # Disunification of ŠAR₂ 𒊹 and TI₂ 𒎗.
       if meszl == '633':
         sign = '𒎗'
@@ -230,6 +253,7 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
       sign = sign.replace('𒅗 x 𒄯', '𒎂')
       sign = sign.replace('𒅗 x 𒐋', '𒍿')
       sign = sign.replace('𒅗 x 𒈝', '𒎃')
+      sign = sign.replace('𒈹 x 𒍝', '𒎍')
 
       if any(is_printable_basic_latin(c) for c in sign):
         raise ValueError(sign)
