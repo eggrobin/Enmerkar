@@ -85,7 +85,9 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
 
   for row in reader:
     meszl = row[3]
-    if any(is_printable_basic_latin(c) for c in row[0] + row[1]) or row[0] != row[1]:
+    if (not row[0] or
+        any(is_printable_basic_latin(c) for c in row[0] + row[1]) or
+        row[0] != row[1]):
       if meszl == '003+003\n(839+756+003+003)':
         # A spelling of Idiqlat in the MesZL glossary.  No sign name, just type
         # it as ḪAL.ḪAL.
@@ -94,9 +96,9 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         pass  # UŠUMₓ is missing in the Sinacherib font.
       elif row[2].startswith('ARAD x ŠE\n'):
         continue  # Labat has ìr×še but Borger does not; it is not encoded.
-      elif (row[0] and
-            all(not is_printable_basic_latin(c) for c in row[0]) and
-            all(c in ' x' for c in row[1] if is_printable_basic_latin(c))):
+      elif row[0] and all(not is_printable_basic_latin(c) for c in row[0]) and (
+          all (word.strip() in ('', '.', 'x', 'over', 'crossing')
+               for word in re.split('[^!-~]', row[1]))):
         pass  # Signs missing in the Sinacherib font.
       elif meszl == '58':
         continue  # 𒅗×𒌍 is an unencoded variant of 𒅗×𒊓 = 𒅾.
@@ -109,6 +111,7 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
           '67',  # HZL 150: Körperteilbezeichnung?
           '70',  # HZL 142: u.B.
           '156',
+          '194',
         ):
         # Signs from https://www.unicode.org/wg2/docs/n4277.pdf.
         pass
@@ -132,13 +135,28 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         # MUNUS.MA, the latter being the neo-Assyrian style.  Šašková gives
         # both, with a note.
         pass
+      elif meszl == '170 (also 250)':
+        # Borger lists two variant glyphs of TA×ḪI as separate entries, the
+        # second one being only a reference to the former.  Only one is
+        # encoded.
+        pass
+      elif row[2].startswith('SA.NI'):
+        pass # Labat-only sign, no neo-Assyrian form.
+      elif meszl == '177':
+        # Borger writes USAN (GÚ×NUN, GÚ-NUN), and thus Šašková gives both
+        # 𒄛 and 𒄘𒉣.  On the other hand for 178, Borger writes
+        # DUR (GÚ×GAG, GÚ-GAG) yet Šašková gives only 𒄙 and lets the
+        # neo-Assyrian font handle it by rendering that as GÚ-GAG.  Leave the
+        # variant of USAN up to the font here too; Borger gives only one
+        # Assyrian glyph anyway.
+        pass
+      elif meszl == '189':
+        # As far as I can tell 𒊕×𒉌 SAG×NI is not encoded.
+        continue
       else:
         raise ValueError(row)
 
-
       row_index += 1
-      if not row[0]:
-        continue
       if meszl in meszl_seen:
         meszl_seen[meszl] += 1
         meszl += '/%d' % meszl_seen[meszl]
@@ -235,6 +253,12 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         # Šašková.
         sign = '𒉬'
 
+      # Only one variant of TA×ḪI is encoded.
+      sign = sign.replace('𒋭\nalso\n𒋫 x 𒄭', '𒋭')
+
+      # See the comment about USAN above.
+      sign = sign.replace('𒄛\nand\n𒄘𒉣', '𒄛')
+
       # For some reason Šašková does not always use 𒌍, which was there in the
       # initial Unicode 5.0 character set.
       sign = sign.replace('𒌋𒌋𒌋', '𒌍')
@@ -243,9 +267,11 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
       # Global substitutions: U.U, ME.EŠ, MUNUS.TUG₂ are always MAN, MEŠ, NIN
       # respectively.
       sign = sign.replace('𒌋𒌋', '𒎙').replace('𒈨𒌍', '𒎌').replace('𒊩𒌆', '𒎏')
+
       # Disunification of ŠAR₂ 𒊹 and TI₂ 𒎗.
       if meszl == '633':
         sign = '𒎗'
+
       sign = sign.replace('𒅗 x 𒌅', '𒎆')
       sign = sign.replace('𒅗 x 𒌫', '𒎇')
       sign = sign.replace('𒅗 x 𒉺', '𒎄')
@@ -254,6 +280,7 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
       sign = sign.replace('𒅗 x 𒐋', '𒍿')
       sign = sign.replace('𒅗 x 𒈝', '𒎃')
       sign = sign.replace('𒈹 x 𒍝', '𒎍')
+      sign = sign.replace('𒊕 x 𒅊', '𒎖')
 
       if any(is_printable_basic_latin(c) for c in sign):
         raise ValueError(sign)
