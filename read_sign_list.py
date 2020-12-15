@@ -112,6 +112,8 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
           '70',  # HZL 142: u.B.
           '156',
           '194',
+          '224',
+          '243',
         ):
         # Signs from https://www.unicode.org/wg2/docs/n4277.pdf.
         pass
@@ -140,6 +142,11 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         # second one being only a reference to the former.  Only one is
         # encoded.
         pass
+      elif meszl == '250':
+        continue  # That one is a reference without readings in Šašková.
+      elif meszl == '250 (also 170)':
+        # Same as '170 (also 250)', except there is one more reading.
+        pass
       elif row[2].startswith('SA.NI'):
         pass # Labat-only sign, no neo-Assyrian form.
       elif meszl == '177':
@@ -151,8 +158,71 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         # Assyrian glyph anyway.
         pass
       elif meszl == '189':
-        # As far as I can tell 𒊕×𒉌 SAG×NI is not encoded.
+        # As far as I can tell 𒊕×𒉌 SAG×NI is not encoded.  It is attested,
+        # e.g., https://cdli.ucla.edu/search/archival_view.php?ObjectID=P217023.
+        # Its reading is unknown.  It probably should be encoded.
         continue
+      elif meszl == '231':
+        # Same story for 𒀊×𒌋 AB×U, attested, e.g., in
+        # https://cdli.ucla.edu/search/archival_view.php?ObjectID=P227527.
+        # Unclear whether AB×AŠ is actually a thing, both are under 231 anyway.
+        continue
+      elif meszl == '233':
+        # Similarly for 𒀊×𒆠 AB×KI, but if I am reading Borger correctly that
+        # one is only attested in one or two tablets (MSL 16 218 211, whatever
+        # that means exactly).  Nothing on CDLI.
+        continue
+      elif meszl == '208':
+        # As far as I can tell NIQ₃ is not encoded; is it even a thing? It comes
+        # with a great deal of question marks in the litterature.
+        continue
+      elif meszl == '240':
+        # UM×U-LAGAB, URUDU×U-LAGAB, not encoded.
+        continue
+      elif row[2].startswith('URUDU x U'):
+        # Unencoded variant of UM×U, same number in Borger.
+        continue
+      elif row[2].startswith('DUB x ŠA3'):
+        # DUB×ŠA₃ is not encoded, UM×ŠA₃ is.  The latter reading is also
+        # mentioned as Landsberger’s in Borger’s entry 244.  Šašková writes “old
+        # variant of DUB x ŠA3?” in her entry for UM×ŠA₃; just unify them.
+        pass
+      elif row[2].startswith('DUB x LAGAB'):
+        # Exact same story with DUB×LAGAB vs. UM×LAGAB, 245.
+        pass
+      elif meszl = '254':
+        # KAM₂ has the same neo-Assyrian glyph as GAN (253).  In Labat (143),
+        # the Babylonian glyph is shown as a tilted version of that neo-Assyrian
+        # glyph.  That tilted glyph also appears in Borger as KAMᵛ, in the entry
+        # 595 for KAM, and in the middle Assyrian section of Labat’s entry 406
+        # for KAM.  This includes neo-Babylonian, see, e.g.,
+        # https://cdli.ucla.edu/search/archival_view.php?ObjectID=P285452.
+        # Unicode has U+1219A (KAM2) 𒆚 whose reference glyph is tilted.
+        # This would match the Babylonian glyphs for KAM₂.
+        # Šašková’s list exclaims that KAM2 is the wrong name for that
+        # character, i.e., that it represents KAMᵛ.  There isn’t much intrinsic
+        # to the standard that implies that: the reference glyphs are
+        # Babylonian,.so KAM₂ would have this glyph, and KAMᵛ would be an
+        # unencoded variant.  It is unclear whether KAMᵛ is a thing outside of
+        # Assyrian styles, so it may well be that it need not be encoded by the
+        # standards of Unicode.
+        # Sadly, things are muddied by the homophones of DIM, where GAN vs. KAMᵛ
+        # distinguishes DIM₉ vs. DIM₁₁ and DIM₈ vs DIM₁₀.
+        # DIM₁₀ and DIM₁₁ (the ones with a tilted KAM) are attested in
+        # neo-Assyrian, e.g.,
+        # https://cdli.ucla.edu/search/archival_view.php?ObjectID=P396336,
+        # https://cdli.ucla.edu/search/archival_view.php?ObjectID=P285450,
+        # so this is not KAM₂ (which would be the same as GAN in neo-Assyrian).
+        # In order to distinguish the DIM homophones, either a new character
+        # KAMᵛ would need to be encoded, or we should assume that the Unicode
+        # U+1219A (KAM2) represents KAMᵛ.
+        # To help muddy waters, the semantic distinction between KAM₂ and KAMᵛ
+        # does not seem all that great: both are used as determinatives after
+        # ordinals, both are used as sumerograms for the same words, and it is
+        # not hard to find transcriptions using KAM₂ for what Borger would call
+        # KAMᵛ (i.e., the tilted sign in neo-Assyrian), e.g.,
+        # https://cdli.ucla.edu/search/archival_view.php?ObjectID=P398808.
+        pass
       else:
         raise ValueError(row)
 
@@ -255,9 +325,14 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
 
       # Only one variant of TA×ḪI is encoded.
       sign = sign.replace('𒋭\nalso\n𒋫 x 𒄭', '𒋭')
+      sign = sign.replace('𒋫 x 𒄭\nalso\n𒋭', '𒋭')
 
       # See the comment about USAN above.
       sign = sign.replace('𒄛\nand\n𒄘𒉣', '𒄛')
+
+      # See the comments about 244 and 245 above.
+      sign = sign.replace('𒁾 x𒊮', '𒌠')
+      sign = sign.replace('𒁾 x𒆸', '𒌞')
 
       # For some reason Šašková does not always use 𒌍, which was there in the
       # initial Unicode 5.0 character set.
@@ -281,6 +356,8 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
       sign = sign.replace('𒅗 x 𒈝', '𒎃')
       sign = sign.replace('𒈹 x 𒍝', '𒎍')
       sign = sign.replace('𒊕 x 𒅊', '𒎖')
+      sign = sign.replace('𒀊 x 𒉣', '𒍰')
+      sign = sign.replace('𒁾 x 𒊺', '𒍶')
 
       if any(is_printable_basic_latin(c) for c in sign):
         raise ValueError(sign)
