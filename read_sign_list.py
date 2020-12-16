@@ -227,6 +227,9 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
       elif meszl == '276':
         # Borger writes “Sehr unsicher.” of EZEN×SI?, it is not encoded.
         continue
+      elif meszl == '287':
+        # See the comments about DUN₃ below.
+        pass
       else:
         raise ValueError(row)
 
@@ -405,6 +408,11 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
       sign = sign.replace('𒂆', '𒂇')
       # Same for a composite sign.
       sign = sign.replace('𒂧', '𒂨')
+      # Use 𒂆 wherever Šašková uses 𒂅, we will disunify them below.
+      sign = sign.replace('𒂅', '𒂆')
+
+      # Now that we use the correct sign for GIN₂, we have a sign for EZEN×GIN₂.
+      sign = sign.replace('𒂡 x 𒂆', '𒂧')
 
       if not sign or any(is_printable_basic_latin(c) for c in sign):
         raise ValueError(row)
