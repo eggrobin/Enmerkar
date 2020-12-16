@@ -230,6 +230,9 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
       elif meszl == '287':
         # See the comments about DUN₃ below.
         pass
+      elif 'KASKAL over KASKAL.LAGAB over LAGAB':
+        # It appears that šubtu₄ is not encoded.
+        continue
       else:
         raise ValueError(row)
 
