@@ -251,7 +251,7 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
               '848', '45', '84', '129', '187', '193', '202', '223+889+552',
               '266 (sign LUGAL)', '302+596', '353/2', '469+809+598+590/2',
               '491+380', '491+748', '491+839', '541+184', '545', '724+136',
-              '737+755', '839+010+387', '839+756+202',
+              '737+755', '839+010+387', '839+756+202', '303'
           ):
         readings += ')'
       elif meszl in ('001+183', '280 (sign EZEN x MIR)', '575+183', '748+183'):
@@ -372,6 +372,8 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
       sign = sign.replace('𒆚', '𒄰')
       if meszl == '254':
         sign = '𒆚'
+
+      # TODO(egg): investigate 𒌗 vs. 𒌚 for ITI, including in other signs.
 
       # Unicode has three signs DUN₃ 𒂅, DUN₃ gunû 𒂆, DUN₃ gunû gunû 𒂇; the
       # reference glyphs match the descriptions, they are increasingly gunûd.
