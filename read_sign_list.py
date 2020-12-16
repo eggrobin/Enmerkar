@@ -370,6 +370,42 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
       if meszl == '254':
         sign = '𒆚'
 
+      # Unicode has three signs DUN₃ 𒂅, DUN₃ gunû 𒂆, DUN₃ gunû gunû 𒂇; the
+      # reference glyphs match the descriptions, they are increasingly gunûd.
+      # In neo-Assyrian (or indeed in old Assyrian or old Babylonian) these
+      # correspond to two signs, GIN₂ (which has the reading dun₃), and MIR,
+      # where MIR=GIN₂ gunû (Borger 556).
+      # Šašková assumes that the code point for dun₃(GIN₂) is DUN₃ 𒂅,
+      # therefore that MIR = DUN₃ gunû 𒂆, and has no idea what to make of
+      # DUN₃ gunû gunû 𒂇.
+      # Looking at Labat is enlightening.  The entry 347 for MIR shows two
+      # precursor classical sumerian glyphs, one of which is LAK 667 (resembling
+      # the reference glyph for 𒂆), and the other one a seemingly unrelated
+      # LAK 154; from LAK 667 Labat has an arrow redirecting to entry 595, while
+      # LAK 154 morphs into something related to 𒂆 and becomes MIR, one of
+      # whose old Babylonian glyphs is the reference glyph for 𒂇.
+      # Meanwhile at entry 595 (TUN₃), Labat gives two precursor glyphs
+      # resembling the reference glyphs for 𒂅 and 𒂆 (LAK 666 and 667),
+      # merging into the latter in Assyrian and Babylonian.
+      # It therefore appears that:
+      # — LAK 666 is encoded as 𒂅;
+      # — LAK 667 is encoded as 𒂆 = LAK 666 gunû;
+      # — LAK 154 is encoded as 𒂇 = LAK 667 gunû;
+      # — LAK 666 and LAK 667 merge (with the glyph of LAK 667);
+      # — the result of this merger is read dun₃ in neo-Assyrian, but it looks
+      #   like DUN₃ gunû.
+      # We thus get MIR = 𒂇 rather than 𒂆, but the readings of GIN₂ have to
+      # be split between DUN₃ 𒂅 and DUN₃ gunû 𒂆 (which will have the same
+      # glyph any Assyrian or Babylonian font).
+      # The conventions used by Oracc are consistent with the above analysis.
+      # The splitting of readings between 𒂅 and 𒂆 is largely a matter of
+      # sumerology; we defer to Oracc without further investigation.
+      #
+      # Šašková consistently uses 𒂆 for MIR, replace that by 𒂇.
+      sign = sign.replace('𒂆', '𒂇')
+      # Same for a composite sign.
+      sign = sign.replace('𒂧', '𒂨')
+
       if not sign or any(is_printable_basic_latin(c) for c in sign):
         raise ValueError(row)
 
