@@ -200,7 +200,7 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         # for KAM.  Borger gives no Babylonian glyph for KAM₂, so it is possible
         # that he calls any tilted GAN KAMᵛ.
         # Unicode has U+1219A (KAM2) 𒆚 whose reference glyph is tilted.
-        # This would match the Babylonian glyphs for KAM₂.
+        # This would match the Babylonian glyphs for KAM₂, or the glyph KAMᵛ.
         # Šašková’s list exclaims that KAM2 is the wrong name for that
         # character, i.e., that it represents KAMᵛ.  There isn’t much intrinsic
         # to the standard that implies that: the reference glyphs are
@@ -208,29 +208,21 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         # unencoded variant.  It is unclear whether KAMᵛ is a thing outside of
         # Assyrian styles, so it may well be that it need not be encoded by the
         # standards of Unicode.
-        # Sadly, things are muddied by the homophones of DIM, where GAN vs. KAMᵛ
-        # distinguishes DIM₉ vs. DIM₁₁ and DIM₈ vs DIM₁₀.
-        # DIM₁₀ and DIM₁₁ (the ones with a tilted KAM) are attested in
-        # neo-Assyrian, e.g.,
-        # https://cdli.ucla.edu/search/archival_view.php?ObjectID=P396336,
-        # https://cdli.ucla.edu/search/archival_view.php?ObjectID=P285450,
-        # so this is not KAM₂ (which would be the same as GAN in neo-Assyrian).
-        # In order to distinguish the DIM homophones, either a new character
-        # KAMᵛ would need to be encoded, or we should assume that the Unicode
-        # U+1219A (KAM2) represents KAMᵛ.
-        # For further confusion, the semantic distinction between KAM₂ and KAMᵛ
-        # does not seem all that great: both are used as determinatives after
-        # ordinals, both are used as sumerograms for the same words, and it is
-        # not hard to find transcriptions using KAM₂ for what Borger would call
-        # KAMᵛ (i.e., the tilted sign in neo-Assyrian), e.g.,
-        # https://cdli.ucla.edu/search/archival_view.php?ObjectID=P398808.
-        #
-        # We decide that what ultimately matters is what is on the tablets:
-        # — KAMᵛ is U+1219A (KAM2),
-        # — KAM₂ and associated readings are a readings of U+1219A (KAM2),
-        # — KAM₂ and associated readings are neo-Assyrian readings of GAN.
-        # Since this is an Akkadian IME, not specifically a neo-Assyrian one,
-        # KAM₂ is primarily KAM2, and GAN as a variant (input [kam2v]).
+        # Indeed KAM appears to be a common transcription of KAMᵛ, and KAM
+        # written 𒄭×𒁁 seems rare in neo-Assyrian.
+        # Where Šašková goes with
+        # 𒄰 = ḪI×BAD = KAM ≠ KAMᵛ = U+1219A 𒆚, KAM₂ = GAN or unencoded,
+        # we choose
+        # 𒄰 = ḪI×BAD = KAM = KAMᵛ ≠ KAM₂ = U+1219A 𒆚 KAM2 ≠ GAN.
+        # This approach is etymologically sound. It also has the advantage of
+        # being consistent with Oracc conventions, which, being maintained under
+        # the auspices of Tinney who co-authored the Unicode proposals, are
+        # probably sound.
+        # On the flipside, this means that for neo-Assyrian purposes, a font is
+        # needed that uses the Babylonian glyph for KAM₂ as its glyph for KAM,
+        # and the same neo-Assyrian glyph for both KAM₂ and GAN.
+        # Then again neo-Assyrian badly needs a new font anyway, all the
+        # existing ones are stuck sometime before 2014.
         pass
       elif meszl == '276':
         # Borger writes “Sehr unsicher.” of EZEN×SI?, it is not encoded.
@@ -374,82 +366,80 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
       sign = sign.replace('𒂡 x 𒊺', '𒍸')
 
       # See the extensive discussion of KAM₂ vs. KAMᵛ above.
+      sign = sign.replace('𒆚', '𒄰')
       if meszl == '254':
-        sign_variants = ('𒆚', '𒃶')
-      else:
-        sign_variants = (sign,)
+        sign = '𒆚'
 
-      for sign in sign_variants:
-        if not sign or any(is_printable_basic_latin(c) for c in sign):
-          raise ValueError(row)
+      if not sign or any(is_printable_basic_latin(c) for c in sign):
+        raise ValueError(row)
 
-        first_reading = Reading(sign, row_index)
-        first_reading.value = row[2].split('\n')[0]
+      first_reading = Reading(sign, row_index)
+      first_reading.value = row[2].split('\n')[0]
 
-        if sign == '𒇽𒇽' and first_reading.value == 'LU2 over LU2':
-          # Not encoded, same reading as LU2.LU2 which is in the list.
-          continue
+      if sign == '𒇽𒇽' and first_reading.value == 'LU2 over LU2':
+        # Not encoded, same reading as LU2.LU2 which is in the list.
+        continue
 
-        sign_readings = [first_reading]
-        current_reading = first_reading
-        for c in readings:
-          processed_readings += c
-          if depth == 1 and c in ',;':
+      sign_readings = [first_reading]
+      current_reading = first_reading
+      for c in readings:
+        processed_readings += c
+        if depth == 1 and c in ',;':
+          current_reading = Reading(sign, row_index)
+          sign_readings.append(current_reading)
+          continue  # Consume delimiters between comments.
+        if c == '(':
+          depth += 1
+          if depth in (1, 2):
+            continue  # Consume the initial & start-of-comment parentheses.
+        elif c == ')':
+          depth -= 1
+          if depth in (0, 1):
+            continue  # Consume the final & end-of-comment parentheses.
+
+        if depth == 1:
+          if current_reading is first_reading:
             current_reading = Reading(sign, row_index)
             sign_readings.append(current_reading)
-            continue  # Consume delimiters between comments.
-          if c == '(':
-            depth += 1
-            if depth in (1, 2):
-              continue  # Consume the initial & start-of-comment parentheses.
-          elif c == ')':
-            depth -= 1
-            if depth in (0, 1):
-              continue  # Consume the final & end-of-comment parentheses.
+          current_reading.value += c
+          if current_reading.comment:
+            raise ValueError(
+                'Reading %s restarts after comment %s [MesZL %s]' % (
+                    current_reading.value, current_reading.comment, meszl))
+        elif depth > 1:
+          current_reading.comment += c
+        else:
+          raise ValueError('surfaced before end of readings: %s[!] %r' % (processed_readings, row))
+      if depth != 0:
+        raise ValueError('depth=%d at end of readings %r' % (depth, row))
+      for reading in sign_readings:
+        reading.normalize()
+      # We handle numbers ourselves, and thus discard any numerical readings
+      # found in Šašková.
+      sign_readings = [
+          reading for reading in sign_readings
+          if any (c.isalpha() for c in reading.value)]
 
-          if depth == 1:
-            if current_reading is first_reading:
-              current_reading = Reading(sign, row_index)
-              sign_readings.append(current_reading)
-            current_reading.value += c
-            if current_reading.comment:
-              raise ValueError(
-                  'Reading %s restarts after comment %s [MesZL %s]' % (
-                      current_reading.value, current_reading.comment, meszl))
-          elif depth > 1:
-            current_reading.comment += c
-          else:
-            raise ValueError('surfaced before end of readings: %s[!] %r' % (processed_readings, row))
-        if depth != 0:
-          raise ValueError('depth=%d at end of readings %r' % (depth, row))
-        for reading in sign_readings:
-          reading.normalize()
-        # We handle numbers ourselves, and thus discard any numerical readings
-        # found in Šašková.
-        sign_readings = [
-            reading for reading in sign_readings
-            if any (c.isalpha() for c in reading.value)]
+      # Deal with the disunification of 60 and 1 in Unicode.
+      for reading in sign_readings:
+        # Readings given for 60 in MesZL 748.
+        if reading.sign == '𒁹' and reading.value in ('GEŠ2', 'GIŠ2', 'GEŠTA'):
+          reading.sign = '𒐕'
+        # Labat-only readings for 60n.
+        if reading.sign == '𒐊' and reading.value == 'GEŠIA':
+          reading.sign = '𒐙'
+        if reading.sign == '𒐋' and reading.value == 'GEŠAŠ':
+          reading.sign = '𒐚'
+        if reading.sign in '𒐌𒑂' and reading.value == 'GEŠUMUN':
+          reading.sign = '𒐛'
+        if reading.sign in '𒐍𒑄' and reading.value == 'GEŠUSSU':
+          reading.sign = '𒐜'
+        if reading.sign == '𒑆' and reading.value == 'GEŠILIMMU':
+          reading.sign = '𒐝'
 
-        # Deal with the disunification of 60 and 1 in Unicode.
-        for reading in sign_readings:
-          # Readings given for 60 in MesZL 748.
-          if reading.sign == '𒁹' and reading.value in ('GEŠ2', 'GIŠ2', 'GEŠTA'):
-            reading.sign = '𒐕'
-          # Labat-only readings for 60n.
-          if reading.sign == '𒐊' and reading.value == 'GEŠIA':
-            reading.sign = '𒐙'
-          if reading.sign == '𒐋' and reading.value == 'GEŠAŠ':
-            reading.sign = '𒐚'
-          if reading.sign in '𒐌𒑂' and reading.value == 'GEŠUMUN':
-            reading.sign = '𒐛'
-          if reading.sign in '𒐍𒑄' and reading.value == 'GEŠUSSU':
-            reading.sign = '𒐜'
-          if reading.sign == '𒑆' and reading.value == 'GEŠILIMMU':
-            reading.sign = '𒐝'
-
-        for reading in sign_readings:
-          readings_by_value.setdefault(reading.value, []).append(reading)
-          readings_by_sign.setdefault(reading.sign, []).append(reading)
+      for reading in sign_readings:
+        readings_by_value.setdefault(reading.value, []).append(reading)
+        readings_by_sign.setdefault(reading.sign, []).append(reading)
       ok_entries += 1
 
 # Insert the numbers which we listed ourselves.
