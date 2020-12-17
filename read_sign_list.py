@@ -564,7 +564,11 @@ for value, readings in readings_by_value.items():
                   # MesZL and Labat readings in agreement, with a ? from MesZL.
                   ('GAMBI', 'MUNUS.UŠ.DI'),
                   # MesZL 905 and 906 unified in Unicode (as in Labat).
-                  ('MUR7', 'SIG4')
+                  ('MUR7', 'SIG4'),
+                  # Duplicate entries for variants of TA×ḪI unified by Unicode
+                  # as 𒋭.  They differ only by their comment.
+                  ('ALAMMUŠ', 'LAL3'),
+                  ('ALAMUŠ', 'LAL3'),
               )):
             print_readings(value, readings, by_source=True)
             raise ValueError('Inconsistent duplicate readings')
