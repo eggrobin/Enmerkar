@@ -124,6 +124,12 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
           '282',
           '319/2',
           '322',
+          '393',
+          '408/2',
+          '454',
+          '488',
+          '518',
+          '524',
         ):
         # Signs from https://www.unicode.org/wg2/docs/n4277.pdf.
         pass
@@ -267,6 +273,55 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         # it is easy to find, e.g., NINDA₂×ŠE AN with the reading ša₁₀:
         # https://cdli.ucla.edu/search/archival_view.php?ObjectID=P345814
         continue
+      elif meszl in ('334', '335', '337'):
+        # More unencoded 𒉒×something signs with no readings.
+        continue
+      elif meszl == '355':
+        # 𒌈 gunû and ×𒃸, not encoded.
+        continue
+      elif meszl == '364':
+        # Borger writes “Wenn es ŠIM×BÚR gegeben hat […]”.  Not encoded.
+        continue
+      elif meszl == '370':
+        continue  # ŠIM×PI, not encoded.
+      elif ('𒉌𒌓' in row[0] and
+            row[0] in row[1] and
+            row[0].replace('𒉌𒌓', '𒉌𒂟') in row[1]
+            and 'Neo-Assyrian:' in row[1]):
+        # Prior to the encoding of NA₄ one had to use either NI.UD or NI.ERIM,
+        # the latter being the neo-Assyrian style.  Šašková gives both, with a
+        # note.
+        pass
+      elif row[2].startswith('GA2 x EZEN'):
+        # Labat-only variant of 𒃢=GA₂×PA, in parentheses in Labat.
+        # Not encoded.
+        continue
+      elif meszl == '423':
+        continue  # Borger writes “unsicher”; not encoded.
+      elif meszl == '436':
+        # Unencoded neo-Assyrian ligature of NI and GIŠ, with the neo-Assyrian
+        # glyph of KISAL.
+        continue
+      elif meszl in ('456', '456/2'):
+        # A sign with uncertain decompositions in Borger, Proto-Ea only.  Not
+        # encoded.
+        continue
+      elif meszl == '460/2':
+        continue  # An unencoded variant of 𒁦.
+      elif '𒁃' in row[0]:
+        # BAḪAR₂ tends to be decomposed (into 𒂁𒋡𒁓) in Assyrian sign lists,
+        # but it is its own thing earlier (LAK742) and is encoded separately.
+        pass
+      elif meszl == '473':
+        continue  # GU₄ × KASKAL, not encoded.
+      elif meszl == '488/2':
+        continue  # Alternative decomposition of 𒎘.
+      elif row[2].startswith('SANGA2\n'):
+        # In neo-Assyrian 𒊫 looks like 𒅍𒈣𒂀, but Sinacherib does not
+        # support it.
+        pass
+      elif meszl == '520':
+        continue  # Lots of question marks in Borger; not encoded.
       else:
         raise ValueError(row)
 
@@ -277,7 +332,7 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
       readings = '()'
     # Mismatched parentheses; by MesZL number; entries with identical MesZL number
     # are indexed after the slash.
-    if meszl in ('69', '598/5'):
+    if meszl in ('69', '598/5', '454'):
       readings = '(' + readings
     elif meszl in (
             '848', '45', '84', '129', '187', '193', '202', '223+889+552',
@@ -286,7 +341,8 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
             '737+755', '839+010+387', '839+756+202', '303'
         ):
       readings += ')'
-    elif meszl in ('001+183', '280 (sign EZEN x MIR)', '575+183', '748+183'):
+    elif meszl in ('001+183', '280 (sign EZEN x MIR)', '575+183', '748+183',
+                   '493 (sign IL2)\nlater:\n493+201+565'):
       readings = '(' + readings + ')'
     elif meszl in ('242+753', '380+827', '546\nalso 485', '703/2', '883+149', '883+827'):
       if readings[-1] != ')':
@@ -378,9 +434,13 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
     sign = sign.replace('𒌋𒌋𒌋', '𒌍')
 
     # Use the signs from https://www.unicode.org/wg2/docs/n4277.pdf.
-    # Global substitutions: U.U, ME.EŠ, MUNUS.TUG₂ are always MAN, MEŠ, NIN
-    # respectively.
-    sign = sign.replace('𒌋𒌋', '𒎙').replace('𒈨𒌍', '𒎌').replace('𒊩𒌆', '𒎏')
+    # Global substitutions: U.U, ME.EŠ, MUNUS.TUG₂, NI.UD are always MAN, MEŠ,
+    # NIN, NA₄ respectively.
+    sign = sign.replace(
+        '𒌋𒌋', '𒎙').replace(
+        '𒈨𒌍', '𒎌').replace(
+        '𒊩𒌆', '𒎏').replace(
+        '𒉌𒌓', '𒎎')
 
     # Disunification of ŠAR₂ 𒊹 and TI₂ 𒎗.
     if meszl == '633':
@@ -401,6 +461,16 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
     sign = sign.replace('𒂡 x 𒊺', '𒍸')
     sign = sign.replace('𒉒 x 𒁄', '𒎑')
     sign = sign.replace('𒉒 x 𒄀', '𒎒')
+    sign = sign.replace('𒂷 x 𒀭𒆕𒀀', '𒍹')
+    sign = sign.replace('𒂷 x 𒀾', '𒍺')
+    sign = sign.replace('𒁖𒆨 x 𒌑𒈦', '𒍳')
+    sign = sign.replace('𒌝 x 𒈨', '𒎘')
+    sign = sign.replace('𒈕 x 𒁁', '𒎉')
+    sign = sign.replace('𒇽 x 𒋗', '𒎋')
+
+    # Šašková writes (LU₂×EŠ₃).LAL, but this is actually LU₂×(EŠ₃.LAL), encoded
+    # in 2014.
+    sign = sign.replace('𒈀𒇲', '𒎊')
 
     # See the extensive discussion of KAM₂ vs. KAMᵛ above.
     sign = sign.replace('𒆚', '𒄰')
@@ -445,13 +515,20 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
     # Same for a composite sign.
     sign = sign.replace('𒂧', '𒂨')
     # Use 𒂆 wherever Šašková uses 𒂅, we will disunify them below.
+    # TODO(egg): actually disunify them.
     sign = sign.replace('𒂅', '𒂆')
 
     # Now that we use the correct sign for GIN₂, we have a sign for EZEN×GIN₂.
     sign = sign.replace('𒂡 x 𒂆', '𒂧')
 
+    # Do not decompose 𒁃.
+    sign = sign.replace('𒂁𒋡𒁓', '𒁃')
+    identical_alternatives = re.match('^([^\0-\ff]*)(,\n|\nor\n)\\1$', sign)
+    if '𒁃' in sign and identical_alternatives:
+      sign = identical_alternatives.groups()[0]
+
     if not sign or any(is_printable_basic_latin(c) for c in sign):
-      raise ValueError(row)
+      raise ValueError('sign = "%s", in row %s' % (sign, row))
 
     first_reading = Reading(sign, row_index)
     first_reading.value = row[2].split('\n')[0]
