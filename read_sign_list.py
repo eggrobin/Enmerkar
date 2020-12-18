@@ -170,10 +170,10 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         # e.g., https://cdli.ucla.edu/search/archival_view.php?ObjectID=P217023.
         # Its reading is unknown.  It probably should be encoded.
         continue
-      elif meszl == '231':
+      elif meszl in ('231', '231/2'):
         # Same story for 𒀊×𒌋 AB×U, attested, e.g., in
         # https://cdli.ucla.edu/search/archival_view.php?ObjectID=P227527.
-        # Unclear whether AB×AŠ is actually a thing, both are under 231 anyway.
+        # Unclear whether AB×AŠ is actually a thing; both are under 231.
         continue
       elif meszl == '233':
         # Similarly for 𒀊×𒆠 AB×KI, but if I am reading Borger correctly that
@@ -184,7 +184,7 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         # As far as I can tell NIQ₃ is not encoded; is it even a thing? It comes
         # with a great deal of question marks in the litterature.
         continue
-      elif meszl == '240':
+      elif meszl in ('240', '240/2'):
         # UM×U-LAGAB, URUDU×U-LAGAB, not encoded.
         continue
       elif row[2].startswith('URUDU x U'):
