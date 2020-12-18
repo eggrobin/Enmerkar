@@ -85,6 +85,12 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
 
   for row in reader:
     meszl = row[3]
+    if meszl in meszl_seen:
+      meszl_seen[meszl] += 1
+      meszl += '/%d' % meszl_seen[meszl]
+    else:
+      meszl_seen[meszl] = 1
+
     if (not row[0] or
         any(is_printable_basic_latin(c) for c in row[0] + row[1]) or
         row[0] != row[1]):
@@ -230,18 +236,13 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
       elif meszl == '287':
         # See the comments about DUN₃ below.
         pass
-      elif 'KASKAL over KASKAL.LAGAB over LAGAB':
+      elif row[2].startswith('KASKAL over KASKAL.LAGAB over LAGAB'):
         # It appears that šubtu₄ is not encoded.
         continue
       else:
         raise ValueError(row)
 
     row_index += 1
-    if meszl in meszl_seen:
-      meszl_seen[meszl] += 1
-      meszl += '/%d' % meszl_seen[meszl]
-    else:
-      meszl_seen[meszl] = 1
     readings = ' '.join(row[2].split('\n')[1:-1])
     uncommented_readings = ''
     if not readings:
