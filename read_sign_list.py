@@ -122,6 +122,8 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
           '243',
           '278',
           '282',
+          '319/2',
+          '322',
         ):
         # Signs from https://www.unicode.org/wg2/docs/n4277.pdf.
         pass
@@ -238,6 +240,32 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         pass
       elif row[2].startswith('KASKAL over KASKAL.LAGAB over LAGAB'):
         # It appears that šubtu₄ is not encoded.
+        continue
+      elif meszl == '319':
+        # An erroneous entry: The sign name is AL×KID₂ (which is MesZL 475,
+        # encoded), the given sign is 𒉒 × 𒋺 NINDA₂×KID₂, which is not present
+        # in Borger.
+        continue
+      elif meszl == '321':
+        # NINDA₂×BAN₂, not encoded.
+        continue
+      elif meszl == '325':
+        # NINDA₂×DUB, not encoded, has a question mark in Borger.
+        continue
+      elif meszl == '328':
+        # NINDA₂×ŠID, not encoded, also a question mark.
+        continue
+      elif meszl == '329':
+        # NINDA₂×U₂, not encoded, exists in Borger only with the mention
+        # “Aus ÚR×Ú zu erschliessen?”.
+        continue
+      elif meszl in ('333', '333v3', '333v7'):
+        # The ŠAM₂ variants are a mess. Perhaps they are supposed to be partly
+        # handled at the font level?
+        # TODO(egg): In any case it is incorrect to assign the readings only to
+        # the first variant, and then to discard them because it is not encoded;
+        # it is easy to find, e.g., NINDA₂×ŠE AN with the reading ša₁₀:
+        # https://cdli.ucla.edu/search/archival_view.php?ObjectID=P345814
         continue
       else:
         raise ValueError(row)
@@ -371,6 +399,8 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
     sign = sign.replace('𒁾 x 𒊺', '𒍶')
     sign = sign.replace('𒂡 x 𒄞', '𒍷')
     sign = sign.replace('𒂡 x 𒊺', '𒍸')
+    sign = sign.replace('𒉒 x 𒁄', '𒎑')
+    sign = sign.replace('𒉒 x 𒄀', '𒎒')
 
     # See the extensive discussion of KAM₂ vs. KAMᵛ above.
     sign = sign.replace('𒆚', '𒄰')
