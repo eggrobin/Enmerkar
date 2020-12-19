@@ -103,7 +103,7 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
       elif row[2].startswith('ARAD x ŠE\n'):
         continue  # Labat has ìr×še but Borger does not; it is not encoded.
       elif row[0] and all(not is_printable_basic_latin(c) for c in row[0]) and (
-          all (word.strip() in ('', '.', 'x', 'over', 'crossing')
+          all (word.strip() in ('', '.', 'x', 'over', 'inverted', 'crossing')
                for word in re.split('[^!-~]', row[1]))):
         pass  # Signs missing in the Sinacherib font.
       elif meszl == '58':
@@ -322,6 +322,8 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         pass
       elif meszl == '520':
         continue  # Lots of question marks in Borger; not encoded.
+      elif meszl == '529':
+        continue  # LÚ × KU (oder ähnlich); not encoded.
       else:
         raise ValueError(row)
 
@@ -468,9 +470,7 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
     sign = sign.replace('𒈕 x 𒁁', '𒎉')
     sign = sign.replace('𒇽 x 𒋗', '𒎋')
 
-    # Šašková writes (LU₂×EŠ₃).LAL, but this is actually LU₂×(EŠ₃.LAL), encoded
-    # in 2014.
-    sign = sign.replace('𒈀𒇲', '𒎊')
+    # TODO(egg): Add the reading ešelal for 𒈀𒇲, and the alternative sign 𒎊.
 
     # See the extensive discussion of KAM₂ vs. KAMᵛ above.
     sign = sign.replace('𒆚', '𒄰')
