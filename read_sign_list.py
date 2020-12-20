@@ -103,7 +103,8 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
       elif row[2].startswith('ARAD x ŠE\n'):
         continue  # Labat has ìr×še but Borger does not; it is not encoded.
       elif row[0] and all(not is_printable_basic_latin(c) for c in row[0]) and (
-          all (word.strip() in ('', '.', 'x', 'over', 'inverted', 'crossing')
+          all (word.strip() in ('', '.', 'x', 'over', 'inverted', 'crossing',
+                                'opposing',)
                for word in re.split('[^!-~]', row[1]))):
         pass  # Signs missing in the Sinacherib font.
       elif meszl == '58':
@@ -130,6 +131,9 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
           '488',
           '518',
           '524',
+          '647',
+          '680',
+          '697',
         ):
         # Signs from https://www.unicode.org/wg2/docs/n4277.pdf.
         pass
@@ -324,6 +328,20 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         continue  # Lots of question marks in Borger; not encoded.
       elif meszl == '529':
         continue  # LÚ × KU (oder ähnlich); not encoded.
+      elif meszl in ('579+?', '579+?+579', '579+579+?'):
+        continue  # TODO(egg): I have no idea what is going on with these.
+      elif meszl in ('588/2', '588/3'):
+        continue  # Unencoded variants.
+      elif meszl in ('604', '607'):
+        continue  # Unencoded ŠA₃×something signs.
+      elif meszl in ('604', '607'):
+        continue  # Unencoded ŠA₃×something signs.
+      elif meszl in ('624/2', '626'):
+        continue  # Some sort of NUNUZ-based mess.
+      elif meszl == '636+?':
+        continue  # Illegible sign from Labat’s index.
+      elif meszl in ('654', '656'):
+        continue  # Numeric signs, we handle those separately anyway.
       else:
         raise ValueError(row)
 
@@ -436,17 +454,23 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
     sign = sign.replace('𒌋𒌋𒌋', '𒌍')
 
     # Use the signs from https://www.unicode.org/wg2/docs/n4277.pdf.
-    # Global substitutions: U.U, ME.EŠ, MUNUS.TUG₂, NI.UD are always MAN, MEŠ,
-    # NIN, NA₄ respectively.
+    # Global substitutions: U.U, ME.EŠ, MUNUS.TUG₂, NI.UD, MUNUS.KU, MI.NUNUZ,
+    # NI.ERIM are always MAN, MEŠ, NIN, NA₄,NIN₉, GIG, DAG₃ respectively.
     sign = sign.replace(
         '𒌋𒌋', '𒎙').replace(
         '𒈨𒌍', '𒎌').replace(
         '𒊩𒌆', '𒎏').replace(
-        '𒉌𒌓', '𒎎')
+        '𒉌𒌓', '𒎎').replace(
+        '𒊩𒆪', '𒎐').replace(
+        '𒈪𒉭', '𒍼').replace(
+        '𒉌𒂟', '𒍴')
 
     # Disunification of ŠAR₂ 𒊹 and TI₂ 𒎗.
     if meszl == '633':
       sign = '𒎗'
+    # Disunification of ERIM 𒂟 and PIR₂ 𒎕.
+    if meszl == '613':
+      sign = '𒎕'
 
     sign = sign.replace('𒅗 x 𒌅', '𒎆')
     sign = sign.replace('𒅗 x 𒌫', '𒎇')
@@ -469,6 +493,8 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
     sign = sign.replace('𒌝 x 𒈨', '𒎘')
     sign = sign.replace('𒈕 x 𒁁', '𒎉')
     sign = sign.replace('𒇽 x 𒋗', '𒎋')
+    sign = sign.replace('𒀖 x 𒀀', '𒍱')
+    sign = sign.replace('𒀫 x 𒆬', '𒍲')
 
     # TODO(egg): Add the reading ešelal for 𒈀𒇲, and the alternative sign 𒎊.
 
@@ -526,6 +552,9 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
     identical_alternatives = re.match('^([^\0-\ff]*)(,\n|\nor\n)\\1$', sign)
     if '𒁃' in sign and identical_alternatives:
       sign = identical_alternatives.groups()[0]
+
+    if row[2].startswith('GE22\n'):
+      sign = '𒍻'
 
     if not sign or any(is_printable_basic_latin(c) for c in sign):
       raise ValueError('sign = "%s", in row %s' % (sign, row))
