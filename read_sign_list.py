@@ -455,7 +455,8 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
 
     # Use the signs from https://www.unicode.org/wg2/docs/n4277.pdf.
     # Global substitutions: U.U, ME.EŠ, MUNUS.TUG₂, NI.UD, MUNUS.KU, MI.NUNUZ,
-    # NI.ERIM are always MAN, MEŠ, NIN, NA₄,NIN₉, GIG, DAG₃ respectively.
+    # NI.ERIM, ḪI.GIR₃ are always MAN, MEŠ, NIN, NA₄,NIN₉, GIG, DAG₃, ḪUS
+    # respectively.
     sign = sign.replace(
         '𒌋𒌋', '𒎙').replace(
         '𒈨𒌍', '𒎌').replace(
@@ -463,7 +464,8 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         '𒉌𒌓', '𒎎').replace(
         '𒊩𒆪', '𒎐').replace(
         '𒈪𒉭', '𒍼').replace(
-        '𒉌𒂟', '𒍴')
+        '𒉌𒂟', '𒍴').replace(
+        '𒄭𒄊', '𒍽')
 
     # Disunification of ŠAR₂ 𒊹 and TI₂ 𒎗.
     if meszl == '633':
