@@ -134,6 +134,8 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
           '647',
           '680',
           '697',
+          '763',
+          '886',
         ):
         # Signs from https://www.unicode.org/wg2/docs/n4277.pdf.
         pass
@@ -342,6 +344,37 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         continue  # Illegible sign from Labat’s index.
       elif meszl in ('654', '656'):
         continue  # Numeric signs, we handle those separately anyway.
+      elif meszl in ('730', '735'):
+        pass  # Variants.
+      elif meszl in ('741\nalso 882', '882\nalso 741'):
+        pass # 𒎔 vs. 𒉾.
+      elif meszl == '746+358+?':
+        continue  # ???
+      elif row[2].startswith('LAGAB x GAR3\n'):
+        continue  # That’s a lot of question marks.
+      elif meszl == '757':
+        pass  # Seems to just be the same sign as ENGUR.
+      elif meszl == '796':
+        continue  # INDA₂ is not encoded.
+      elif meszl == '811':
+        continue  # No name, side-by-side ligature of existing signs.
+      elif meszl in ('829/2', '829/3'):
+        continue  # Unencoded variants.
+      elif meszl == '837':
+        continue  # Numeric sign.
+      elif meszl == '839+086+298+591':
+        continue  # Needless decomposition of ASAL₂.
+      elif row[2].startswith('LAK 852\n'):
+        pass  # LAK 852, missing in Sinacherib.
+      elif meszl == '870':
+        # Variants of EN₂. Let’s just pick 𒋙𒀭: looking at Labat, 𒌋𒀭 is the
+        # classical Sumerian version, before 𒋙 was a thing; this can be handled
+        # at the font level.
+        pass
+      elif meszl.startswith('XXX'):
+        pass  # Ancient signs, not in Borger, not in Sinacherib.
+      elif row == ['', '', '', '', '', '']:
+        break  # We have reached the end of the table.
       else:
         raise ValueError(row)
 
@@ -497,6 +530,7 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
     sign = sign.replace('𒇽 x 𒋗', '𒎋')
     sign = sign.replace('𒀖 x 𒀀', '𒍱')
     sign = sign.replace('𒀫 x 𒆬', '𒍲')
+    sign = sign.replace('𒆸 x 𒄀', '𒎈')
 
     # TODO(egg): Add the reading ešelal for 𒈀𒇲, and the alternative sign 𒎊.
 
@@ -549,14 +583,31 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
     # Now that we use the correct sign for GIN₂, we have a sign for EZEN×GIN₂.
     sign = sign.replace('𒂡 x 𒂆', '𒂧')
 
-    # Do not decompose 𒁃.
+    # Do not decompose 𒁃 nor 𒀷.
     sign = sign.replace('𒂁𒋡𒁓', '𒁃')
+    sign = sign.replace('𒀀𒌅𒃮𒇺', '𒀷')
     identical_alternatives = re.match('^([^\0-\ff]*)(,\n|\nor\n)\\1$', sign)
-    if '𒁃' in sign and identical_alternatives:
+    if ('𒁃' in sign or '𒀷' in sign) and identical_alternatives:
       sign = identical_alternatives.groups()[0]
 
     if row[2].startswith('GE22\n'):
       sign = '𒍻'
+
+    if meszl == '730':
+      sign = sign.split('\nold\n')[0]
+    if meszl == '735':
+      sign = sign.split('\nnewer\n')[0]
+
+    if row[2].startswith('PEŠ2v\n'):
+      sign = '𒎔'
+    if row[2].startswith('PEŠ2\n'):
+      sign = '𒉾'
+
+    if meszl == '757':
+      sign = '𒇉'  # ZIKUM = ENGUR.
+
+    if meszl == '870':
+      sign = '𒋙𒀭'
 
     if not sign or any(is_printable_basic_latin(c) for c in sign):
       raise ValueError('sign = "%s", in row %s' % (sign, row))
