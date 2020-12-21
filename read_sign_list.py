@@ -2,6 +2,7 @@
 import csv
 import re
 import sys
+import unicodedata
 
 import numbers
 
@@ -27,7 +28,8 @@ def is_composition_sign(c):
 def is_composition_character(c):
   return (is_lowercase_akkadian_letter(c) or
           is_digit(c) or
-          is_composition_sign(c))
+          is_composition_sign(c) or
+          c == 'x')
 
 class Reading:
   def __init__(self, sign, šašková_index):
@@ -61,7 +63,46 @@ class Reading:
       if source not in SOURCES:
         raise ValueError('Unexpected source %s' % source)
       self.source = source
-      
+
+# See the comments below re. DUN₃ 𒂅, DUN₃ gunû 𒂆, and DUN₃ gunû gunû 𒂇.
+DUN3_VARIANTS = {
+  # http://oracc.museum.upenn.edu/ogsl/signlist/l0068/o0000160/index.html
+  'DU5': '𒂅',
+  'DUG5': '𒂅',
+  'DUN3': '𒂅',
+  'SU18': '𒂅',
+  'SUG5': '𒂅',
+  'TU18': '𒂅',
+  'TUN3': '𒂅',
+  'TUG8': '𒂅',
+  'ṬU': '𒂅',
+  # In Borger, not in Oracc.  Adding it where the SUG reading is.
+  'SUK5': '𒂅',
+  # Labat-only readings, not in Oracc; adding those to the variant with the
+  # DUN/TUN and SU readings.
+  'SU14': '𒂅',
+  'ṬUN': '𒂅',
+  # http://oracc.museum.upenn.edu/ogsl/signlist/l0068/o0000161/index.html
+  'AGA3': '𒂆',
+  'GE11': '𒂆',
+  'GI11': '𒂆',
+  'GIG4': '𒂆',
+  'GIM2': '𒂆',
+  'GIN2': '𒂆',
+  'PUŠ4': '𒂆',
+  # http://oracc.museum.upenn.edu/ogsl/signlist/l0080/o0002178/index.html
+  'ḪURSAG': '𒂅',
+  # http://oracc.museum.upenn.edu/ogsl/signlist/l0071/o0001279/index.html
+  'AGARIN3': '𒂆',
+  # http://oracc.museum.upenn.edu/ogsl/signlist/l0071/o0001367/index.html
+  'GILGAMEŠ': '𒂆',
+  'GILGAMES': '𒂆',
+  # http://oracc.museum.upenn.edu/ogsl/signlist/l0090/o0002642/index.html
+  'NIR2': '𒂆',
+  # Labat-only reading, not in Oracc.
+  'NINI2': '𒂆',
+}
+
 readings_by_value = {}
 readings_by_sign = {}
 
@@ -577,7 +618,6 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
     # Same for a composite sign.
     sign = sign.replace('𒂧', '𒂨')
     # Use 𒂆 wherever Šašková uses 𒂅, we will disunify them below.
-    # TODO(egg): actually disunify them.
     sign = sign.replace('𒂅', '𒂆')
 
     # Now that we use the correct sign for GIN₂, we have a sign for EZEN×GIN₂.
@@ -675,6 +715,17 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         reading.sign = '𒐜'
       if reading.sign == '𒑆' and reading.value == 'GEŠILIMMU':
         reading.sign = '𒐝'
+
+      if '𒂆' in reading.sign and all(is_composition_character(c.lower())
+                                       for c in reading.value):
+        try:
+          reading.sign = reading.sign.replace('𒂆',
+                                              DUN3_VARIANTS[reading.value])
+        except KeyError as e:
+          print(', '.join(unicodedata.name(c).replace('CUNEIFORM SIGN ', '')
+                          for c in reading.sign),
+                file=sys.stderr)
+          raise
 
     for reading in sign_readings:
       readings_by_value.setdefault(reading.value, []).append(reading)
@@ -823,6 +874,9 @@ for composition, readings in readings_by_composition.items():
         raise ValueError('Inconsistent numeric readings')
 
 for composition, readings in readings_by_composition.items():
-  if not all(is_composition_character(c.lower()) for c in composition):
+  if (not all(is_composition_character(c.lower()) for c in composition) or
+      composition.startswith('x')):
+    # TODO(egg): composition.startswith('x') is a cheesy way to eliminate xv,
+    # which happens to be the only reading wherein x is not ₓ at this point.
     continue
   print('"%s"="%s"' % (composition, readings[0].sign))
