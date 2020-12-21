@@ -99,6 +99,10 @@ OrderingKey(
         reading.back().back() += c - L'0';
         last_category = InputCategory::ReadingNumeric;
       }
+    } else if (c == L'x') {
+      reading.emplace_back().emplace_back();
+      reading.back().back() = std::numeric_limits<int>::max();
+      last_category = InputCategory::ReadingNumeric;
     } else if (Sources().contains(c)) {
       source_order = -Sources().at(c).publication_date;
       last_category = InputCategory::Source;
@@ -126,7 +130,7 @@ std::wstring PrettyTranscriptionHint(std::wstring_view composition_input,
     // Reading alphanumeric, and a handful of symbols for fractions,
     // punctuation, and determinative shorthands.
     return IsDigit(c) || Alphabet().contains(c) || c == '/' || c == ':' ||
-           c == L'⫶' || c == 'f';
+           c == L'⫶' || c == 'f' || c == 'x';
   };
   bool subscript_has_been_entered = true;
   int vowel_count = 0;
@@ -178,11 +182,13 @@ std::wstring PrettyTranscriptionHint(std::wstring_view composition_input,
       token_hint += L"‸variant ";
     } else {
       token_hint += L'‸';
-      if (IsDigit(composition_input[i])) {
+      if (IsDigit(composition_input[i]) || composition_input[i] == L'x') {
         if (!after_letters || in_parenthetical) {
           token_hint += composition_input[i];
         } else if (accent.empty()) {
-          token_hint += L'₀' + (composition_input[i] - L'0');
+          token_hint += composition_input[i] == L'x'
+                            ? L'ₓ'
+                            : L'₀' + (composition_input[i] - L'0');
         }
       } else {
         if (Alphabet().contains(composition_input[i])) {
