@@ -143,11 +143,18 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         pass  # UŠUMₓ is missing in the Sinacherib font.
       elif row[2].startswith('ARAD x ŠE\n'):
         continue  # Labat has ìr×še but Borger does not; it is not encoded.
-      elif row[0] and all(not is_printable_basic_latin(c) for c in row[0]) and (
-          all (word.strip() in ('', '.', 'x', 'over', 'inverted', 'crossing',
-                                'opposing',)
-               for word in re.split('[^!-~]', row[1]))):
+      elif (row[0] and all(not is_printable_basic_latin(c) for c in row[0]) and
+            (not row[1] or
+             (any(is_printable_basic_latin(c) for c in row[1]) and
+              (all (word.strip() in ('', '.', 'x', 'over', 'inverted', 'crossing',
+                                     'opposing',)
+               for word in re.split('[^!-~]', row[1])))))):
         pass  # Signs missing in the Sinacherib font.
+      elif '𒄒' in row[0] and row[1] == row[0].replace('𒄒', '𒁉𒑖'):
+        # The Sinacherib font has a GIŠ crossing GIŠ which does not look like
+        # the neo-Assyrian KIB; these should be unified, and a neo-Assyrian font
+        # should have the KIB glyph for that code point.
+        pass
       elif meszl == '58':
         continue  # 𒅗×𒌍 is an unencoded variant of 𒅗×𒊓 = 𒅾.
       elif meszl in (
@@ -294,6 +301,12 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
       elif row[2].startswith('KASKAL over KASKAL.LAGAB over LAGAB'):
         # It appears that šubtu₄ is not encoded.
         continue
+      elif meszl == '303':
+        # The neo-Assyrian form is given as KASKAL.UD×EŠ whereas the UR III form
+        # is given as KASKAL.UD šeššig, even though UD×EŠ and UD šeššig have the
+        # same neo-Assyrian glyph.  Oracc says UD šeššig is correct here, use
+        # that.
+        pass
       elif meszl == '319':
         # An erroneous entry: The sign name is AL×KID₂ (which is MesZL 475,
         # encoded), the given sign is 𒉒 × 𒋺 NINDA₂×KID₂, which is not present
@@ -331,6 +344,9 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         continue
       elif meszl == '370':
         continue  # ŠIM×PI, not encoded.
+      elif meszl == '379 (sign KAK)':
+        # KAK × IGI gunû, is not in Sinacherib, KAK.IGI gunû is used instead.
+        continue
       elif ('𒉌𒌓' in row[0] and
             row[0] in row[1] and
             row[0].replace('𒉌𒌓', '𒉌𒂟') in row[1]
@@ -371,6 +387,8 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         continue  # Lots of question marks in Borger; not encoded.
       elif meszl == '529':
         continue  # LÚ × KU (oder ähnlich); not encoded.
+      elif row[2].startswith('ŠU.MIN.MEŠ\n'):
+        pass  # Typo in the neo-Assyrian form (ŠU.MIN.AN.MEŠ).
       elif meszl in ('579+?', '579+?+579', '579+579+?'):
         continue  # TODO(egg): I have no idea what is going on with these.
       elif meszl in ('588/2', '588/3'):
@@ -383,7 +401,7 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         continue  # Some sort of NUNUZ-based mess.
       elif meszl == '636+?':
         continue  # Illegible sign from Labat’s index.
-      elif meszl in ('654', '656'):
+      elif meszl in ('654', '656', '709'):
         continue  # Numeric signs, we handle those separately anyway.
       elif meszl in ('730', '735'):
         pass  # Variants.
@@ -405,6 +423,8 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
         continue  # Numeric sign.
       elif meszl == '839+086+298+591':
         continue  # Needless decomposition of ASAL₂.
+      elif meszl == '845':
+        pass  # Typo in the UR III form, A.A×A instead of A×A, handled below.
       elif row[2].startswith('LAK 852\n'):
         pass  # LAK 852, missing in Sinacherib.
       elif meszl == '870':
@@ -572,6 +592,9 @@ with open(r".\sign_list.csv", encoding="utf-8") as file:
     sign = sign.replace('𒀖 x 𒀀', '𒍱')
     sign = sign.replace('𒀫 x 𒆬', '𒍲')
     sign = sign.replace('𒆸 x 𒄀', '𒎈')
+
+    if sign == '𒀀𒀁':
+      sign = '𒀁'  # Typo.
 
     # TODO(egg): Add the reading ešelal for 𒈀𒇲, and the alternative sign 𒎊.
 
