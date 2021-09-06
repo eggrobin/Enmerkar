@@ -1,4 +1,5 @@
 ﻿import sys
+import re
 import codecs
 import unicodedata
 
@@ -126,10 +127,21 @@ for name, forms in forms_by_name.items():
         if encoding not in encoded_forms_by_value[value]:
           encoded_forms_by_value[value][encoding] = []
         encoded_forms_by_value[value][encoding].append(form)
-  else:
-    for form in forms:
-      if form.values:
-        print(f"No codepoints for {form}: {'; '.join(form.values)}")
+
+for name, forms in forms_by_name.items():
+  if name.startswith("|") and name.endswith("|") and not forms[0].codepoints:
+    encoding = ""
+    components = []
+    for component in re.findall(r"(?:[^.()]|\([^()]+\))+", name[1:-1]):
+      if component in forms_by_name and forms_by_name[component][0].codepoints:
+        encoding += forms_by_name[component][0].codepoints
+        components.append(component)
+      else:
+        break
+    else:
+      print(f"Candidate encoding for {name}: {encoding}, from {components}")
+
+exit()
 
 for value, forms_by_codepoints in encoded_forms_by_value.items():
   if "ₓ" not in value and len(forms_by_codepoints) > 1:
