@@ -1,5 +1,6 @@
 ﻿import sys
 import codecs
+import unicodedata
 
 #sys.stdout = codecs.getwriter("utf-16")(sys.stdout.detach())
 
@@ -40,7 +41,7 @@ try:
     tokens = line.split()
     if not tokens:
       continue
-    if tokens[0] == "@sign" or tokens[0] == "@form":
+    if tokens[0] == "@sign" or tokens[0] == "@form" or tokens[:2] == ["@end", "sign"]:
       if name:
         if form_id:
           form = Form(name, form_id, main_forms_by_name[sign_name], values, codepoints)
@@ -53,17 +54,19 @@ try:
           forms_by_name[name].append(form)
         else:
           forms_by_name[name] = [form]
-      name = tokens[-1]
+      name = None
       codepoints = None
       values = []
     if tokens[0] == "@sign":
       if len(tokens) != 2:
         raise ValueError(tokens)
+      name = tokens[-1]
       sign_name = tokens[-1]
       form_id = None
     if tokens[0] == "@form":
       if len(tokens) != 3 and not tokens[3][0] in ("x", "["):
         raise ValueError(tokens)
+      name = tokens[-1]
       form_id = tokens[1]
     if tokens[0] == "@v":  # Excluding deprecated values @v-, as well as questionable @v? for now.
       if tokens[1].startswith("%") or tokens[1].startswith("#"):
@@ -135,9 +138,20 @@ for value, forms_by_codepoints in encoded_forms_by_value.items():
 
 for value, forms_by_codepoints in encoded_forms_by_value.items():
   if value[0] in '1234567890':
-    continue  # Not looking at numbers for now.
+    continue  # We do numbers separately.
   for c in value:
     if c not in 'bdgptkʾṭqzšsṣhmnrlwyjaeiu₁₂₃₄₅₆₇₈₉₀ₓŋ:⁺⁻ś':  # Oracc uses ḫ for h.
       print(f"Unexpected character {c} in value {value} for {'; '.join(forms_by_codepoints.keys())}")
       print(forms_by_codepoints.values())
       break
+
+encoded_signs = set(form.codepoints for forms in forms_by_name.values() for form in forms)
+encoded_signs_with_values = set(form.codepoints for forms in forms_by_name.values() for form in forms if form.values)
+
+for u in range(0x12000, 0x12550):  # Cuneiform, Cuneiform numbers and punctuation, Early Dynastic cuneiform.
+  if unicodedata.category(chr(u)) == "Cn":
+    continue
+  if chr(u) not in encoded_signs:
+    print(f"No form U+{u:X} {unicodedata.name(chr(u))} {chr(u)}")
+  if chr(u) not in encoded_signs_with_values:
+    print(f"No values for U+{u:X} {unicodedata.name(chr(u))} {chr(u)}")
