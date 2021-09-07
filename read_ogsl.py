@@ -121,6 +121,29 @@ for name, forms in forms_by_name.items():
     encoding = encodings[0]
     for form in forms:
       form.codepoints = encoding
+
+for name, forms in forms_by_name.items():
+  if name.startswith("|") and name.endswith("|") and not forms[0].codepoints:
+    encoding = ""
+    components = []
+    for component in re.findall(r"(?:[^.()]|\([^()]+\))+", name[1:-1]):
+      if "×" in component:
+        component = f"{component}"
+      if component in forms_by_name and forms_by_name[component][0].codepoints:
+        encoding += forms_by_name[component][0].codepoints
+        components.append(component)
+      else:
+        break
+    else:
+      for form in forms:
+        form.codepoints = encoding
+      print(f"Encoding {forms[0] if len(forms) == 1 else forms} from {components}")
+
+
+for name, forms in forms_by_name.items():
+  encoding = forms[0].codepoints
+  if encoding:
+    for form in forms:
       for value in form.values:
         if not value in encoded_forms_by_value:
           encoded_forms_by_value[value] = {}
@@ -129,19 +152,9 @@ for name, forms in forms_by_name.items():
         encoded_forms_by_value[value][encoding].append(form)
 
 for name, forms in forms_by_name.items():
-  if name.startswith("|") and name.endswith("|") and not forms[0].codepoints:
-    encoding = ""
-    components = []
-    for component in re.findall(r"(?:[^.()]|\([^()]+\))+", name[1:-1]):
-      if component in forms_by_name and forms_by_name[component][0].codepoints:
-        encoding += forms_by_name[component][0].codepoints
-        components.append(component)
-      else:
-        break
-    else:
-      print(f"Candidate encoding for {name}: {encoding}, from {components}")
-
-exit()
+  values = [value for form in forms for value in form.values if "@c" not in value]
+  if values and not forms[0].codepoints:
+    print(f"No encoding for {name} with values {values}")
 
 for value, forms_by_codepoints in encoded_forms_by_value.items():
   if "ₓ" not in value and len(forms_by_codepoints) > 1:
