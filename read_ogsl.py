@@ -18,7 +18,7 @@ MODIFIERS = {
   "90": "ROTATED NINETY DEGREES",
   "n": "NUTILLU",
   "180": "INVERTED",
-  "v": "ASTERISK",  # In 𒋬 TA ASTERISK.
+  "v": "VARIANT",
 }
 
 
@@ -197,7 +197,7 @@ try:
     if tokens[0] == "@ucode":
       if len(tokens) != 2:
         raise ValueError(tokens)
-      codepoints = ''.join('X' if x in ('X', 'None') else chr(int("0" + x, 16)) for x in tokens[-1].split("."))
+      codepoints = ''.join((x if x in ("X", "None") else chr(int("0" + x, 16)) for x in tokens[-1].split(".")))
       for c in codepoints:
         if ord(c) >= 0xE000 and ord(c) <= 0xF8FF:
           codepoints = None
@@ -231,7 +231,7 @@ def rename(old_name, new_name):
 # OGSL naming bugs handled here:
 
 # Insufficiently decomposed/normalized in OGSL.
-for name in ("|DIM×EŠ|", "|KA×EŠ|", "|LAK617×MIR|", "|KAR.MUŠ|", "|ŠE₃.TU.BU|", "|GAD+KID₂.DUH|", "|ŠUL.GI|"):
+for name in ("|DIM×EŠ|", "|KA×EŠ|", "|LAK617×MIR|", "|KAR.MUŠ|", "|ŠE₃.TU.BU|", "|GAD+KID₂.DUH|", "|ŠUL.GI|", "|UD.MUD.NUN.KI|", "|IM.LAK648|"):
   rename(name,
          name.replace(
              "EŠ", "(U.U.U)").replace(
@@ -239,7 +239,11 @@ for name in ("|DIM×EŠ|", "|KA×EŠ|", "|LAK617×MIR|", "|KAR.MUŠ|", "|ŠE₃.
              "KAR", "TE.A").replace(
              "ŠE₃", "EŠ₂").replace(
              "KID₂", "TAK₄").replace(
-             "ŠUL", "DUN"))
+             "ŠUL", "DUN").replace(
+             "MUD", "HU.HI").replace(
+             # Not sure what to make of the following @note in |URU×MIN|; but it is called |URU×MIN|, so shrug.
+             # LAK648 is GIŠGAL, but is not properly described as URU×MIN. Many of the URU× signs are LAK648× in ED.
+             "LAK648", "URU×MIN"))
 
 # Insufficiently decomposed in its name, and also incorrectly decomposed in its encoding. see below.
 rename("ŠITA₂", "|ŠITA.GIŠ|")
@@ -332,6 +336,28 @@ for name, forms in forms_by_name.items():
       if form.codepoints != "𒋙":
         raise ValueError("OGSL bug fixed")
       form.codepoints = "𒋙𒂈"
+    if name == "|ŠEŠ.KI.DIM×ŠE|":
+      # Probably copied over from another munzerₓ, see http://oracc.museum.upenn.edu/epsd2/cbd/sux/o0034493.html.
+      # Attested in https://cdli.ucla.edu/search/search_results.php?SearchMode=Text&ObjectID=P010677 (RTL?)
+      # and https://cdli.ucla.edu/search/search_results.php?SearchMode=Text&ObjectID=P010087 (partial).
+      if form.codepoints != "𒀖𒀭𒋀𒆠":
+        raise ValueError("OGSL bug fixed")
+      form.codepoints = "𒋀𒆠𒁵"
+    if name == "|UD.MA₂.AB×(U.U.U).ŠIR|":
+      # http://oracc.museum.upenn.edu/epsd2/o0047595. No source for that form,
+      # so can’t check, but let’s trust the description and assume there is a
+      # stray U and None in the encoding.
+      if form.codepoints != "𒌓𒈣𒀔𒌋None𒋓":
+        raise ValueError("OGSL bug fixed")
+      form.codepoints = "𒌓𒈣𒀔𒋓"
+    if name == "|U.GIŠ%GIŠ|":
+      # http://oracc.museum.upenn.edu/epsd2/o0039173.
+      # Attested in http://oracc.iaas.upenn.edu/epsd2/praxis/P273907 where it is
+      # transliterated U.KIB, clearly looks like KIB=GIŠ%GIŠ in
+      # https://cdli.ucla.edu/search/search_results.php?SearchMode=Text&ObjectID=P273907.
+      if form.codepoints != "𒌋𒉣":
+        raise ValueError("OGSL bug fixed")
+      form.codepoints = "𒌋𒄒"
 
     # Unicode and OGSL have both  𒋲 4×TAB and 𒅄 4×(IDIM&IDIM), with the same
     # values, namely burₓ, buruₓ, gurinₓ, gurunₓ, and kurunₓ.
@@ -491,6 +517,8 @@ for name, forms in forms_by_name.items():
     expected_unicode_name = "LAGAB TIMES GUD PLUS GUD"
   if expected_unicode_name == "PA LAGAB TIMES GUD OVER GUD":
     expected_unicode_name = "PA LAGAB TIMES GUD PLUS GUD"
+  if expected_unicode_name == "SAL LAGAB TIMES GUD OVER GUD":
+    expected_unicode_name = "SAL LAGAB TIMES GUD PLUS GUD"
 
   # OGSL has no MA×TAK₄, Unicode has no MA GUNU TIMES TAK4.
   # This is probably fine, though I don’t know where the gunû went.
@@ -500,6 +528,12 @@ for name, forms in forms_by_name.items():
   if expected_unicode_name == "MURUB4":
     # @note MURUB₄(LAK157) merges with NISAG(LAK159)
     expected_unicode_name = "NISAG"
+
+  # Various variants.
+  if expected_unicode_name == "TA VARIANT":
+    expected_unicode_name = expected_unicode_name.replace("VARIANT", "ASTERISK")
+  if expected_unicode_name == "U OVER U U VARIANT OVER U VARIANT":
+    expected_unicode_name = expected_unicode_name.replace("VARIANT", "REVERSED")
 
   # Aliases from https://www.unicode.org/wg2/docs/n4277.pdf.
   # Looking up by alias work, but the name is the name, and there is no API to
@@ -522,9 +556,9 @@ for name, forms in forms_by_name.items():
   if expected_unicode_name == "SHU2 DUN3 GUNU GUNU SHESHIG":
     expected_unicode_name = "SHU2 DUN4"
 
-
   actual_unicode_name = " ".join(unicodedata.name(c).replace("CUNEIFORM SIGN ", "") if ord(c) >= 0x12000 else c for c in encoding)
-  if "CUNEIFORM NUMERIC SIGN" in actual_unicode_name:
+  if ("CUNEIFORM NUMERIC SIGN" in actual_unicode_name or
+      "CUNEIFORM PUNCTUATION SIGN" in actual_unicode_name):
     continue  # TODO(egg): deal with that.
 
   if expected_unicode_name == "SHU OVER SHU INVERTED":  # Magical Unicode word order.
