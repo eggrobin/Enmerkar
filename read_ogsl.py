@@ -15,20 +15,22 @@ MODIFIERS = {
   # In U+1248F CUNEIFORM SIGN DUG TIMES ASH AT LEFT, LAK561, given as
   # @uname CUNEIFORM SIGN DUG TIMES ASH FRONT in OGSL.
   "f": "AT LEFT",
-  "90": "ROTATED NINETY DEGREES"
+  "90": "ROTATED NINETY DEGREES",
+  "n": "NUTILLU",
+  "180": "INVERTED"
 }
 
 
 def compute_expected_unicode_name_at(string, index, inner_plus):
   expected_unicode_name = ""
   i = index
-  while i < len(name):
-    c = name[i]
+  while i < len(string):
+    c = string[i]
     if (i + 4 <= len(string) and
         string[i:i+3] == "LAK" and
         string[i+3].isdigit()):
       lak_number = 0
-      i = i + 3
+      i += 3
       while i < len(string) and string[i].isdigit():
         lak_number *= 10
         lak_number += int(string[i])
@@ -39,9 +41,10 @@ def compute_expected_unicode_name_at(string, index, inner_plus):
     if c == "|":
       continue
     elif c == "(":
+      opened = i-1
       (inner_sign, i) = compute_expected_unicode_name_at(string, i, inner_plus)
-      if (string[i - 1] != ")"):
-        raise ValueError(f"unmatched parenthesis in {string}")
+      if (string[i-1] != ")"):
+        raise ValueError(f"unmatched parenthesis in {string},\n{string}\n{(opened)*' '+'('+(i-2-opened)*'~'+string[i-1]}")
       inner_sign = inner_sign.replace(".".join(3*["DISH"]), "THREE DISH")
       inner_sign = inner_sign.replace(".".join(3*["DISH TENU"]), "THREE DISH TENU")
       # Unicode uses PLUS for . in inner signs ×., thus
@@ -89,6 +92,9 @@ def compute_expected_unicode_name_at(string, index, inner_plus):
 
 
 def compute_expected_unicode_name(string, inner_plus=True):
+  # Unicode sometimes distributes & over ., but not always.
+  if string == "|(KASKAL.LAGAB×U)&(KASKAL.LAGAB×U)|":
+    string = "|(KASKAL&KASKAL).(LAGAB×U&LAGAB×U)|"
   name = compute_expected_unicode_name_at(string, 0, inner_plus)[0]
   return name.replace(".", " ") if inner_plus else name.replace(".", " PLUS ")
 
@@ -239,6 +245,10 @@ rename("|ŠU₂.NESAG|", "|ŠU₂.NISAG|")
 # Conventiently Unicode has the former and not the latter.
 rename("|(ŠE&ŠE).HUB₂|", "|ŠE.HUB₂|")
 
+# ASCII ugliness in form ~c |ŠU₂.3xAN| of |BAR.AN|.  OGSL correctly uses 3×AN everywhere else.
+rename("|ŠU₂.3xAN|", "|ŠU₂.3×AN|")
+
+
 # OGSL encoding bugs handled here.
 for name, forms in forms_by_name.items():
   for form in forms:
@@ -262,8 +272,52 @@ for name, forms in forms_by_name.items():
       if "𒀾" not in form.codepoints:
         raise ValueError("OGSL bug fixed")
       form.codepoints = form.codepoints.replace("𒀾", "𒍩")
-    if name == "|DAG.KISIM₅×X|":
+    if name == "|LU₂.SU|":
+      # šimašgi is very blatantly LU₂.SU, not LU.SU.
+      # https://cdli.ucla.edu/search/search_results.php?SearchMode=Text&PrimaryPublication=&MuseumNumber=&Provenience=&Period=&TextSearch=szimaszgi&ObjectID=&requestFrom=Submit
+      if form.codepoints != "𒇻𒋢":
+        raise ValueError("OGSL bug fixed")
+      form.codepoints = "𒇽𒋢"
+    if name == "|LU₂.SU.A|":
+      # Same as above.
+      # https://cdli.ucla.edu/search/search_results.php?SearchMode=Text&PrimaryPublication=&MuseumNumber=&Provenience=&Period=&TextSearch=szimaszgi2&ObjectID=&requestFrom=Submit
+      if form.codepoints != "𒇻𒋢𒀀":
+        raise ValueError("OGSL bug fixed")
+      form.codepoints = "𒇽𒋢𒀀"
+    if name == "|LU₃.PAP.PAP|":
+      # The entry has the encoding for BARA₂.PAP.PAP (which exists as its own form).
+      # See http://oracc.museum.upenn.edu/epsd2/cbd/sux/o0040424.html, see, e.g.,
+      # http://oracc.museum.upenn.edu/epsd2/sux
+      # https://cdli.ucla.edu/dl/lineart/P221674_l.jpg,
+      # titab₂ is pretty clearly meant to be 𒈖𒉽𒉽 (especially since 𒁈𒉽𒉽 is
+      # titab already).
+      if form.codepoints != "𒁈𒉽𒉽":
+        raise ValueError("OGSL bug fixed")
+      form.codepoints = "𒈖𒉽𒉽"
+    if name == "|PA.DAG.KISIM₅×GUD|":
+      # DAG instead of DAG.KISIM₅×GUD.
+      if form.codepoints != "𒉺𒁖":
+        raise ValueError("OGSL bug fixed")
+      form.codepoints = "𒉺𒁟"
+    if name == "|PA.DAG.KISIM₅×KAK|":
+      # DAG instead of DAG.KISIM₅×KAK.
+      if form.codepoints != "𒉺𒁖":
+        raise ValueError("OGSL bug fixed")
+      form.codepoints = "𒉺𒁣"
+
+    # Signs that are not really there, one way or another.
+    if name == "|DAG.KISIM₅×X|" or name == "|NUNUZ.AB₂×X|":
       form.codepoints = None  # If it has an X it is not encoded.
+    if name == "|IM.IM.KAD₃IM.KAD₃A|":
+      # What is that supposed to be? |IM.IM.KAD₃.IM.KAD₃A|?
+      # In any case they have IM.A there…
+      form.codepoints = None
+    if name == "|LU₂@g.UŠ₂|":
+      # No LU₂ gunû…
+      form.codepoints = None
+    if name == "|PAP.PAP×ŠE|":
+      # No PAP×ŠE afaict?
+      form.codepoints = None
 
     # Unicode 7.0 fanciness.
     if name == "GIG":
@@ -327,8 +381,20 @@ for name, forms in forms_by_name.items():
     # Very weird entry and very weird Unicode name.  Merging with LAK 212,
     # see above.
     continue
-  # ASCII ugliness in form ~c |ŠU₂.3xAN| of |BAR.AN|.  OGSL correctly uses 3×AN everywhere else.
-  name = name.replace("3x", "3×")
+
+  if name == "|LAGAB×(IM.IM.ŠU₂LU)|":
+    # Very explicitly mapped to CUNEIFORM SIGN LAGAB TIMES IM PLUS LU.
+    # |LAGAB×(IM.LU)| exists as a variant of elamkuš₂ but is given no readings.
+    # This one has elamkušₓ, which seems appropriate.
+    continue
+
+  if name == "|LAGAB×AŠ@t|":
+    # The unicode name is LAGAB×LIŠ, which is variant ~a of this one.
+    # Both are given the reading gigir₃.  Shrug.
+    continue
+
+  if name== "OO":
+    continue
 
   expected_unicode_name = compute_expected_unicode_name(name)
 
@@ -353,6 +419,35 @@ for name, forms in forms_by_name.items():
 
   # OGSL never decomposes LAL₂, so lets’ treat this as intentional.
   expected_unicode_name = expected_unicode_name.replace("LAL2", "LAL TIMES LAL")
+
+  if expected_unicode_name == "KU4~a":
+    expected_unicode_name = "KU4 VARIANT FORM"
+
+  if expected_unicode_name == "LAGAB TIMES SHITA TENU PLUS GISH":
+    expected_unicode_name = "LAGAB TIMES SHITA PLUS GISH TENU"
+
+  # The representative glyph is more over than plus…
+  if expected_unicode_name == "LAGAB TIMES GUD OVER GUD":
+    expected_unicode_name = "LAGAB TIMES GUD PLUS GUD"
+  if expected_unicode_name == "PA LAGAB TIMES GUD OVER GUD":
+    expected_unicode_name = "PA LAGAB TIMES GUD PLUS GUD"
+
+  # OGSL has no MA×TAK₄, Unicode has no MA GUNU TIMES TAK4.
+  # This is probably fine, though I don’t know where the gunû went.
+  if expected_unicode_name == "MA GUNU TIMES TAK4":
+    expected_unicode_name = "MA TIMES TAK4"
+
+  if expected_unicode_name == "MURUB4":
+    # @note MURUB₄(LAK157) merges with NISAG(LAK159)
+    expected_unicode_name = "NISAG"
+
+  # Aliases from https://www.unicode.org/wg2/docs/n4277.pdf.
+  # Looking up by alias work, but the name is the name, and there is no API to
+  # get the alias...
+  if expected_unicode_name == "NU11 TENU":
+    expected_unicode_name = "SHIR TENU"
+  elif expected_unicode_name == "NU11 OVER NU11 BUR OVER BUR":
+    expected_unicode_name = "SHIR OVER SHIR BUR OVER BUR"
 
   actual_unicode_name = " ".join(unicodedata.name(c).replace("CUNEIFORM SIGN ", "") if ord(c) >= 0x12000 else c for c in encoding)
   if "CUNEIFORM NUMERIC SIGN" in actual_unicode_name:
