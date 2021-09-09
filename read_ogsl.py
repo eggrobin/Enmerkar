@@ -428,6 +428,10 @@ for name, forms in forms_by_name.items():
       form.codepoints = "𒍼"
     if "GIG" in name and form.codepoints and "X" in form.codepoints:
       form.codepoints = form.codepoints.replace("X", "𒍼")
+    if name == "KAP₀":
+      form.codepoints = "𒍯"
+    if name == "|AB×NUN|":
+      form.codepoints = "𒍰"
 
     if name == "|GA₂×ZIZ₂|" or form.codepoints and any(ord(sign) >= 0x12480 for sign in form.codepoints):
       # The Early Dynastic block is garbled in OGSL.
@@ -549,6 +553,8 @@ for name, forms in forms_by_name.items():
     expected_unicode_name = expected_unicode_name.replace("VARIANT", "ASTERISK")
   if expected_unicode_name == "U OVER U U VARIANT OVER U VARIANT":
     expected_unicode_name = expected_unicode_name.replace("VARIANT", "REVERSED")
+  if expected_unicode_name == "KAP0":
+    expected_unicode_name = "KAP ELAMITE"
 
   # Aliases from https://www.unicode.org/wg2/docs/n4277.pdf.
   # Looking up by alias work, but the name is the name, and there is no API to
@@ -640,6 +646,12 @@ NON_SIGNS = set((
   # It probably isn’t KWU089 contrary to Koslova, but the variant of 𒁔, consistent with both the name and the reference glyph,
   # exists—whether it deserved its own codepoint is another question…
   "𒍘",
+  # MZL680, Hittite, no values, not in the OGSL.
+  "𒍱",
+  # MZL697, HZL276, Hittite, no values, not in the OGSL.
+  "𒍲",
+  # MZL454, no values, not in the OGSL.
+  "𒍳",
 ))
 
 for u in range(0x12000, 0x12550):  # Cuneiform, Cuneiform numbers and punctuation, Early Dynastic cuneiform.
