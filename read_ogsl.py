@@ -231,7 +231,17 @@ def rename(old_name, new_name):
 # OGSL naming bugs handled here:
 
 # Insufficiently decomposed/normalized in OGSL.
-for name in ("|DIM×EŠ|", "|KA×EŠ|", "|LAK617×MIR|", "|KAR.MUŠ|", "|ŠE₃.TU.BU|", "|GAD+KID₂.DUH|", "|ŠUL.GI|", "|UD.MUD.NUN.KI|", "|IM.LAK648|"):
+for name in ("|DIM×EŠ|", "|KA×EŠ|",
+             "|LAK617×MIR|",
+             "|KAR.MUŠ|",
+             "|ŠE₃.TU.BU|",
+             "|GAD+KID₂.DUH|",
+             "|ŠUL.GI|",
+             "|UD.MUD.NUN.KI|",
+             "|IM.LAK648|",
+             "|E₃.E₃|",
+             "|KUD.KUD|",
+             "|A.GISAL.GADA.GAR.A.SI|"):
   rename(name,
          name.replace(
              "EŠ", "(U.U.U)").replace(
@@ -243,7 +253,12 @@ for name in ("|DIM×EŠ|", "|KA×EŠ|", "|LAK617×MIR|", "|KAR.MUŠ|", "|ŠE₃.
              "MUD", "HU.HI").replace(
              # Not sure what to make of the following @note in |URU×MIN|; but it is called |URU×MIN|, so shrug.
              # LAK648 is GIŠGAL, but is not properly described as URU×MIN. Many of the URU× signs are LAK648× in ED.
-             "LAK648", "URU×MIN"))
+             "LAK648", "URU×MIN").replace(
+             # The entry has the @inote this is a deliberate exception to what should be |UD.DU.UD.DU|.
+             # Not sure why this exception.  There are no values for this one anyway.
+             "E₃", "UD.DU").replace(
+             "KUD", "TAR").replace(
+             "GADA", "GAD"))
 
 # Insufficiently decomposed in its name, and also incorrectly decomposed in its encoding. see below.
 rename("ŠITA₂", "|ŠITA.GIŠ|")
@@ -546,6 +561,10 @@ for name, forms in forms_by_name.items():
   # See the discussion above.  Maybe someday this will be an alias...
   if "IDIM SQUARED" in expected_unicode_name:
     expected_unicode_name = expected_unicode_name.replace("IDIM SQUARED", "IDIM OVER IDIM SQUARED")
+
+  # Probably a misnomer in Unicode.
+  if expected_unicode_name == "LAK-212":
+    expected_unicode_name = "ASAL2"
 
   if expected_unicode_name == "SHE NUN OVER NUN":  # Not decomposed in Unicode.
     expected_unicode_name = "TIR"
