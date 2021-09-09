@@ -17,7 +17,8 @@ MODIFIERS = {
   "f": "AT LEFT",
   "90": "ROTATED NINETY DEGREES",
   "n": "NUTILLU",
-  "180": "INVERTED"
+  "180": "INVERTED",
+  "v": "ASTERISK",  # In 𒋬 TA ASTERISK.
 }
 
 
@@ -230,14 +231,15 @@ def rename(old_name, new_name):
 # OGSL naming bugs handled here:
 
 # Insufficiently decomposed/normalized in OGSL.
-for name in ("|DIM×EŠ|", "|KA×EŠ|", "|LAK617×MIR|", "|KAR.MUŠ|", "|ŠE₃.TU.BU|", "|GAD+KID₂.DUH|"):
+for name in ("|DIM×EŠ|", "|KA×EŠ|", "|LAK617×MIR|", "|KAR.MUŠ|", "|ŠE₃.TU.BU|", "|GAD+KID₂.DUH|", "|ŠUL.GI|"):
   rename(name,
          name.replace(
              "EŠ", "(U.U.U)").replace(
              "MIR", "DUN3@g@g").replace(
              "KAR", "TE.A").replace(
              "ŠE₃", "EŠ₂").replace(
-             "KID₂", "TAK₄"))
+             "KID₂", "TAK₄").replace(
+             "ŠUL", "DUN"))
 
 # Insufficiently decomposed in its name, and also incorrectly decomposed in its encoding. see below.
 rename("ŠITA₂", "|ŠITA.GIŠ|")
@@ -250,6 +252,11 @@ rename("|(ŠE&ŠE).HUB₂|", "|ŠE.HUB₂|")
 
 # ASCII ugliness in form ~c |ŠU₂.3xAN| of |BAR.AN|.  OGSL correctly uses 3×AN everywhere else.
 rename("|ŠU₂.3xAN|", "|ŠU₂.3×AN|")
+
+# ED, not decomposed in its Unicode name.  Other overdecomposed signs are
+# handled below, but because of the ED garbling we actually rename this one.
+# TODO(egg): It has no values, imbue it with GAN? http://oracc.museum.upenn.edu/dcclt/Q000024
+rename("|AŠ.GAN|", "LAK062")
 
 
 # OGSL encoding bugs handled here.
@@ -397,9 +404,6 @@ for name, forms in forms_by_name.items():
         # http://unicode.org/wg2/docs/n4179.pdf.
         form.codepoints = None
       else:
-        if name == "|AŠ.GAN|":
-          name = "LAK062"
-
         # For some reason Unicode has unpredictable rules for PLUS in the ED block.
         try:
           form.codepoints = unicodedata.lookup(
