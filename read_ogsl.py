@@ -620,10 +620,34 @@ for value, forms_by_codepoints in encoded_forms_by_value.items():
 encoded_signs = set(form.codepoints for forms in forms_by_name.values() for form in forms)
 encoded_signs_with_values = set(form.codepoints for forms in forms_by_name.values() for form in forms if form.values)
 
+NON_SIGNS = set((
+  # @nosign |A×GAN₂@t|
+  # @note LAK refers to CT 7, 32b which has zah₃ (line 3; collated from photograph)
+  # Note: zah₃ is A×HA 𒀄.
+  "𒀃",
+  # @nosign KUL@g
+  # @note Does this sign exist? Not found in LAK, Krebernik OBO 160/1, ELLES, ARES 4. Does not seem to represent LAK20 (related to BALA, not to KUL).
+  # Note: LAK20 seems unencoded, see above; maybe it *is* that, misnamed.
+  "𒆱",
+  # No reference to SAG×TAB nor to U+122A1 in the OGSL.
+  "𒊡",
+  # @nosign UŠUMX
+  # @note KWU089 is a by-form of MUŠ (not related to BUR₂). 𒍘
+  # @v- ušumₓ
+  # Note: MUŠ is 𒈲, BUR₂ is 𒁔.
+  # But see https://cdli.ucla.edu/search/archival_view.php?ObjectID=P212207,
+  # https://books.google.fr/books?id=gkJRhioLVOIC&lpg=PA134&ots=rnchJ9pnlo&dq=%22U%C5%A0UMX%22&hl=fr&pg=PA134#v=onepage&q=%22U%C5%A0UMX%22&f=false?
+  # It probably isn’t KWU089 contrary to Koslova, but the variant of 𒁔, consistent with both the name and the reference glyph,
+  # exists—whether it deserved its own codepoint is another question…
+  "𒍘",
+))
+
 for u in range(0x12000, 0x12550):  # Cuneiform, Cuneiform numbers and punctuation, Early Dynastic cuneiform.
   if unicodedata.category(chr(u)) == "Cn":
     continue
+  if chr(u) in NON_SIGNS:
+    continue
   if chr(u) not in encoded_signs:
-    print(f"No form U+{u:X} {unicodedata.name(chr(u))} {chr(u)}")
+    raise KeyError(f"No form U+{u:X} {unicodedata.name(chr(u))} {chr(u)}")
   if chr(u) not in encoded_signs_with_values:
     print(f"No values for U+{u:X} {unicodedata.name(chr(u))} {chr(u)}")
