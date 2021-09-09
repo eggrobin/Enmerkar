@@ -86,8 +86,8 @@ def compute_expected_unicode_name_at(string, index, inner_plus):
         expected_unicode_name += " OPPOSING "
     else:
       expected_unicode_name += c
-  expected_unicode_name = re.sub("(^|\.)3 TIMES (.*)", r"\1\2 THREE TIMES", expected_unicode_name)
-  expected_unicode_name = re.sub("(^|\.)4 TIMES (.*)", r"\1\2 SQUARED", expected_unicode_name)
+  expected_unicode_name = re.sub("(^|\.)3 TIMES ([^.]*)", r"\1\2 THREE TIMES", expected_unicode_name)
+  expected_unicode_name = re.sub("(^|\.)4 TIMES ([^.]*)", r"\1\2 SQUARED", expected_unicode_name)
   return (expected_unicode_name, i)
 
 
@@ -239,6 +239,9 @@ for name in ("|DIM×EŠ|", "|KA×EŠ|", "|LAK617×MIR|", "|KAR.MUŠ|", "|ŠE₃.
              "ŠE₃", "EŠ₂").replace(
              "KID₂", "TAK₄"))
 
+# Insufficiently decomposed in its name, and also incorrectly decomposed in its encoding. see below.
+rename("ŠITA₂", "|ŠITA.GIŠ|")
+
 rename("|ŠU₂.NESAG|", "|ŠU₂.NISAG|")
 
 # LAK207 looks to me like ŠE.HUB₂, not (ŠE&ŠE).HUB₂.
@@ -304,6 +307,54 @@ for name, forms in forms_by_name.items():
       if form.codepoints != "𒉺𒁖":
         raise ValueError("OGSL bug fixed")
       form.codepoints = "𒉺𒁣"
+    if name == "|ŠITA.GIŠ|":  # ŠITA₂ before the renaming pass above.
+      # GA₂.GIŠ seems pretty clearly wrong for the OB form, see, e.g.,
+      # https://cdli.ucla.edu/search/archival_view.php?ObjectID=P241971,
+      # https://cdli.ucla.edu/search/archival_view.php?ObjectID=P345503.
+      # Šašková goes with ŠITA.GIŠ which looks more like it.
+      # In NA ŠITA = GA₂ which may explain the confusion.
+      if form.codepoints != "𒂷𒄑":
+        raise ValueError("OGSL bug fixed")
+      form.codepoints = "𒋖𒄑"
+    if name == "|BAR.3×AN|":  # Weirdly decomposing 𒀯.
+      if form.codepoints != "𒁇𒀮𒀭":
+        raise ValueError("OGSL bug fixed")
+      form.codepoints = "𒁇𒀯"
+    if name == "|ŠU₂.DUN₃@g@g@s|":
+      # Missing DUN₃@g@g@s seems to just be DUN₄.
+      if form.codepoints != "𒋙":
+        raise ValueError("OGSL bug fixed")
+      form.codepoints = "𒋙𒂈"
+
+    # Unicode and OGSL have both  𒋲 4×TAB and 𒅄 4×(IDIM&IDIM), with the same
+    # values, namely burₓ, buruₓ, gurinₓ, gurunₓ, and kurunₓ.
+    # 4×TAB has an @inote field
+    #   #CHECK is this the same as |4×(IDIM&IDIM)|?
+    # OGSL further has 4×IDIM with the values burₓ, buruₓ, gurinₓ, gurun₅, kurunₓ,
+    # which also appears as part of PAP.PAP.4×IDIM.
+    # The epsd2 uses 4×TAB http://oracc.museum.upenn.edu/epsd2/o0029082, and it
+    # is attested in http://oracc.iaas.upenn.edu/dcclt/nineveh/P395694.
+    # The epsd2 also uses 4×IDIM,
+    # http://oracc.museum.upenn.edu/epsd2/cbd/sux/o0040043.html, it is
+    # attested in http://oracc.iaas.upenn.edu/dcclt/nineveh/P365399 and also in
+    # http://oracc.museum.upenn.edu/dcclt/signlists/X003882.21.2#X003882.16.
+    # I was unable to find usages of 4×(IDIM&IDIM) as such.
+    # Šašková uses that codepoint for 4×IDIM in her Sinacherib font, see
+    # http://home.zcu.cz/~ksaskova/Sign_List.html.
+    # We answer the @inote in the affirmative, and consider that 4×(IDIM&IDIM)
+    # is actually just 4×TAB (it has the same values, and isn’t actually used
+    # anyway).  We further follow usage established by Šašková and repurpose
+    # that codepoint as 4×IDIM.
+    # TODO(egg): ask Tinney whether that makes sense, and if it does, write a
+    # proposal to add IDIM SQUARED as an alias for IDIM OVER IDIM SQUARED and to
+    # change the reference glyph.
+    if name == "|4×(IDIM&IDIM)|":
+      form.codepoints = None
+    elif name == "|4×IDIM|":
+      form.codepoints = "𒅄"
+    elif name == "|PAP.PAP.4×IDIM|":
+      form.codepoints = form.codepoints.replace("X", "𒅄")
+
 
     # Signs that are not really there, one way or another.
     if name == "|DAG.KISIM₅×X|" or name == "|NUNUZ.AB₂×X|":
@@ -317,6 +368,11 @@ for name, forms in forms_by_name.items():
       form.codepoints = None
     if name == "|PAP.PAP×ŠE|":
       # No PAP×ŠE afaict?
+      form.codepoints = None
+    if name == "|SU.RU×KUR|":
+      # RU×KUR removed in https://www.unicode.org/wg2/docs/n2786.pdf.
+      # The @ucode for that sign only has SU, and SU.KUR.RU exists so a font
+      # could ligature it.
       form.codepoints = None
 
     # Unicode 7.0 fanciness.
@@ -426,7 +482,7 @@ for name, forms in forms_by_name.items():
   if expected_unicode_name == "LAGAB TIMES SHITA TENU PLUS GISH":
     expected_unicode_name = "LAGAB TIMES SHITA PLUS GISH TENU"
 
-  # The representative glyph is more over than plus…
+  # The reference glyph is more over than plus…
   if expected_unicode_name == "LAGAB TIMES GUD OVER GUD":
     expected_unicode_name = "LAGAB TIMES GUD PLUS GUD"
   if expected_unicode_name == "PA LAGAB TIMES GUD OVER GUD":
@@ -449,9 +505,26 @@ for name, forms in forms_by_name.items():
   elif expected_unicode_name == "NU11 OVER NU11 BUR OVER BUR":
     expected_unicode_name = "SHIR OVER SHIR BUR OVER BUR"
 
+  # See the discussion above.  Maybe someday this will be an alias...
+  if "IDIM SQUARED" in expected_unicode_name:
+    expected_unicode_name = expected_unicode_name.replace("IDIM SQUARED", "IDIM OVER IDIM SQUARED")
+
+  if expected_unicode_name == "SHE NUN OVER NUN":  # Not decomposed in Unicode.
+    expected_unicode_name = "TIR"
+  if "SHE PLUS NUN OVER NUN" in expected_unicode_name:
+    expected_unicode_name = expected_unicode_name.replace("SHE PLUS NUN OVER NUN", "TIR")
+
+  # Sometimes (but not always) decomposed in OGSL, not decomposed in Unicode.
+  if expected_unicode_name == "SHU2 DUN3 GUNU GUNU SHESHIG":
+    expected_unicode_name = "SHU2 DUN4"
+
+
   actual_unicode_name = " ".join(unicodedata.name(c).replace("CUNEIFORM SIGN ", "") if ord(c) >= 0x12000 else c for c in encoding)
   if "CUNEIFORM NUMERIC SIGN" in actual_unicode_name:
     continue  # TODO(egg): deal with that.
+
+  if expected_unicode_name == "SHU OVER SHU INVERTED":  # Magical Unicode word order.
+    expected_unicode_name = "SHU OVER INVERTED SHU"
 
   # TODO(egg): Figure out the PLUS dance someday...
   if actual_unicode_name.replace(" PLUS ", " ") != expected_unicode_name.replace(" PLUS ", " "):
