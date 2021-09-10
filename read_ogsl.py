@@ -334,7 +334,7 @@ rename("|AŠ.GAN|", "LAK062")
 # CDLI abbreviates that to TMH: the relevant tablet is
 # https://cdli.ucla.edu/search/archival_view.php?ObjectID=P020422,
 # Wherein IV 2 clearly is 𒊓𒍶𒉌𒀝𒈨, with a DUB×ŠE 𒍶 (a variant on
-# 𒄤 gaz=GUM×ŠE perhaps?), not a# DUB×EŠ₂ 𒁿.
+# 𒄤 gaz=GUM×ŠE perhaps?), not a DUB×EŠ₂ 𒁿.
 rename("|DUB×EŠ₂|", "|DUB×ŠE|")
 
 # OGSL encoding bugs handled here.
