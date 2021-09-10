@@ -228,7 +228,53 @@ def rename(old_name, new_name):
     del main_forms_by_name[old_name]
     main_forms_by_name[new_name] = forms
 
-# OGSL naming bugs handled here:
+def disunify(unified_name, new_forms):
+  forms = forms_by_name[unified_name]
+  if len(forms) > 1:
+    raise ValueError(f"Multiple forms {unified_name}: {forms}")
+  form = forms[0]
+  if form.form_id:
+    raise ValueError(f"{form} is not a main form")
+  old_values = sorted(set(form.values))
+  new_values = sorted(set(value for new_form in new_forms
+                          for value in new_form.values))
+  if old_values != new_values:
+    for i in range(max(len(old_values), len(new_values))):
+      print(old_values[i] if i < len(old_values) else None,
+            new_values[i] if i < len(new_values) else None)
+    raise ValueError(f"{old_values} != {new_values}")
+  for new_form in new_forms:
+    if new_form.form_id:
+      raise ValueError(f"{new_form} is not a main form")
+    main_forms_by_name[new_form.name] = [new_form]
+    forms_by_name[new_form.name] = [new_form]
+  new_names = set(new_form.name for new_form in new_forms)
+  if unified_name not in new_names:
+    del main_forms_by_name[unified_name]
+    del forms_by_name[unified_name]
+
+# Unicode 7.0 disunifications.
+
+disunify("|NI.UD|",  # Listed as MZL385 in OGSL.
+         [Form("DAG₃", None, None,
+               ["dag₃", "bar₄", "dak₃", "daq₃", "par₇", "tak₃", "taq₃"],  # MZL386.
+               "𒍴"),
+          Form("NA₄", None, None,
+               ["na₄", "i₄", "ia₄", "za₂",  # MZL385.
+               "ya₄",  # OGSL, probably goes with ia₄.
+               # na₄ = abnu, https://oracc.iaas.upenn.edu/dcclt/Q000091,
+               # http://classes.bnf.fr/ecritures/grand/e029.htm.
+               "abnu",
+               # In https://oracc.iaas.upenn.edu/dcclt/signlists/P370411 next to
+               # other na₄ values (and no dag₃ values).
+               "aban", "atumₓ",
+               ],
+               "𒎎")])
+rename("|IM.NI.UD|", "|IM.NA₄|")
+rename("|NI.UD.EN|", "|NA₄.EN|")
+rename("|NI.UD.KI|", "|NA₄.KI|")
+
+# OGSL naming bugs handled here.
 
 # Insufficiently decomposed/normalized in OGSL.
 for name in ("|DIM×EŠ|", "|KA×EŠ|",
@@ -277,6 +323,19 @@ rename("|ŠU₂.3xAN|", "|ŠU₂.3×AN|")
 # TODO(egg): It has no values, imbue it with GAN? http://oracc.museum.upenn.edu/dcclt/Q000024
 rename("|AŠ.GAN|", "LAK062")
 
+# OGSL gives DUB×EŠ₂ the value gaz₃.
+# MZL gives MZL243 DUB×ŠE the value gaz₃, and has no DUB×EŠ₂.
+# MZL cites Revue d’Assyriologie et d’archéologie orientale 60 p. 92, wherein
+# Civil writes DUB×ŠE.
+# Could the origin of DUB×EŠ₂ be a misreading DUB×ŠÈ=DUB×EŠ₂ of DUB×ŠE?
+# The text cited by Civil is TuM 5, 8: IV 2, which means
+# Texte und Materialien der Frau Professor Hilprecht Collection of Babylonian Antiquities 5,
+# Vorsargonische und sargonische Wirtschaftstexte.
+# CDLI abbreviates that to TMH: the relevant tablet is
+# https://cdli.ucla.edu/search/archival_view.php?ObjectID=P020422,
+# Wherein IV 2 clearly is 𒊓𒍶𒉌𒀝𒈨, with a DUB×ŠE 𒍶 (a variant on
+# 𒄤 gaz=GUM×ŠE perhaps?), not a# DUB×EŠ₂ 𒁿.
+rename("|DUB×EŠ₂|", "|DUB×ŠE|")
 
 # OGSL encoding bugs handled here.
 for name, forms in forms_by_name.items():
@@ -423,7 +482,7 @@ for name, forms in forms_by_name.items():
       # could ligature it.
       form.codepoints = None
 
-    # Unicode 7.0 fanciness.
+    # Unicode 7.0 fanciness, except disunifications.
     if name == "GIG":
       form.codepoints = "𒍼"
     if "GIG" in name and form.codepoints and "X" in form.codepoints:
@@ -432,6 +491,12 @@ for name, forms in forms_by_name.items():
       form.codepoints = "𒍯"
     if name == "|AB×NUN|":
       form.codepoints = "𒍰"
+    if "NI.UD" in name:
+      raise ValueError(f"NI.UD in {form}")
+    if form.codepoints and "𒉌𒌓" in form.codepoints:
+      form.codepoints = form.codepoints.replace("𒉌𒌓", "𒎎")
+    if name == "|DUB×ŠE|":
+      form.codepoints = "𒍶"
 
     if name == "|GA₂×ZIZ₂|" or form.codepoints and any(ord(sign) >= 0x12480 for sign in form.codepoints):
       # The Early Dynastic block is garbled in OGSL.
@@ -652,6 +717,16 @@ NON_SIGNS = set((
   "𒍲",
   # MZL454, no values, not in the OGSL.
   "𒍳",
+  # MZL811, with explanations given at MZL748 𒁹:
+  # 60šu, šuššu^šu resp. 60+šu, šuššu^+šu, the number 60.
+  # Borgers writes this can be transcribed 60(KU) in assyrian, but differs from
+  # KU in babylonian.  This is probably why we have a separate codepoint.
+  # See CAD, entry šūši.
+  # Numeric, so let’s handle that separately.
+  # TODO(egg): Handle it.
+  "𒍵",
+  # Probably not actually a thing; see above.
+  "𒁿",
 ))
 
 for u in range(0x12000, 0x12550):  # Cuneiform, Cuneiform numbers and punctuation, Early Dynastic cuneiform.
