@@ -323,7 +323,7 @@ rename("|ŠU₂.3xAN|", "|ŠU₂.3×AN|")
 # TODO(egg): It has no values, imbue it with GAN? http://oracc.museum.upenn.edu/dcclt/Q000024
 rename("|AŠ.GAN|", "LAK062")
 
-# OGSL gives DUB×EŠ₂ the value gaz₃.
+# OGSL gives DUB×EŠ₂ the value gaz₃, and has no DUB×ŠE.
 # MZL gives MZL243 DUB×ŠE the value gaz₃, and has no DUB×EŠ₂.
 # MZL cites Revue d’Assyriologie et d’archéologie orientale 60 p. 92, wherein
 # Civil writes DUB×ŠE.
