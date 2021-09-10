@@ -323,6 +323,8 @@ rename("|ŠU₂.3xAN|", "|ŠU₂.3×AN|")
 # TODO(egg): It has no values, imbue it with GAN? http://oracc.museum.upenn.edu/dcclt/Q000024
 rename("|AŠ.GAN|", "LAK062")
 
+# Unicode 7.0 related things.
+
 # OGSL gives DUB×EŠ₂ the value gaz₃, and has no DUB×ŠE.
 # MZL gives MZL243 DUB×ŠE the value gaz₃, and has no DUB×EŠ₂.
 # MZL cites Revue d’Assyriologie et d’archéologie orientale 60 p. 92, wherein
@@ -336,6 +338,11 @@ rename("|AŠ.GAN|", "LAK062")
 # Wherein IV 2 clearly is 𒊓𒍶𒉌𒀝𒈨, with a DUB×ŠE 𒍶 (a variant on
 # 𒄤 gaz=GUM×ŠE perhaps?), not a DUB×EŠ₂ 𒁿.
 rename("|DUB×EŠ₂|", "|DUB×ŠE|")
+
+# Broken precedence for MZL393 usud.
+rename("|GA₂×AN.KAK.A|", "|GA₂×(AN.KAK.A)|")
+
+rename("|HI.GIR₃|", "HUŠ")
 
 # OGSL encoding bugs handled here.
 for name, forms in forms_by_name.items():
@@ -497,6 +504,18 @@ for name, forms in forms_by_name.items():
       form.codepoints = form.codepoints.replace("𒉌𒌓", "𒎎")
     if name == "|DUB×ŠE|":
       form.codepoints = "𒍶"
+    if name == "|EZEN×GUD|":
+      form.codepoints = "𒍷"
+    if name == "|EZEN×ŠE|":
+      form.codepoints = "𒍸"
+    if name == "|GA₂×(AN.KAK.A)|":
+      form.codepoints = "𒍹"
+    if name == "|GA₂×AŠ₂|":
+      form.codepoints = "𒍺"
+    if name == "GE₂₂":
+      form.codepoints = "𒍻"
+    if name == "HUŠ":
+      form.codepoints = "𒍽"
 
     if name == "|GA₂×ZIZ₂|" or form.codepoints and any(ord(sign) >= 0x12480 for sign in form.codepoints):
       # The Early Dynastic block is garbled in OGSL.
