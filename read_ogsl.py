@@ -565,6 +565,8 @@ for name, forms in forms_by_name.items():
       form.codepoints = "𒎑"
     if name == "|NINDA₂×GI|":
       form.codepoints = "𒎒"
+    if name == "NU₁₁@90":
+      form.codepoints = "𒎓"
 
     if name == "|GA₂×ZIZ₂|" or form.codepoints and any(ord(sign) >= 0x12480 for sign in form.codepoints):
       # The Early Dynastic block is garbled in OGSL.
@@ -804,6 +806,10 @@ NON_SIGNS = set((
   "𒎅",
   # MZL763, no values, not in the OGSL.
   "𒎈",
+  # MZL741, variant of MZL882.  Not clear how it differs, does it have the same
+  # values?  Does it only have a specific logographic value like TA*?  Punt for
+  # now.
+  "𒎔",
 ))
 
 for u in range(0x12000, 0x12550):  # Cuneiform, Cuneiform numbers and punctuation, Early Dynastic cuneiform.
