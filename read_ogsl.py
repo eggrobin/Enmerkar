@@ -344,6 +344,19 @@ rename("|GA₂×AN.KAK.A|", "|GA₂×(AN.KAK.A)|")
 
 rename("|HI.GIR₃|", "HUŠ")
 
+# Probably broken precedence for MZL532, see MZL514.
+# TODO(egg): Borger cites MSL 14 461f. and MSL 16 212 42; I think the former
+# is https://cdli.ucla.edu/search/archival_view.php?ObjectID=P258842, check
+# that.
+rename("|LU₂×EŠ₂.LAL|", "|LU₂×(EŠ₂.LAL)|")
+
+rename("|ME.U.U.U|", "MEŠ")
+
+for name in list(forms_by_name.keys()):
+  if "ME.U.U.U" in name:
+    rename(name, name.replace("ME.U.U.U", "MEŠ"))
+
+
 # OGSL encoding bugs handled here.
 for name, forms in forms_by_name.items():
   for form in forms:
@@ -516,6 +529,28 @@ for name, forms in forms_by_name.items():
       form.codepoints = "𒍻"
     if name == "HUŠ":
       form.codepoints = "𒍽"
+    if name == "|KA×GIŠ|":
+      form.codepoints = "𒎀"
+    if name == "|KA×HI×AŠ₂|":
+      form.codepoints = "𒎂"
+    if name == "|KA×LUM|":
+      form.codepoints = "𒎃"
+    if name == "|KA×PA|":
+      form.codepoints = "𒎄"
+    if name == "|KA×TU|":
+      form.codepoints = "𒎆"
+    if name == "|KA×UR₂|":
+      form.codepoints = "𒎇"
+    if name == "|LU₂@s×BAD|":
+      form.codepoints = "𒎉"
+    if name == "|LU₂×(EŠ₂.LAL)|":
+      form.codepoints = "𒎊"
+    if name == "|LU₂×ŠU|":
+      form.codepoints = "𒎋"
+    if "MEŠ" in name:
+      form.codepoints = form.codepoints.replace("𒈨𒌍", "𒎌").replace("𒈨𒌋𒌋𒌋", "𒎌")
+    if name == "|MUŠ₃×ZA|":
+      form.codepoints = "𒎍"
 
     if name == "|GA₂×ZIZ₂|" or form.codepoints and any(ord(sign) >= 0x12480 for sign in form.codepoints):
       # The Early Dynastic block is garbled in OGSL.
@@ -746,6 +781,15 @@ NON_SIGNS = set((
   "𒍵",
   # Probably not actually a thing; see above.
   "𒁿",
+  # No idea where that comes from.  Maybe look it HethZL?
+  "𒍾",
+  # MZL067, Hittite, no values, not in the OGSL.
+  "𒍿",
+  # No idea for that one either.
+  "𒎁",
+  "𒎅",
+  # MZL763, no values, not in the OGSL.
+  "𒎈",
 ))
 
 for u in range(0x12000, 0x12550):  # Cuneiform, Cuneiform numbers and punctuation, Early Dynastic cuneiform.
