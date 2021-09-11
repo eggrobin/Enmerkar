@@ -351,10 +351,16 @@ rename("|HI.GIR₃|", "HUŠ")
 rename("|LU₂×EŠ₂.LAL|", "|LU₂×(EŠ₂.LAL)|")
 
 rename("|ME.U.U.U|", "MEŠ")
-
 for name in list(forms_by_name.keys()):
   if "ME.U.U.U" in name:
     rename(name, name.replace("ME.U.U.U", "MEŠ"))
+
+rename("|SAL.TUG₂|", "NIN")
+for name in list(forms_by_name.keys()):
+  if "SAL.TUG₂" in name and name != "|GU₂×(SAL.TUG₂)|":
+    rename(name, name.replace("SAL.TUG₂", "NIN"))
+
+rename("|SAL.KU|", "NIN₉")
 
 
 # OGSL encoding bugs handled here.
@@ -551,6 +557,14 @@ for name, forms in forms_by_name.items():
       form.codepoints = form.codepoints.replace("𒈨𒌍", "𒎌").replace("𒈨𒌋𒌋𒌋", "𒎌")
     if name == "|MUŠ₃×ZA|":
       form.codepoints = "𒎍"
+    if form.codepoints and "NIN" in name:
+      form.codepoints = form.codepoints.replace("𒊩𒌆", "𒎏")
+    if name == "NIN₉":
+      form.codepoints = "𒎐"
+    if name == "|NINDA₂×BAL|":
+      form.codepoints = "𒎑"
+    if name == "|NINDA₂×GI|":
+      form.codepoints = "𒎒"
 
     if name == "|GA₂×ZIZ₂|" or form.codepoints and any(ord(sign) >= 0x12480 for sign in form.codepoints):
       # The Early Dynastic block is garbled in OGSL.
@@ -584,7 +598,7 @@ for name, forms in forms_by_name.items():
     components = []
     for component in re.findall(r"(?:[^.()]|\([^()]+\))+", name[1:-1]):
       if "×" in component:
-        component = f"{component}"
+        component = f"|{component}|"
       if component in forms_by_name and forms_by_name[component][0].codepoints:
         encoding += forms_by_name[component][0].codepoints
         components.append(component)
