@@ -322,9 +322,10 @@ disunify(["ERIN₂"],
 # and 𒌋𒁹𒌋 for DIN.
 # In terms of encoding, this however requires four characters:
 # ḪI 𒄭, ŠÁR 𒊹, TÍ 𒎗, and DIN 𒁷, where the glyphs should be
-# TÍ=DIN=𒁷 in OAkk,  ḪI=𒄭, ŠÁR=𒊹, then quickly ḪI=ŠÁR=𒄭, as is the case,
-# e.g., in https://cdli.ucla.edu/search/archival_view.php?ObjectID=P142654,
-# and by NA DIN=𒌋𒁹𒌋≠ḪI=ŠÁR=TÍ=𒎗.
+# γλ(TÍ)=γλ(DIN)=𒁷 in OAkk,  γλ(ḪI)=𒄭, γλ(ŠÁR)=𒊹, then quickly
+# γλ(ḪI)=γλ(ŠÁR)=𒄭, as is the case, e.g., in
+# https://cdli.ucla.edu/search/archival_view.php?ObjectID=P142654,
+# and by NA γλ(DIN)=𒌋𒁹𒌋≠γλ(ḪI)=γλ(ŠÁR)=γλ(TÍ)=𒎗.
 # The OGSL predates the separate encoding of TÍ 𒎗, so its values (notably tí)
 # are found both in the entries for DIN and ḪI.
 # The following surgery deals with that.
