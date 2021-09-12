@@ -274,6 +274,26 @@ rename("|IM.NI.UD|", "|IM.NA₄|")
 rename("|NI.UD.EN|", "|NA₄.EN|")
 rename("|NI.UD.KI|", "|NA₄.KI|")
 
+disunify("ERIN₂",
+         [Form("ERIN₂", None, None,
+               ["erin₂", "erim", "erem", "eren₂", "nura", "nuri", "nuru",
+                "rin₂", "rina₂", "sap₂", "ṣab", "ṣap", "ṣapa","zab", "zalag₂",
+                "zap", "erena₂", "erina₂",
+                # NABU 1990/12.
+                "surₓ",
+                # Note 𒋝 SIG; putting that there rather than with the UD-like
+                # ones.
+                "sigₓ",],
+               "𒂟"),
+          Form("PIR₂", None, None,
+               [# MZL values; all homophones of 𒌓 UD.
+               "pir₂", "bir₃", "hiš₃", "lah₂", "lih₂", "par₅", "per₂",
+                # Other OGSL values; shoving them there, since they are
+                # homophones of UD (or similar to them) and the ERIN₂ ones in
+                # MZL are not.
+                "udaₓ", "tam₅"],
+               "𒎕")])
+
 # OGSL naming bugs handled here.
 
 # Insufficiently decomposed/normalized in OGSL.
@@ -810,6 +830,8 @@ NON_SIGNS = set((
   # values?  Does it only have a specific logographic value like TA*?  Punt for
   # now.
   "𒎔",
+  # MZL194, no values, not in the OGSL.
+  "𒎖"
 ))
 
 for u in range(0x12000, 0x12550):  # Cuneiform, Cuneiform numbers and punctuation, Early Dynastic cuneiform.
