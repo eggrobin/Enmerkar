@@ -228,14 +228,17 @@ def rename(old_name, new_name):
     del main_forms_by_name[old_name]
     main_forms_by_name[new_name] = forms
 
-def disunify(unified_name, new_forms):
-  forms = forms_by_name[unified_name]
-  if len(forms) > 1:
-    raise ValueError(f"Multiple forms {unified_name}: {forms}")
-  form = forms[0]
-  if form.form_id:
-    raise ValueError(f"{form} is not a main form")
-  old_values = sorted(set(form.values))
+def disunify(unified_names, new_forms):
+  old_forms = []
+  for unified_name in unified_names:
+    forms = forms_by_name[unified_name]
+    if len(forms) > 1:
+      raise ValueError(f"Multiple forms {unified_name}: {forms}")
+    old_forms.append(forms[0])
+    if old_forms[-1].form_id:
+      raise ValueError(f"{old_forms[-1]} is not a main form")
+  old_values = sorted(set(value for old_form in old_forms
+                          for value in old_form.values))
   new_values = sorted(set(value for new_form in new_forms
                           for value in new_form.values))
   if old_values != new_values:
@@ -243,6 +246,13 @@ def disunify(unified_name, new_forms):
       print(old_values[i] if i < len(old_values) else None,
             new_values[i] if i < len(new_values) else None)
     raise ValueError(f"{old_values} != {new_values}")
+  for new_form in new_forms:
+    other_values = set(value for other_form in new_forms
+                             for value in other_form.values
+                             if other_form != new_form)
+    for value in new_form.values:
+      if value in other_values:
+        raise ValueError(f"Duplicate value {value}")
   for new_form in new_forms:
     if new_form.form_id:
       raise ValueError(f"{new_form} is not a main form")
@@ -255,7 +265,7 @@ def disunify(unified_name, new_forms):
 
 # Unicode 7.0 disunifications.
 
-disunify("|NI.UD|",  # Listed as MZL385 in OGSL.
+disunify(["|NI.UD|"],  # Listed as MZL385 in OGSL.
          [Form("DAG₃", None, None,
                ["dag₃", "bar₄", "dak₃", "daq₃", "par₇", "tak₃", "taq₃"],  # MZL386.
                "𒍴"),
@@ -274,7 +284,7 @@ rename("|IM.NI.UD|", "|IM.NA₄|")
 rename("|NI.UD.EN|", "|NA₄.EN|")
 rename("|NI.UD.KI|", "|NA₄.KI|")
 
-disunify("ERIN₂",
+disunify(["ERIN₂"],
          [Form("ERIN₂", None, None,
                ["erin₂", "erim", "erem", "eren₂", "nura", "nuri", "nuru",
                 "rin₂", "rina₂", "sap₂", "ṣab", "ṣap", "ṣapa","zab", "zalag₂",
@@ -318,7 +328,22 @@ disunify("ERIN₂",
 # The OGSL predates the separate encoding of TÍ 𒎗, so its values (notably tí)
 # are found both in the entries for DIN and ḪI.
 # The following surgery deals with that.
-# TODO(egg): surgery.
+disunify(["HI"],
+         [Form("DIN", None, None,
+               # All OGSL values for DIN except ti₂ and di₂.
+               [],#["den", "din", "dini", "gurun₈", "kurun₂", "ten₂", "tim₃", "tin",
+                #"ṭen"],
+               "𒁷"),
+          Form("TI₂", None, None,
+               # Values given in MÉA396, 231.
+               ["ṭi₂", "ṭe₂", "ti₂", "te₂", "de₈", "di₂"],
+               "𒎗"),
+          Form("HI", None, None,
+               # The OGSL values for HI, with the ones from TI₂ above removed.
+               ["dab₃", "danₓ", "da₁₀", "dub₃", "dugu", "dug₃",
+                "du₁₀", "ha₄", "he", "hi", "i₁₁", "kugu", "muₓ",
+                "ta₈", "ʾi₃", "ṭab₆", "ṭa₃"],
+               "𒄭")])
 
 # OGSL naming bugs handled here.
 
