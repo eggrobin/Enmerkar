@@ -329,11 +329,11 @@ disunify(["ERIN₂"],
 # The OGSL predates the separate encoding of TÍ 𒎗, so its values (notably tí)
 # are found both in the entries for DIN and ḪI.
 # The following surgery deals with that.
-disunify(["HI"],
+disunify(["DIN", "HI"],
          [Form("DIN", None, None,
                # All OGSL values for DIN except ti₂ and di₂.
-               [],#["den", "din", "dini", "gurun₈", "kurun₂", "ten₂", "tim₃", "tin",
-                #"ṭen"],
+               ["den", "din", "dini", "gurun₈", "kurun₂", "ten₂", "tim₃", "tin",
+                "ṭen"],
                "𒁷"),
           Form("TI₂", None, None,
                # Values given in MÉA396, 231.
@@ -820,9 +820,13 @@ for name, forms in forms_by_name.items():
     print(f"No encoding for {name} with values {values}")
 
 for value, forms_by_codepoints in encoded_forms_by_value.items():
+  main_forms = [forms for encoding, forms in forms_by_codepoints.items()
+                for form in forms if not form.form_id]
   if "ₓ" not in value and len(forms_by_codepoints) > 1:
-    print(f"Multiple signs with value {value}: {'; '.join(forms_by_codepoints.keys())}")
-    print(forms_by_codepoints.values())
+    if len(main_forms) > 1:
+      print(f"Multiple main forms with value {value}: {main_forms}")
+    elif not main_forms:
+      print(f"Multiple variant forms with value {value}: {forms_by_codepoints.values()}")
 
 for value, forms_by_codepoints in encoded_forms_by_value.items():
   if value[0] in '1234567890':
@@ -907,5 +911,5 @@ for u in range(0x12000, 0x12550):  # Cuneiform, Cuneiform numbers and punctuatio
     continue
   if chr(u) not in encoded_signs:
     raise KeyError(f"No form U+{u:X} {unicodedata.name(chr(u))} {chr(u)}")
-  if chr(u) not in encoded_signs_with_values:
+  if False and chr(u) not in encoded_signs_with_values:
     print(f"No values for U+{u:X} {unicodedata.name(chr(u))} {chr(u)}")
