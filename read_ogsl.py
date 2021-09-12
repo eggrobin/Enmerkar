@@ -639,13 +639,15 @@ for name, forms in forms_by_name.items():
       form.codepoints = "𒎒"
     if name == "NU₁₁@90":
       form.codepoints = "𒎓"
+    if name == "|U.U|":
+      form.codepoints = "𒎙"
 
-    if name == "|GA₂×ZIZ₂|" or form.codepoints and any(ord(sign) >= 0x12480 for sign in form.codepoints):
+    if (name == "|GA₂×ZIZ₂|" or
+        form.codepoints and any(ord(sign) >= 0x12480 for sign in form.codepoints) or
+        name in ("LAK617", "|LAK648×NI|", "|ŠE.NAM₂|")):
       # The Early Dynastic block is garbled in OGSL.
       if name == "|ŠE&ŠE.NI|":
         form.codepoints = chr(0x12532) + "𒉌"
-      elif name == "|MI.ZA₇|":
-        form.codepoints = "𒈪" + chr(0x12541)
       elif name == "|MUŠ₃.ZA₇|":
         form.codepoints = "𒈹" + chr(0x12541)
       elif name == "|ŠE&ŠE.KIN|":
@@ -654,6 +656,7 @@ for name, forms in forms_by_name.items():
                     "|ŠE@v+NAM₂|", "URU@g"):
         # Seemingly unencoded, |KUŠU₂×SAL| is present an early proposal,
         # http://unicode.org/wg2/docs/n4179.pdf.
+        # Post-scriptum: It looks like some of those got renamed from × to +…
         form.codepoints = None
       else:
         # For some reason Unicode has unpredictable rules for PLUS in the ED block.
@@ -883,11 +886,22 @@ NON_SIGNS = set((
   # now.
   "𒎔",
   # MZL194, no values, not in the OGSL.
-  "𒎖"
+  "𒎖",
+  # MZL488, a variant of 𒌝𒈨.
+  # TODO(egg): should it take its place (and should the UM.ME rendition be a
+  # matter for the font?)
+  "𒎘",
+  # Mystery ED things.
+  # TODO(egg): Do another pass over these.
+  "𒔯", "𒔵", "𒔹", "𒔼", "𒕀",
 ))
 
 for u in range(0x12000, 0x12550):  # Cuneiform, Cuneiform numbers and punctuation, Early Dynastic cuneiform.
   if unicodedata.category(chr(u)) == "Cn":
+    continue
+  if unicodedata.name(chr(u)).startswith("CUNEIFORM NUMERIC SIGN"):
+    continue
+  if unicodedata.name(chr(u)).startswith("CUNEIFORM PUNCTUATION SIGN"):
     continue
   if chr(u) in NON_SIGNS:
     continue
