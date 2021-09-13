@@ -111,7 +111,6 @@ values = []
 
 main_forms_by_name = {}
 forms_by_name = {}
-encoded_forms_by_value = {}
 
 class Form:
   def __init__(self, name, form_id, sign, values, codepoints):
@@ -227,10 +226,15 @@ def rename(old_name, new_name):
   for form in forms:
     form.name = new_name
   del forms_by_name[old_name]
-  forms_by_name[new_name] = forms
+  if new_name not in forms_by_name:
+    forms_by_name[new_name] = []
+  forms_by_name[new_name] += forms
   if old_name in main_forms_by_name:
+    main_form = main_forms_by_name[old_name]
     del main_forms_by_name[old_name]
-    main_forms_by_name[new_name] = forms
+    if new_name in main_forms_by_name:
+      raise ValueError(f"Renaming yields duplicate main forms {new_name}")
+    main_forms_by_name[new_name] = main_form
 
 def disunify(unified_names, new_forms):
   old_forms = []
@@ -352,25 +356,29 @@ disunify(["DIN", "HI"],
 
 # OGSL naming bugs handled here.
 
+# Unnormalized |GAD+TAK₄.DUH| (neither has values).
+del main_forms_by_name["|GAD+KID₂.DUH|"]
+del forms_by_name["|GAD+KID₂.DUH|"]
+# Unnormalized |A.GISAL.GAD.GAR.A.SI| (both with the value addirₓ).
+del main_forms_by_name["|A.GISAL.GADA.GAR.A.SI|"]
+del forms_by_name["|A.GISAL.GADA.GAR.A.SI|"]
+
 # Insufficiently decomposed/normalized in OGSL.
 for name in ("|DIM×EŠ|", "|KA×EŠ|",
              "|LAK617×MIR|",
              "|KAR.MUŠ|",
              "|ŠE₃.TU.BU|",
-             "|GAD+KID₂.DUH|",
              "|ŠUL.GI|",
              "|UD.MUD.NUN.KI|",
              "|IM.LAK648|",
              "|E₃.E₃|",
-             "|KUD.KUD|",
-             "|A.GISAL.GADA.GAR.A.SI|"):
+             "|KUD.KUD|"):
   rename(name,
          name.replace(
              "EŠ", "(U.U.U)").replace(
              "MIR", "DUN3@g@g").replace(
              "KAR", "TE.A").replace(
              "ŠE₃", "EŠ₂").replace(
-             "KID₂", "TAK₄").replace(
              "ŠUL", "DUN").replace(
              "MUD", "HU.HI").replace(
              # Not sure what to make of the following @note in |URU×MIN|; but it is called |URU×MIN|, so shrug.
@@ -379,8 +387,7 @@ for name in ("|DIM×EŠ|", "|KA×EŠ|",
              # The entry has the @inote this is a deliberate exception to what should be |UD.DU.UD.DU|.
              # Not sure why this exception.  There are no values for this one anyway.
              "E₃", "UD.DU").replace(
-             "KUD", "TAR").replace(
-             "GADA", "GAD"))
+             "KUD", "TAR"))
 
 # Insufficiently decomposed in its name, and also incorrectly decomposed in its encoding. see below.
 rename("ŠITA₂", "|ŠITA.GIŠ|")
@@ -494,7 +501,10 @@ for name, forms in forms_by_name.items():
       if form.codepoints != "𒉺𒁖":
         raise ValueError("OGSL bug fixed")
       form.codepoints = "𒉺𒁣"
-    if name == "|ŠITA.GIŠ|":  # ŠITA₂ before the renaming pass above.
+    if name == "|ŠITA.GIŠ|" and not form.form_id:
+      # ŠITA₂ before the renaming pass above.
+      # Note that OGSL gives |ŠITA.GIŠ| as a valueless form ~c.
+      # TODO(egg): Consult Labat.
       # GA₂.GIŠ seems pretty clearly wrong for the OB form, see, e.g.,
       # https://cdli.ucla.edu/search/archival_view.php?ObjectID=P241971,
       # https://cdli.ucla.edu/search/archival_view.php?ObjectID=P345503.
@@ -807,12 +817,15 @@ for name, forms in forms_by_name.items():
   if actual_unicode_name.replace(" PLUS ", " ") != expected_unicode_name.replace(" PLUS ", " "):
     raise ValueError(f"{name} encoded as {encoding}, {expected_unicode_name} != {actual_unicode_name}")
 
+
+encoded_forms_by_value = {}
+
 for name, forms in forms_by_name.items():
   encoding = forms[0].codepoints
   if encoding:
     for form in forms:
       for value in form.values:
-        if not value in encoded_forms_by_value:
+        if value not in encoded_forms_by_value:
           encoded_forms_by_value[value] = {}
         if encoding not in encoded_forms_by_value[value]:
           encoded_forms_by_value[value][encoding] = []
@@ -824,7 +837,7 @@ for name, forms in forms_by_name.items():
     print(f"No encoding for {name} with values {values}")
 
 for value, forms_by_codepoints in encoded_forms_by_value.items():
-  main_forms = [forms for encoding, forms in forms_by_codepoints.items()
+  main_forms = [form for encoding, forms in forms_by_codepoints.items()
                 for form in forms if not form.form_id]
   if "ₓ" not in value and len(forms_by_codepoints) > 1:
     if len(main_forms) > 1:
