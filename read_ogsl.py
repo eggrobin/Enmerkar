@@ -193,6 +193,10 @@ try:
           value = "zuliₓ"
         else:
           continue
+      if value == "?":
+        continue
+      if "[...]" in value:
+        continue
       values.append(value)
     if tokens[0] == "@ucode":
       if len(tokens) != 2:
@@ -829,7 +833,7 @@ for value, forms_by_codepoints in encoded_forms_by_value.items():
       print(f"Multiple variant forms with value {value}: {forms_by_codepoints.values()}")
 
 for value, forms_by_codepoints in encoded_forms_by_value.items():
-  if value[0] in '1234567890':
+  if value[0] in '1234567890' or value == "oo":
     continue  # We do numbers separately.
   for c in value:
     if c not in 'bdgptkʾṭqzšsṣhmnrlwyjaeiu₁₂₃₄₅₆₇₈₉₀ₓŋ:⁺⁻ś':  # Oracc uses ḫ for h.
