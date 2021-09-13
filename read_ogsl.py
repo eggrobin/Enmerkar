@@ -841,9 +841,9 @@ for value, forms_by_codepoints in encoded_forms_by_value.items():
                 for form in forms if not form.form_id]
   if "ₓ" not in value and len(forms_by_codepoints) > 1:
     if len(main_forms) > 1:
-      print(f"Multiple main forms with value {value}: {main_forms}")
+      print(f"Multiple main forms with non-ₓ value {value}: {main_forms}")
     elif not main_forms:
-      print(f"Multiple variant forms with value {value}: {forms_by_codepoints.values()}")
+      print(f"Multiple variant forms and no main form with non-ₓ value {value}: {forms_by_codepoints.values()}")
 
 for value, forms_by_codepoints in encoded_forms_by_value.items():
   if value[0] in '1234567890' or value == "oo":
