@@ -177,7 +177,7 @@ try:
         value = tokens[1]
       if value.startswith("/") and value.endswith("/"):
         continue  # Not sure what the values between slashes are.
-      if "-" in value:
+      if "-" in value and not value.endswith("-"):
         # Not sure what those values for sign sequences, e.g., e₆-a aš₇-gi₄, etc. are about; just type the components.
         continue
       if "°" in value:  # What is up with those ° and ·?
@@ -192,10 +192,20 @@ try:
           value = "zuliₓ"
         else:
           continue
-      if value == "?":
+      if value in ("?", "x", "xₓ") or value.endswith("?"):
         continue
       if "[...]" in value:
         continue
+      if value[0] in '1234567890' or value == "oo":
+        continue  # We do numeric values by hand.
+      if value[0] == "{":
+        continue  # Weird values with determinative markup?
+      if value.endswith("@d"):
+        continue  # @d in Elamite values anše@d and geštin@d.
+      if value.endswith("+"):
+        value = value[:-1] + "⁺"
+      value = value.replace("'", "ʾ")
+
       values.append(value)
     if tokens[0] == "@ucode":
       if len(tokens) != 2:
@@ -594,6 +604,44 @@ for name, forms in forms_by_name.items():
       # could ligature it.
       form.codepoints = None
 
+    # Aggressively unifying numbers.
+    # There is another |AŠ.AŠ| as form ~c of |AN.AŠ.AN|, with the value tillaₓ;
+    # let’s not use 2(AŠ) there.
+    if name == "|AŠ.AŠ|" and "min₅" in values:
+      form.codepoints = "𒐀"
+    if name == "|AŠ.AŠ.AŠ|":
+      form.codepoints = "𒐁"
+    if name == "|TAB.AŠ|":
+      form.codepoints = "𒐻"
+    if name == "|AŠ&AŠ&AŠ|":
+      # TODO(egg): This also has the value šušur which seems unrelated to the
+      # (numeric) value eš₁₆; maybe šušur should be AŠ&AŠ&AŠ 𒀼?
+      form.codepoints = "𒐺"
+    if name == "LIMMU₂":
+      # TODO(egg): Why is 𒇹 separate from 𒐂?  Unifying.
+      form.codepoints = "𒐂"
+    if name == "|AŠ&AŠ&AŠ.AŠ|":
+      form.codepoints = "𒐽"
+    if name == "|AŠ&AŠ&AŠ.AŠ&AŠ&AŠ|":
+      form.codepoints = "𒑀"
+    if name == "|AŠ&AŠ&AŠ.AŠ&AŠ&AŠ|":
+      form.codepoints = "𒑀"
+    if name == "|AŠ&AŠ&AŠ.AŠ&AŠ&AŠ.AŠ|":
+      form.codepoints = "𒑁"
+    if name == "|AŠ&AŠ&AŠ.AŠ&AŠ&AŠ.TAB|":
+      form.codepoints = "𒑅"
+    if name == "IMIN":
+      form.codepoints = "𒐌"
+
+
+    # See https://github.com/oracc/ogsl/commit/11f04981b49131894bc5cba543f09b255985b1a2.
+    # There may be a problem, but not having a codepoint for de₂ is not a
+    # solution.  We let UMUM×KASKAL = de₂, and consider that making it look
+    # like an UMUM šeššig is a problem for the font.
+    if name == "DE₂":
+      form.codepoints = "𒌤"
+
+
     # Unicode 7.0 fanciness, except disunifications.
     if name == "GIG":
       form.codepoints = "𒍼"
@@ -772,6 +820,9 @@ for name, forms in forms_by_name.items():
     # @note MURUB₄(LAK157) merges with NISAG(LAK159)
     expected_unicode_name = "NISAG"
 
+  if expected_unicode_name == "DE2":
+    expected_unicode_name = "UMUM TIMES KASKAL"
+
   # Various variants.
   if expected_unicode_name == "TA VARIANT":
     expected_unicode_name = expected_unicode_name.replace("VARIANT", "ASTERISK")
@@ -833,7 +884,8 @@ for name, forms in forms_by_name.items():
 
 for name, forms in forms_by_name.items():
   values = [value for form in forms for value in form.values if "@c" not in value]
-  if values and not forms[0].codepoints:
+  if values and not forms[0].codepoints and any(
+    re.match("^[bdgptkʾṭqzšsṣhmnrlwyaeiu]{1,3}[₁₂₃₄₅₆₇₈₉₀]?$", value) for value in values):
     print(f"No encoding for {name} with values {values}")
 
 for value, forms_by_codepoints in encoded_forms_by_value.items():
@@ -844,12 +896,12 @@ for value, forms_by_codepoints in encoded_forms_by_value.items():
       print(f"Multiple main forms with non-ₓ value {value}: {main_forms}")
     elif not main_forms:
       print(f"Multiple variant forms and no main form with non-ₓ value {value}: {forms_by_codepoints.values()}")
+    else:
+      print(f"Multiple forms (one main) with non-ₓ value {value}: {forms_by_codepoints.values()}")
 
 for value, forms_by_codepoints in encoded_forms_by_value.items():
-  if value[0] in '1234567890' or value == "oo":
-    continue  # We do numbers separately.
   for c in value:
-    if c not in 'bdgptkʾṭqzšsṣhmnrlwyjaeiu₁₂₃₄₅₆₇₈₉₀ₓŋ:⁺⁻ś':  # Oracc uses ḫ for h.
+    if c not in 'bdgptkʾṭqzšsṣhmnrlwyaeiu₁₂₃₄₅₆₇₈₉₀ₓŋ:⁺⁻ś':  # Oracc uses h for ḫ, y for j.
       print(f"Unexpected character {c} in value {value} for {'; '.join(forms_by_codepoints.keys())}")
       print(forms_by_codepoints.values())
       break
@@ -915,6 +967,8 @@ NON_SIGNS = set((
   # Mystery ED things.
   # TODO(egg): Do another pass over these.
   "𒔯", "𒔵", "𒔹", "𒔼", "𒕀",
+  # Unified in favour of the numeric versions.
+  "𒀼", "𒅓", "𒇹"
 ))
 
 for u in range(0x12000, 0x12550):  # Cuneiform, Cuneiform numbers and punctuation, Early Dynastic cuneiform.
