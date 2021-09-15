@@ -17,7 +17,9 @@ BASIC_FRACTIONS = {
 # being the 3-row one, described as the normal Babylonian form in Friberg
 # (2007), 0.4 f.  See also Friberg p. 50-52.
 # Note that this is reversed from
-# http://oracc.museum.upenn.edu/doc/help/editinginatf/metrology/metrologicaltables/index.html.
+# http://oracc.museum.upenn.edu/doc/help/editinginatf/metrology/metrologicaltables/index.html,
+# but same as
+# http://oracc.museum.upenn.edu/doc/help/editinginatf/maths/index.html.
 DIŠ_NUMERALS = [
   [],
   ['𒁹'],
@@ -34,8 +36,8 @@ DIŠ_NUMERALS = [
 # Only the first five are used as part of the counting number systems, the rest
 # appear as BÙR.  We still put them in this list so that the signs may be
 # referred to by name as a ligature of multiple U signs.
-# Again we follow Friberg to choose the normal form, backwards from Oracc (see
-# Friberg p. 53).
+# Again we follow Friberg to choose the normal form, backwards from Oracc metrology,
+# same as Oracc maths (see Friberg p. 53).
 U_NUMERALS = [
   [],
   ['𒌋'],
@@ -267,11 +269,10 @@ add_sexagesimal_compositions('šargal', ŠARGAL_NUMERALS, ŠARʾUGAL_NUMERALS)
 # Referring to signs by by name (except DIŠ since it is our default).
 add_simple_compositions('aš', AŠ_NUMERALS)
 add_simple_compositions('u', U_NUMERALS)
-# Not putting the alephs there as MesZL does not an aleph on šaru.
-add_simple_compositions('buru', BURʾU_NUMERALS)
+add_simple_compositions('burʾu', BURʾU_NUMERALS)
 add_simple_compositions('gešu', GEŠʾU_NUMERALS)
-add_simple_compositions('šaru', ŠARʾU_NUMERALS)
-add_simple_compositions('šarugal', ŠARʾUGAL_NUMERALS)
+add_simple_compositions('šarʾu', ŠARʾU_NUMERALS)
+add_simple_compositions('šarʾugal', ŠARʾUGAL_NUMERALS)
 
 compositions_by_sign = {}
 for composition, sign in compositions.items():

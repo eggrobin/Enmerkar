@@ -628,14 +628,22 @@ for name, forms in forms_by_name.items():
       form.codepoints = "𒐂"
     if name == "|AŠ&AŠ&AŠ.AŠ|":
       form.codepoints = "𒐽"
-    if name == "|AŠ&AŠ&AŠ.AŠ&AŠ&AŠ|":
-      form.codepoints = "𒑀"
+    if name == "|TAB.TAB.AŠ|":
+      form.codepoints = "𒐃"
+    if name == "|TAB.TAB.TAB|":
+      form.codepoints = "𒐄"
     if name == "|AŠ&AŠ&AŠ.AŠ&AŠ&AŠ|":
       form.codepoints = "𒑀"
     if name == "|AŠ&AŠ&AŠ.AŠ&AŠ&AŠ.AŠ|":
       form.codepoints = "𒑁"
+    if name == "|TAB.TAB.TAB.AŠ|":
+      form.codepoints = "𒐅"
+    if name == "|TAB.TAB.TAB.TAB|":
+      form.codepoints = "𒐆"
     if name == "|AŠ&AŠ&AŠ.AŠ&AŠ&AŠ.TAB|":
       form.codepoints = "𒑅"
+    if name == "|TAB.TAB.TAB.TAB.AŠ|":
+      form.codepoints = "𒐇"
     if name == "IMIN":
       form.codepoints = "𒐌"
     if name == "|DIŠ.DIŠ.DIŠ|":
