@@ -1070,7 +1070,7 @@ for encoding, composition in {
     '𒊩' : 'f',
     '𒀭' : 'd',
     '𒍵' : '60šu',  # See above.
-    '𒋬' : 'tav',  # Variant of TA with a specific logographic value (ištu).
+    '𒋬' : 'tav1',  # Variant of TA with a specific logographic value (ištu).
   }.items():
   compositions.setdefault(composition, []).append(encoding)
 
