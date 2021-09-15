@@ -638,15 +638,20 @@ for name, forms in forms_by_name.items():
       form.codepoints = "𒑅"
     if name == "IMIN":
       form.codepoints = "𒐌"
+    if name == "|DIŠ.DIŠ.DIŠ|":
+      form.codepoints = "𒐈"
+    if name == "|DIŠ.DIŠ.DIŠ.U.U|":
+      form.codepoints = "𒐈𒎙"
+    if name == "|DIŠ.DIŠ.DIŠ.U.U.U|":
+      form.codepoints = "𒐈𒌍"
 
 
     # See https://github.com/oracc/ogsl/commit/11f04981b49131894bc5cba543f09b255985b1a2.
     # There may be a problem, but not having a codepoint for de₂ is not a
-    # solution.  We let UMUM×PA = de₂ (it appears as one of the neo-Sumerian
-    # forms in Labat), and consider that making it look like an UMUM šeššig is a
-    # problem for the font.
+    # solution.  We let UMUM×KASKAL = de₂, and consider that making it
+    # look like an UMUM šeššig is a problem for the font.
     if name == "DE₂":
-      form.codepoints = "𒌥"
+      form.codepoints = "𒌤"
 
 
     # Unicode 7.0 fanciness, except disunifications.
@@ -829,7 +834,7 @@ for name, forms in forms_by_name.items():
 
   if expected_unicode_name == "DE2":
     # See above.
-    expected_unicode_name = "UMUM TIMES PA"
+    expected_unicode_name = "UMUM TIMES KASKAL"
 
   # Various variants.
   if expected_unicode_name == "TA VARIANT":
@@ -881,7 +886,7 @@ encoded_forms_by_value = {}
 
 for name, forms in forms_by_name.items():
   encoding = forms[0].codepoints
-  if encoding:
+  if encoding and all(ord(c) >= 0x12000 for c in encoding):
     for form in forms:
       for value in form.values:
         if value not in encoded_forms_by_value:
@@ -891,10 +896,14 @@ for name, forms in forms_by_name.items():
         encoded_forms_by_value[value][encoding].append(form)
 
 for name, forms in forms_by_name.items():
-  values = [value for form in forms for value in form.values if "@c" not in value]
-  if values and not forms[0].codepoints and any(
-    re.match("^[bdgptkʾṭqzšsṣhmnrlwyaeiu]{1,3}[₁₂₃₄₅₆₇₈₉₀]?$", value) for value in values):
-    print(f"No encoding for {name} with values {values}")
+  values = [value for form in forms for value in form.values]
+  unencoded_basic_values = [
+      value for value in values
+      if re.match("^[bdgptkʾṭqzšsṣhmnrlwyaeiu]{1,3}[₁₂₃₄₅₆₇₈₉₀]?$", value) and
+      value not in encoded_forms_by_value]
+  if values and not forms[0].codepoints and unencoded_basic_values:
+    print(f"No encoding for {name} with values {values}; "
+          f"{unencoded_basic_values} not otherwise encoded")
 
 for value, forms_by_codepoints in encoded_forms_by_value.items():
   main_forms = [form for encoding, forms in forms_by_codepoints.items()
@@ -953,7 +962,7 @@ NON_SIGNS = set((
   "𒍵",
   # Probably not actually a thing; see above.
   "𒁿",
-  # No idea where that comes from.  Maybe look it HethZL?
+  # No idea where that comes from.  Maybe look for it HethZL?
   "𒍾",
   # MZL067, Hittite, no values, not in the OGSL.
   "𒍿",
@@ -990,5 +999,14 @@ for u in range(0x12000, 0x12550):  # Cuneiform, Cuneiform numbers and punctuatio
     continue
   if chr(u) not in encoded_signs:
     raise KeyError(f"No form U+{u:X} {unicodedata.name(chr(u))} {chr(u)}")
-  if False and chr(u) not in encoded_signs_with_values:
-    print(f"No values for U+{u:X} {unicodedata.name(chr(u))} {chr(u)}")
+
+with open(".\ogsl.txt", "w", encoding="utf-16") as f:
+  for value, forms_by_codepoints in sorted(encoded_forms_by_value.items()):
+    main_form_encodings = [form.codepoints for encoding, forms in forms_by_codepoints.items()
+                           for form in forms if not form.form_id]
+    for encoding, forms in forms_by_codepoints.items():
+      if "ₓ" in value or (len(forms_by_codepoints) > 1 and len(main_form_encodings) != 1):
+        name = forms[0].name[1:-1] if forms[0].name.startswith("|") else forms[0].name
+        print(f"{value}({name}):{encoding}", file=f)
+      else:
+        print(f"{value}:{encoding}", file=f)
