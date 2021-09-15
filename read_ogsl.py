@@ -198,6 +198,12 @@ try:
         continue
       if value[0] in '1234567890' or value == "oo":
         continue  # We do numeric values by hand.
+      if value in "dfm":
+        # We do determinative shorthands by hand.
+        continue
+      if value in ("𒑱", ':"', ":.", ":"):
+        # We do punctuation by hand.
+        continue
       if value[0] == "{":
         continue  # Weird values with determinative markup?
       if value.endswith("@d"):
@@ -636,10 +642,11 @@ for name, forms in forms_by_name.items():
 
     # See https://github.com/oracc/ogsl/commit/11f04981b49131894bc5cba543f09b255985b1a2.
     # There may be a problem, but not having a codepoint for de₂ is not a
-    # solution.  We let UMUM×KASKAL = de₂, and consider that making it look
-    # like an UMUM šeššig is a problem for the font.
+    # solution.  We let UMUM×PA = de₂ (it appears as one of the neo-Sumerian
+    # forms in Labat), and consider that making it look like an UMUM šeššig is a
+    # problem for the font.
     if name == "DE₂":
-      form.codepoints = "𒌤"
+      form.codepoints = "𒌥"
 
 
     # Unicode 7.0 fanciness, except disunifications.
@@ -821,7 +828,8 @@ for name, forms in forms_by_name.items():
     expected_unicode_name = "NISAG"
 
   if expected_unicode_name == "DE2":
-    expected_unicode_name = "UMUM TIMES KASKAL"
+    # See above.
+    expected_unicode_name = "UMUM TIMES PA"
 
   # Various variants.
   if expected_unicode_name == "TA VARIANT":
@@ -901,9 +909,9 @@ for value, forms_by_codepoints in encoded_forms_by_value.items():
 
 for value, forms_by_codepoints in encoded_forms_by_value.items():
   for c in value:
-    if c not in 'bdgptkʾṭqzšsṣhmnrlwyaeiu₁₂₃₄₅₆₇₈₉₀ₓŋ:⁺⁻ś':  # Oracc uses h for ḫ, y for j.
-      print(f"Unexpected character {c} in value {value} for {'; '.join(forms_by_codepoints.keys())}")
+    if c not in 'bdgptkʾṭqzšsṣhmnrlwyaeiu₁₂₃₄₅₆₇₈₉₀ₓŋ⁺⁻ś':  # Oracc uses h for ḫ, y for j.
       print(forms_by_codepoints.values())
+      raise ValueError(f"Unexpected character {c} in value {value} for {'; '.join(forms_by_codepoints.keys())}")
       break
 
 encoded_signs = set(form.codepoints for forms in forms_by_name.values() for form in forms)
