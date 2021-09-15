@@ -3,6 +3,8 @@ import re
 import codecs
 import unicodedata
 
+import numbers
+
 #sys.stdout = codecs.getwriter("utf-16")(sys.stdout.detach())
 
 
@@ -327,6 +329,14 @@ disunify(["ERIN₂"],
                 # MZL are not.
                 "udaₓ", "tam₅"],
                "𒎕")])
+
+# Being numeric, eše₃ is disunified from either BAD or IDIM.
+for form in forms_by_name["BAD"]:
+  form.values = [value for value in form.values if value != "eše₃"]
+for form in forms_by_name["IDIM"]:
+  form.values = [value for value in form.values if value != "eše₃"]
+main_forms_by_name["EŠE₃"] = Form("EŠE₃", None, None, ["eše₃"], "𒑘")
+forms_by_name["EŠE₃"] = [main_forms_by_name["EŠE₃"]]
 
 # The history of ḪI, ŠÁR, TÍ, and DIN is confusing; as usual with these
 # questions one should look at Labat.
@@ -966,7 +976,6 @@ NON_SIGNS = set((
   # KU in babylonian.  This is probably why we have a separate codepoint.
   # See CAD, entry šūši.
   # Numeric, so let’s handle that separately.
-  # TODO(egg): Handle it.
   "𒍵",
   # Probably not actually a thing; see above.
   "𒁿",
@@ -1008,13 +1017,81 @@ for u in range(0x12000, 0x12550):  # Cuneiform, Cuneiform numbers and punctuatio
   if chr(u) not in encoded_signs:
     raise KeyError(f"No form U+{u:X} {unicodedata.name(chr(u))} {chr(u)}")
 
+compositions = {}
+
+for value, forms_by_codepoints in sorted(encoded_forms_by_value.items()):
+  normalized_value = ""
+  for c in value:
+    if c in "₀₁₂₃₄₅₆₇₈₉":
+      normalized_value += chr(ord("0") + ord(c) - ord("₀"))
+    elif c == "ₓ":
+      normalized_value += "x"
+    elif c == "h":
+      normalized_value += "ḫ"
+    elif c == "y":
+      normalized_value += "j"
+    else:
+      normalized_value += c
+  main_form_encodings = [form.codepoints for encoding, forms in forms_by_codepoints.items()
+                          for form in forms if not form.form_id]
+  form_index = 0
+  for encoding, forms in forms_by_codepoints.items():
+    if "ₓ" in value or (
+        len(forms_by_codepoints) > 1 and (
+            encoding not in main_form_encodings or
+            len(main_form_encodings) != 1)):
+      form_index += 1
+      compositions.setdefault(f"{normalized_value}v{form_index}", []).append(encoding)
+    else:
+      compositions.setdefault(normalized_value, []).append(encoding)
+
+for composition, encoding in numbers.compositions.items():
+  compositions.setdefault(composition, []).append(encoding)
+
+
+# Punctuation, common determinatives, edge cases.
+for encoding, composition in {
+    # MesZL 592.
+    '𒑱' : ':',
+    # MesZL 576: Trennungszeichen (wie n592; Umschrift :).  Disunified from GAM
+    # in Unicode.
+    '𒑲' : ':v',
+    # MesZL 577: Trennungs- und Wiederholungszeichen (Umschrift mit Parpola,
+    # LASEA pXX ⫶).  Disunified from ILIMMU4 in Unicode.
+    '𒑳' : '⫶',
+    # Word divider.  See MesZL 748, p. 418: In Kültepe wird ein senkrechter Keil
+    # als Worttrenner gebraucht.  Disunified from DIŠ in Unicode.
+    # See AAA 1/3, 01 for an example usage:
+    # https://cdli.ucla.edu/search/archival_view.php?ObjectID=P360975.
+    # We use the transcription convention from CDLI, a forward slash.
+    '𒑰' : '/',
+    # Determinatives for personal names and gods.
+    '𒁹' : 'm',
+    '𒊩' : 'f',
+    '𒀭' : 'd',
+    '𒍵' : '60šu',  # See above.
+    '𒋬' : 'tav',  # Variant of TA with a specific logographic value (ištu).
+  }.items():
+  compositions.setdefault(composition, []).append(encoding)
+
+# Uniqueness of compositions.
+for composition, encodings in compositions.items():
+  if len(encodings) != 1:
+    raise ValueError(f"Multiple signs with composition {composition}: {encodings}")
+
+# Sanity check of numbers: 1meow and meow must map to the same sign.
+for composition, encodings in compositions.items():
+  if re.match('^1\D', composition):
+    if composition[1:] in compositions:
+      if encodings[0] != compositions[composition[1:]][0]:
+        if composition in ('1iku', "1šargal"):
+          # Borger gives iku as a reading for 𒃷 in 𒀸𒃷.  Friberg sees that as
+          # a determinative, and transcribes it 1iku GAN2.  Shrug.
+          # Conversely our šargal numerals contain the 𒃲.
+          continue
+        raise ValueError(f"Inconsistent numeric readings: {composition}={encodings[0]},"
+                         f" {composition[1:]}={compositions[composition[1:]][0]}")
+
 with open(".\ogsl.txt", "w", encoding="utf-16") as f:
-  for value, forms_by_codepoints in sorted(encoded_forms_by_value.items()):
-    main_form_encodings = [form.codepoints for encoding, forms in forms_by_codepoints.items()
-                           for form in forms if not form.form_id]
-    for encoding, forms in forms_by_codepoints.items():
-      if "ₓ" in value or (len(forms_by_codepoints) > 1 and len(main_form_encodings) != 1):
-        name = forms[0].name[1:-1] if forms[0].name.startswith("|") else forms[0].name
-        print(f"{value}({name}):{encoding}", file=f)
-      else:
-        print(f"{value}:{encoding}", file=f)
+  for composition, encodings in compositions.items():
+    print(f'"{composition}"="{encodings[0]}"', file=f)
