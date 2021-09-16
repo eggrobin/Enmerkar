@@ -103,6 +103,15 @@ OrderingKey(
       reading.emplace_back().emplace_back();
       reading.back().back() = std::numeric_limits<int>::max();
       last_category = InputCategory::ReadingNumeric;
+    } else if (c == L'+' || c == L'-') {
+      if (last_category != InputCategory::ReadingNumeric) {
+        // Treat an absence of numeric reading as a numeric reading of -1, so it
+        // sorts before any numeric reading, but still allows us to append a key
+        // for the sign.
+        reading.emplace_back().emplace_back(-1);
+        last_category = InputCategory::ReadingNumeric;
+      }
+      reading.back().emplace_back(c == L'-' ? 0 : 1);
     } else if (Sources().contains(c)) {
       source_order = -Sources().at(c).publication_date;
       last_category = InputCategory::Source;
