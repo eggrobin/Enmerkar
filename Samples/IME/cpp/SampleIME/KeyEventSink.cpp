@@ -338,6 +338,8 @@ STDAPI CSampleIME::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam,
             wch = wch == L'd' ? L'ᵈ'
                 : wch == L'f' ? L'ᶠ'
                 : wch == L'm' ? L'ᵐ'
+                : wch == L'+' ? L'⁺'
+                : wch == L'-' ? L'⁻'
                               : wch;
           } else {
             if (wch >= L'0' && wch <= L'9') {

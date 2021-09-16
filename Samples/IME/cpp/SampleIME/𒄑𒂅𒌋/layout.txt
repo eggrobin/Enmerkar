@@ -46,7 +46,7 @@ transcriptions and transliterated Akkadian.
 Superscript one [¹] stands for a dead key with the following effect on the next
 keypress:
 — digits and [x] are typed normally, rather than as subscripts;
-— [d], [f], and [m] are typed as superscripts;
+— [d], [f], [m], [+], and [-] are typed as superscripts;
 — [¹] goes through.
 In particular, the determinative shorthands ᵈ, ᶠ, ᵐ, and ¹ can be typed as
 [¹][d], [¹][f], [¹][m], and [¹][¹] respectively.
