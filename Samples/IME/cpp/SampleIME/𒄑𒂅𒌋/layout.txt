@@ -1,10 +1,10 @@
-﻿⫶  1  2  3  4  5  6  7  8  9  0  -  =
-    q  w  e  r  t  y  u  i  o  p  [  ]  \
+﻿⫶  1  2  3  4  5  6  7  8  9  0  -  +
+    q  w  e  r  t  ŋ  u  i  ś  p  [  ]  \
      a  s  d  f  g  ḫ  j  k  l  :  ʾ
       z  x  š  v  b  n  m  ṣ  ṭ  /
 
-¹  !  ́   ̀   «  »  ̂   ̄   *  (  )  .  +
-    Q  W  E  R  T  Y  U  I  O  P  ⸢  ⸣  ×
+¹  !  ́   ̀   «  »  ̂   ̄   *  (  )  .  =
+    Q  W  E  R  T  Ŋ  U  I  Ś  P  ⸢  ⸣  ×
      A  S  D  F  G  Ḫ  J  K  L  ‹ ›
       Z  X  Š  V  B  N  M  Ṣ  Ṭ  ?
 
@@ -20,9 +20,11 @@ This file is NOT in a Unicode Normal Form; combining marks will be input as-is.
 
 The lowercase layout is used for cuneiform composition. In order to be able to
 input all composition sequences, it should include the following:
-— the Akkadian alphabet [abdegḫijlmnpqrsṣštṭuwz];
+— the basic Akkadian alphabet [abdegḫijlmnpqrsṣštṭuwz];
 — the letter ʾaleph [ʾ];
-— the digits [0] through [9];
+— the letters [ŋ] for Sumerian values and [ś] for Old Akkadian values;
+— the digits [0] through [9] and the letter [x], for homophone indices;
+— the signs [-] and [+], for simplified and complexified forms of signs;
 — the forward slash [/], for fractions and the Kültepe word divider 𒑰;
 — the punctuation signs [:] and [⫶];
 — the letter [f], as a shorthand for the determinative 𒊩;
@@ -52,11 +54,11 @@ In particular, the determinative shorthands ᵈ, ᶠ, ᵐ, and ¹ can be typed a
 Dvorak-like layout:
 
 ⫶  1  2  3  4  5  6  7  8  9  0  [  ]
-    ʾ  ṣ  ṭ  p  y  f  g  š  r  l  /  =  \
-     a  o  e  u  i  d  ḫ  t  n  s  -
+    ʾ  ṣ  ṭ  p  ŋ  f  g  š  r  l  /  +  \
+     a  ś  e  u  i  d  ḫ  t  n  s  -
       :  q  j  k  x  b  m  w  v  z
 
 ¹  !  ́   ̀   «  »  ̂   ̄   *  (  )  ⸢  ⸣
-    ‹  Ṣ  Ṭ  P  Y  F  G  Š  R  L  ?  +  ×
-     A  O  E  U  I  D  Ḫ  T  N  S  .
+    ‹  Ṣ  Ṭ  P  Ŋ  F  G  Š  R  L  ?  =  ×
+     A  Ś  E  U  I  D  Ḫ  T  N  S  .
       ›  Q  J  K  X  B  M  W  V  Z

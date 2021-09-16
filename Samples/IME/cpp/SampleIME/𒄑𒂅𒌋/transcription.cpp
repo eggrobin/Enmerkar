@@ -32,9 +32,9 @@ std::map<wchar_t, Source> const& Sources() {
 std::map<wchar_t, int> const& Alphabet() {
   static const std::map<wchar_t, int>& alphabetical_order =
       ([]() -> auto const& {
-        constexpr std::array<wchar_t, 24> alphabet{
-            {'a', 'b', 'd', 'e', 'g', L'ḫ', 'i', 'j', 'k', 'l', 'm', 'n',
-             'p', 'q', 'r', 's', L'ṣ', L'š', 't', L'ṭ', 'u', 'w', 'z', ʾaleph}};
+        constexpr std::array<wchar_t, 26> alphabet{
+            {'a', 'b', 'd', 'e', 'g', L'ŋ', L'ḫ', 'i', 'j', 'k', 'l', 'm', 'n',
+             'p', 'q', 'r', 's', L'ṣ', L'š', L'ś', 't', L'ṭ', 'u', 'w', 'z', ʾaleph}};
         auto& alphabetical_order = *new std::map<wchar_t, int>();
         for (int i = 0; i < alphabet.size(); ++i) {
           alphabetical_order.emplace(alphabet[i], i);
@@ -130,7 +130,7 @@ std::wstring PrettyTranscriptionHint(std::wstring_view composition_input,
     // Reading alphanumeric, and a handful of symbols for fractions,
     // punctuation, and determinative shorthands.
     return IsDigit(c) || Alphabet().contains(c) || c == '/' || c == ':' ||
-           c == L'⫶' || c == 'f' || c == 'x';
+           c == L'⫶' || c == 'f' || c == 'x' || c == '+' || c == '-';
   };
   bool subscript_has_been_entered = true;
   int vowel_count = 0;
@@ -200,6 +200,10 @@ std::wstring PrettyTranscriptionHint(std::wstring_view composition_input,
           token_hint += L"ᶠ";
         } else if (composition_input == L"d") {
           token_hint += L"ᵈ";
+        } else if (composition_input[i] == L'+') {
+          token_hint += L'⁺';
+        } else if (composition_input[i] == L'-') {
+          token_hint += L'⁻';
         } else {
           token_hint += composition_input[i];
         }

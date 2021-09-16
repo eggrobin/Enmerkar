@@ -1030,6 +1030,10 @@ for value, forms_by_codepoints in sorted(encoded_forms_by_value.items()):
       normalized_value += "ḫ"
     elif c == "y":
       normalized_value += "j"
+    elif c == "⁺":
+      normalized_value += "+"
+    elif c == "⁻":
+      normalized_value += "-"
     else:
       normalized_value += c
   main_form_encodings = [form.codepoints for encoding, forms in forms_by_codepoints.items()
@@ -1092,6 +1096,7 @@ for composition, encodings in compositions.items():
         raise ValueError(f"Inconsistent numeric readings: {composition}={encodings[0]},"
                          f" {composition[1:]}={compositions[composition[1:]][0]}")
 
-with open(".\ogsl.txt", "w", encoding="utf-16") as f:
+with open(r".\Samples\IME\cpp\SampleIME\Dictionary\sign_list.txt",
+          "w", encoding="utf-16") as f:
   for composition, encodings in compositions.items():
     print(f'"{composition}"="{encodings[0]}"', file=f)
