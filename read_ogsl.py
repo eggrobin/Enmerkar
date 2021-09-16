@@ -1067,8 +1067,10 @@ for encoding, composition in {
     # als Worttrenner gebraucht.  Disunified from DIŠ in Unicode.
     # See AAA 1/3, 01 for an example usage:
     # https://cdli.ucla.edu/search/archival_view.php?ObjectID=P360975.
-    # We use the transcription convention from CDLI, a forward slash.
-    '𒑰' : '/',
+    # We use a transliteration inspired by CDLI’s, a forward slash; however we
+    # use that for the normal word divider ZWSP as well, making the OA one v1.
+    '𒑰' : '/v1',
+    '\u200B': '/',
     # Determinatives for personal names and gods.
     '𒁹' : 'm',
     '𒊩' : 'f',

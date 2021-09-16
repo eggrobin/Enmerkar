@@ -25,7 +25,8 @@ input all composition sequences, it should include the following:
 — the letters [ŋ] for Sumerian values and [ś] for Old Akkadian values;
 — the digits [0] through [9] and the letter [x], for homophone indices;
 — the signs [-] and [+], for simplified and complexified forms of signs;
-— the forward slash [/], for fractions and the Kültepe word divider 𒑰;
+— the forward slash [/], for word dividers (both the usual zero-width space and
+  the Kültepe word divider 𒑰) as well as fractions;
 — the punctuation signs [:] and [⫶];
 — the letter [f], as a shorthand for the determinative 𒊩;
 — the letter [v], for variants.
