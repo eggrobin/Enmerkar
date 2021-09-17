@@ -1,2 +1,2 @@
-﻿Xsux:Segoe UI Historic:10
+﻿Xsux:Noto Sans Cuneiform:10
 Latn:Segoe UI:10

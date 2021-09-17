@@ -27,6 +27,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_35D8D6C184D64E3AB61DB2A250CEA65E"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_63D6C3B10B114F2EA35575C64DAB5AB6"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -156,6 +162,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_35D8D6C184D64E3AB61DB2A250CEA65E"
+            {
+            "SourcePath" = "8:..\\..\\..\\..\\..\\..\\Downloads\\NotoSansCuneiform-Regular.ttf"
+            "TargetName" = "8:NotoSansCuneiform-Regular.ttf"
+            "Tag" = "8:"
+            "Folder" = "8:_2BD0BF13F9054CEEBA4FA85F6B912952"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:5"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_63D6C3B10B114F2EA35575C64DAB5AB6"
             {
             "SourcePath" = "8:..\\SampleIME\\Dictionary\\sign_list.txt"
@@ -242,6 +268,17 @@
         }
         "Folder"
         {
+            "{1525181F-901A-416C-8A58-119130FE478E}:_2BD0BF13F9054CEEBA4FA85F6B912952"
+            {
+            "Name" = "8:#1911"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:FontsFolder"
+                "Folders"
+                {
+                }
+            }
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_358807FFCFBB41E0984C7FDA90CACCC9"
             {
             "DefaultLocation" = "8:[ProgramFiles64Folder][Manufacturer]\\[ProductName]"
@@ -315,7 +352,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Xsux IME"
         "ProductCode" = "8:{81AB21F1-E9E0-418C-A19E-5FB99828AF60}"
-        "PackageCode" = "8:{654CAC72-9E9B-4040-AC97-744727B5F053}"
+        "PackageCode" = "8:{67D8BFE8-1B50-4743-A55E-8B0D023C2B4F}"
         "UpgradeCode" = "8:{D949C6DA-17B2-4C66-92BB-2A8EE7749B33}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
