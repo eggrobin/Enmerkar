@@ -1,0 +1,53 @@
+﻿̂   1  2  3  4  5  6  7  8  9  0  ʾ  ̄
+    q  w  e  r  t  z  u  i  ś  p  ṭ  +  \
+     a  s  d  f  g  ḫ  j  k  l  ṣ  ⫶
+      ŋ  x  š  v  b  n  m  /  :  -
+
+×  !  ́   ̀   «  »  [  ]  (  )  =  ?  ¹
+    Q  W  E  R  T  Z  U  I  Ś  P  Ṭ  *  ⸣
+     A  S  D  F  G  Ḫ  J  K  L  Ṣ  ⸢
+      Ŋ  X  Š  V  B  N  M  ‹  ›  .
+
+The first 47 code points of this file, ignoring spaces, carriage returns, and
+line feeds, define the lowercase layout, based on an ANSI physical layout read
+by rows.  The next 47 define the uppercase layout.
+
+These code points must lie in the Basic Multilingual Plane.
+
+Any further characters in this file are ignored.
+
+This file is NOT in a Unicode Normal Form; combining marks will be input as-is.
+
+The lowercase layout is used for cuneiform composition. In order to be able to
+input all composition sequences, it should include the following:
+— the basic Akkadian alphabet [abdegḫijlmnpqrsṣštṭuwz];
+— the letter ʾaleph [ʾ];
+— the letters [ŋ] for Sumerian values and [ś] for Old Akkadian values;
+— the digits [0] through [9] and the letter [x], for homophone indices;
+— the signs [-] and [+], for simplified and complexified forms of signs;
+— the forward slash [/], for word dividers (both the usual zero-width space and
+  the Kültepe word divider 𒑰) as well as fractions;
+— the punctuation signs [:] and [⫶];
+— the letter [f], as a shorthand for the determinative 𒊩;
+— the letter [v], for variants.
+
+The lowercase layout further defines the behaviour of keyboard shortcuts using
+the control key; note that Ctrl+š is sent as Ctrl+c, and Ctrl+ḫ is sent as
+Ctrl+h.
+
+The characters from the lowercase layout are typed directly when the shift key
+is held with caps lock off, or when caps lock is on, with the following
+adjustments:
+— digits are typed as subscripts;
+— the letter [x] is typed as subscript.
+When the shift key is held with caps lock on, the characters from the uppercase
+layout are typed.  The intent is that caps lock be used for writing
+transcriptions and transliterated Akkadian.
+
+Superscript one [¹] stands for a dead key with the following effect on the next
+keypress:
+— digits and [x] are typed normally, rather than as subscripts;
+— [d], [f], [m], [+], and [-] are typed as superscripts;
+— [¹] goes through.
+In particular, the determinative shorthands ᵈ, ᶠ, ᵐ, and ¹ can be typed as
+[¹][d], [¹][f], [¹][m], and [¹][¹] respectively.

@@ -317,10 +317,19 @@
     <CopyFileToFolders Include="Dictionary\sign_list.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="𒂊𒂗𒈨𒅕𒃸\layout.txt">
+    <Text Include="𒂊𒂗𒈨𒅕𒃸\fonts.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="𒂊𒂗𒈨𒅕𒃸\fonts.txt">
+    <Text Include="𒂗𒈨𒅕𒃸\layout_qwertŋ.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="𒂗𒈨𒅕𒃸\layout_azertŋ.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="𒂗𒈨𒅕𒃸\layout_qwertz.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="𒂗𒈨𒅕𒃸\layout_ʾṣṭpŋf.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

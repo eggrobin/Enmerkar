@@ -128,7 +128,10 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="𒂊𒂗𒈨𒅕𒃸\fonts.txt" />
-    <Text Include="𒂊𒂗𒈨𒅕𒃸\layout.txt" />
+    <Text Include="𒂗𒈨𒅕𒃸\layout_azertŋ.txt" />
+    <Text Include="𒂗𒈨𒅕𒃸\layout_qwertz.txt" />
+    <Text Include="𒂗𒈨𒅕𒃸\layout_qwertŋ.txt" />
+    <Text Include="𒂗𒈨𒅕𒃸\layout_ʾṣṭpŋf.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0C8FE010-5146-44D8-AF99-82702C15FEA5}</ProjectGuid>

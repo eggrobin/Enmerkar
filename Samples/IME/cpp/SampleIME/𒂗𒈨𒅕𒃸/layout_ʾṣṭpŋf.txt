@@ -1,12 +1,12 @@
-﻿⫶  1  2  3  4  5  6  7  8  9  0  -  +
-    q  w  e  r  t  ŋ  u  i  ś  p  [  ]  \
-     a  s  d  f  g  ḫ  j  k  l  :  ʾ
-      z  x  š  v  b  n  m  ṣ  ṭ  /
+﻿⫶  1  2  3  4  5  6  7  8  9  0  [  ]
+    ʾ  ṣ  ṭ  p  ŋ  f  g  š  r  l  /  +  \
+     a  ś  e  u  i  d  ḫ  t  n  s  -
+      :  q  j  k  x  b  m  w  v  z
 
-¹  !  ́   ̀   «  »  ̂   ̄   *  (  )  .  =
-    Q  W  E  R  T  Ŋ  U  I  Ś  P  ⸢  ⸣  ×
-     A  S  D  F  G  Ḫ  J  K  L  ‹ ›
-      Z  X  Š  V  B  N  M  Ṣ  Ṭ  ?
+¹  !  ́   ̀   «  »  ̂   ̄   *  (  )  ⸢  ⸣
+    ‹  Ṣ  Ṭ  P  Ŋ  F  G  Š  R  L  ?  =  ×
+     A  Ś  E  U  I  D  Ḫ  T  N  S  .
+      ›  Q  J  K  X  B  M  W  V  Z
 
 The first 47 code points of this file, ignoring spaces, carriage returns, and
 line feeds, define the lowercase layout, based on an ANSI physical layout read
@@ -51,15 +51,3 @@ keypress:
 — [¹] goes through.
 In particular, the determinative shorthands ᵈ, ᶠ, ᵐ, and ¹ can be typed as
 [¹][d], [¹][f], [¹][m], and [¹][¹] respectively.
-
-Dvorak-like layout:
-
-⫶  1  2  3  4  5  6  7  8  9  0  [  ]
-    ʾ  ṣ  ṭ  p  ŋ  f  g  š  r  l  /  +  \
-     a  ś  e  u  i  d  ḫ  t  n  s  -
-      :  q  j  k  x  b  m  w  v  z
-
-¹  !  ́   ̀   «  »  ̂   ̄   *  (  )  ⸢  ⸣
-    ‹  Ṣ  Ṭ  P  Ŋ  F  G  Š  R  L  ?  =  ×
-     A  Ś  E  U  I  D  Ḫ  T  N  S  .
-      ›  Q  J  K  X  B  M  W  V  Z
