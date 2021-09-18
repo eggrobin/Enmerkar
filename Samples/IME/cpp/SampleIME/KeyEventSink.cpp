@@ -15,7 +15,7 @@
 #include "KeyHandlerEditSession.h"
 #include "Compartment.h"
 
-#include "𒄑𒂅𒌋/settings.h"
+#include "𒂗𒈨𒅕𒃸/settings.h"
 
 // 0xF003, 0xF004 are the keys that the touch keyboard sends for next/previous
 #define THIRDPARTY_NEXTPAGE  static_cast<WORD>(0xF003)
@@ -90,7 +90,7 @@ BOOL CSampleIME::_IsKeyEaten(_In_ ITfContext *pContext, UINT codeIn, _Out_ UINT 
     //
     // Map virtual key to character code
     //
-    WCHAR wch = 𒄑𒂅𒌋::LatinLayout::GetCharacter(codeIn);
+    WCHAR wch = 𒂗𒈨𒅕𒃸::LatinLayout::GetCharacter(codeIn);
     *pCodeOut = codeIn;// VKeyFromVKPacketAndWchar(codeIn, wch);
 
     if (pwch)
@@ -328,7 +328,7 @@ STDAPI CSampleIME::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam,
         SendInput(1, &input, sizeof(input));
       } else {
         if (GetKeyState(VK_CAPITAL) & 1 && Global::ModifiersValue & (TF_MOD_SHIFT | TF_MOD_LSHIFT | TF_MOD_RSHIFT)) {
-          wch = 𒄑𒂅𒌋::LatinLayout::GetShiftedCharacter(code);
+          wch = 𒂗𒈨𒅕𒃸::LatinLayout::GetShiftedCharacter(code);
         }
         if (!Received¹ && wch == L'¹') {
           Received¹ = true;

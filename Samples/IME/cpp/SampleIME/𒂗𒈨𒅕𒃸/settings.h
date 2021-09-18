@@ -8,7 +8,7 @@
 #include <Windows.h>
 #include <WinUser.h>
 
-namespace 𒄑𒂅𒌋 {
+namespace 𒂗𒈨𒅕𒃸 {
 
 inline constexpr std::array<std::uint8_t, 47> ANSIPrintableVirtualKeyCodes{{
     // clang-format off
@@ -33,4 +33,4 @@ class LatinLayout {
   static wchar_t GetShiftedCharacter(std::uint8_t virtual_key_code);
 };
 
-}  // namespace 𒄑𒂅𒌋
+}  // namespace 𒂗𒈨𒅕𒃸

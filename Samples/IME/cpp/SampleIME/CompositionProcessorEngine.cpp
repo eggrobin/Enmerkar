@@ -18,7 +18,7 @@
 #include "LanguageBar.h"
 #include "RegKey.h"
 
-#include "𒄑𒂅𒌋/settings.h"
+#include "𒂗𒈨𒅕𒃸/settings.h"
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -1486,7 +1486,7 @@ HRESULT CSampleIME::GetComModuleName(REFGUID rclsid, _Out_writes_(cchPath)WCHAR*
 void CCompositionProcessorEngine::InitKeyStrokeTable()
 {
     int i = 0;
-    for (auto const key_code : 𒄑𒂅𒌋::ANSIPrintableVirtualKeyCodes)
+    for (auto const key_code : 𒂗𒈨𒅕𒃸::ANSIPrintableVirtualKeyCodes)
     {
         _keystrokeTable[i].VirtualKey = key_code;
         _keystrokeTable[i].Modifiers = 0;
@@ -1529,9 +1529,9 @@ void CCompositionProcessorEngine::SetInitialCandidateListRange()
 void CCompositionProcessorEngine::SetDefaultCandidateTextFont()
 {
     // Candidate Text Font
-  for(auto const [font_handle, font] : std::array<std::pair<HFONT&, 𒄑𒂅𒌋::Font>, 2>{{
-          {Global::CuneiformFont, 𒄑𒂅𒌋::GetUserCuneiformFont()},
-          {Global::LatinFont, 𒄑𒂅𒌋::GetUserLatinFont()}}}) {
+  for(auto const [font_handle, font] : std::array<std::pair<HFONT&, 𒂗𒈨𒅕𒃸::Font>, 2>{{
+          {Global::CuneiformFont, 𒂗𒈨𒅕𒃸::GetUserCuneiformFont()},
+          {Global::LatinFont, 𒂗𒈨𒅕𒃸::GetUserLatinFont()}}}) {
     if (font_handle == nullptr)
     {
         font_handle = CreateFont(-MulDiv(font.size_in_points, GetDeviceCaps(GetDC(NULL), LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, 0, 0, 0, 0, 0, 0, 0, 0, font.name.c_str());

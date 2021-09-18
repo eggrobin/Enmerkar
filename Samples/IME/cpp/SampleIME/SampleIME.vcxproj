@@ -70,8 +70,8 @@
     <ClInclude Include="TfTextLayoutSink.h" />
     <ClInclude Include="TipCandidateList.h" />
     <ClInclude Include="TipCandidateString.h" />
-    <ClInclude Include="𒄑𒂅𒌋\settings.h" />
-    <ClInclude Include="𒄑𒂅𒌋\transcription.h" />
+    <ClInclude Include="𒂗𒈨𒅕𒃸\settings.h" />
+    <ClInclude Include="𒂗𒈨𒅕𒃸\transcription.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ActiveLanguageProfileNotifySink.cpp" />
@@ -120,15 +120,15 @@
     <ClCompile Include="ThreadMgrEventSink.cpp" />
     <ClCompile Include="TipCandidateList.cpp" />
     <ClCompile Include="TipCandidateString.cpp" />
-    <ClCompile Include="𒄑𒂅𒌋\settings.cpp" />
-    <ClCompile Include="𒄑𒂅𒌋\transcription.cpp" />
+    <ClCompile Include="𒂗𒈨𒅕𒃸\settings.cpp" />
+    <ClCompile Include="𒂗𒈨𒅕𒃸\transcription.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SampleIME.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="𒄑𒂅𒌋\fonts.txt" />
-    <Text Include="𒄑𒂅𒌋\layout.txt" />
+    <Text Include="𒂊𒂗𒈨𒅕𒃸\fonts.txt" />
+    <Text Include="𒂊𒂗𒈨𒅕𒃸\layout.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0C8FE010-5146-44D8-AF99-82702C15FEA5}</ProjectGuid>

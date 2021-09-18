@@ -9,7 +9,7 @@
 #include "BaseDictionaryEngine.h"
 #include "Globals.h"
 
-#include "𒄑𒂅𒌋/transcription.h"
+#include "𒂗𒈨𒅕𒃸/transcription.h"
 
 //+---------------------------------------------------------------------------
 // ctor
@@ -79,7 +79,7 @@ VOID CBaseDictionaryEngine::MergeSortByFindKeyCode(_Inout_ CSampleImeArray<CCand
                 {
                     *pLI = *pItemList->GetAt(midTemp++);
                 }
-                else if (midTemp == rightRange || 𒄑𒂅𒌋::InputsOrdered(left_composition, mid_composition))
+                else if (midTemp == rightRange || 𒂗𒈨𒅕𒃸::InputsOrdered(left_composition, mid_composition))
                 {
                     *pLI = *pItemList->GetAt(leftRangeTemp++);
                 }
@@ -107,7 +107,7 @@ VOID CBaseDictionaryEngine::MergeSortByFindKeyCode(_Inout_ CSampleImeArray<CCand
         const std::wstring_view left_composition = pItemList->GetAt(leftRange)->full_composition;
         const std::wstring_view left_next_composition = pItemList->GetAt(leftRange+1)->full_composition;
 
-        if (!𒄑𒂅𒌋::InputsOrdered(left_composition, left_next_composition))
+        if (!𒂗𒈨𒅕𒃸::InputsOrdered(left_composition, left_next_composition))
         {
             CCandidateListItem ListItem;
             ListItem = *pItemList->GetAt(leftRange);

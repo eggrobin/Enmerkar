@@ -1,4 +1,4 @@
-﻿#include "𒄑𒂅𒌋/settings.h"
+﻿#include "𒂗𒈨𒅕𒃸/settings.h"
 
 #include <codecvt>
 #include <filesystem>
@@ -9,7 +9,7 @@
 
 #include "Globals.h"
 
-namespace 𒄑𒂅𒌋 {
+namespace 𒂗𒈨𒅕𒃸 {
 
 constexpr std::array<wchar_t, 256> GetLayout(
     std::array<wchar_t, 48> ansi_rows) {
@@ -40,7 +40,7 @@ std::filesystem::path UserAppDataDirectory() {
                          &allocated);
     return allocated;
   }();
-  auto path = std::filesystem::path(appdata) / "mockingbirdnest" / "Xsux IME";
+  auto path = std::filesystem::path(appdata) / "mockingbirdnest" / "Enmerkar";
   if (!std::filesystem::exists(path)) {
     std::filesystem::create_directories(path);
   }
@@ -182,4 +182,4 @@ wchar_t LatinLayout::GetShiftedCharacter(std::uint8_t virtual_key_code) {
   return layout[virtual_key_code];
 }
 
-}  // namespace 𒄑𒂅𒌋
+}  // namespace 𒂗𒈨𒅕𒃸

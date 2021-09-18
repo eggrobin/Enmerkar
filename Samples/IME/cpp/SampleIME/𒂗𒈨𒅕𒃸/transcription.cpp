@@ -1,4 +1,4 @@
-﻿#include "𒄑𒂅𒌋/transcription.h"
+﻿#include "𒂗𒈨𒅕𒃸/transcription.h"
 
 #include <algorithm>
 #include <array>
@@ -7,7 +7,7 @@
 #include <set>
 #include <vector>
 
-namespace 𒄑𒂅𒌋 {
+namespace 𒂗𒈨𒅕𒃸 {
 
 constexpr wchar_t ʾaleph = L'ʾ';
 
@@ -241,4 +241,4 @@ bool InputsOrdered(std::wstring_view left, std::wstring_view right) {
   return OrderingKey(left) < OrderingKey(right);
 }
 
-}  // namespace 𒄑𒂅𒌋
+}  // namespace 𒂗𒈨𒅕𒃸

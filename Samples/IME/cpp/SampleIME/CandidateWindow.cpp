@@ -12,7 +12,7 @@
 #include "BaseWindow.h"
 #include "CandidateWindow.h"
 
-#include "𒄑𒂅𒌋/transcription.h"
+#include "𒂗𒈨𒅕𒃸/transcription.h"
 
 //+---------------------------------------------------------------------------
 //
@@ -678,7 +678,7 @@ void CCandidateWindow::_DrawList(_In_ HDC dcHandle, _In_ UINT iIndex, _In_ RECT 
         }
         {
           HFONT const old_font = (HFONT)SelectObject(dcHandle, Global::LatinFont);
-          std::wstring const hint = 𒄑𒂅𒌋::PrettyTranscriptionHint(composition, composition.size() - tail.size()) + Global::trace;
+          std::wstring const hint = 𒂗𒈨𒅕𒃸::PrettyTranscriptionHint(composition, composition.size() - tail.size()) + Global::trace;
           ExtTextOut(dcHandle, StringPosition * cxLine, pageCount * cyLine + cyOffset, ETO_OPAQUE, &rc, hint.data(), hint.size(), NULL);
           SelectObject(dcHandle, old_font);
         }
