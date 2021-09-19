@@ -33,6 +33,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_1E4C9EFFBAC84B908656EB9C7B1CE028"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_35D8D6C184D64E3AB61DB2A250CEA65E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -193,6 +199,26 @@
             "Tag" = "8:"
             "Folder" = "8:_358807FFCFBB41E0984C7FDA90CACCC9"
             "Condition" = "8:LAYOUT=(Dvorak)"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1E4C9EFFBAC84B908656EB9C7B1CE028"
+            {
+            "SourcePath" = "8:..\\..\\..\\..\\LICENSE"
+            "TargetName" = "8:LICENSE"
+            "Tag" = "8:"
+            "Folder" = "8:_358807FFCFBB41E0984C7FDA90CACCC9"
+            "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -671,7 +697,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:The sign list used by this input method is based on the Oracc Global Sign List by the OGSL Project, licensed under the CC BY-SA 3.0 license."
+                            "Value" = "8:This software is based on the sample IME from Windows classic samples, available under the MIT license. The sign list used by this input method is based on the Oracc Global Sign List by the OGSL Project, available under the CC BY-SA 3.0 license."
                             "DefaultValue" = "8:#1202"
                             "UsePlugInResources" = "11:TRUE"
                             }
@@ -745,7 +771,7 @@
                 {
                     "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_7E0B6127A0D142C68C0E06B3E6C9CEC0"
                     {
-                    "Sequence" = "3:200"
+                    "Sequence" = "3:300"
                     "DisplayName" = "8:Installation Folder"
                     "UseDynamicProperties" = "11:TRUE"
                     "IsDependency" = "11:FALSE"
@@ -809,7 +835,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:The sign list used by this input method is based on the Oracc Global Sign List by the OGSL Project, licensed under the CC BY-SA 3.0 license."
+                            "Value" = "8:This software is based on the sample IME from Windows classic samples by Microsoft Corporation, available under the MIT license. The sign list used by this input method is based on the Oracc Global Sign List by the OGSL Project, available under the CC BY-SA 3.0 license."
                             "DefaultValue" = "8:#1202"
                             "UsePlugInResources" = "11:TRUE"
                             }
@@ -830,7 +856,7 @@
                     }
                     "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_AD17EC7F477B4C0991C4E4EBBEF8DF56"
                     {
-                    "Sequence" = "3:110"
+                    "Sequence" = "3:200"
                     "DisplayName" = "8:RadioButtons   (4 buttons)"
                     "UseDynamicProperties" = "11:TRUE"
                     "IsDependency" = "11:FALSE"
@@ -1009,7 +1035,7 @@
                     }
                     "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_DA6B69B4D6D34DE18E058FEFDA9980E1"
                     {
-                    "Sequence" = "3:300"
+                    "Sequence" = "3:400"
                     "DisplayName" = "8:Confirm Installation"
                     "UseDynamicProperties" = "11:TRUE"
                     "IsDependency" = "11:FALSE"
