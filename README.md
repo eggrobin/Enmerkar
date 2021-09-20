@@ -1,5 +1,5 @@
 # 𒂗𒈨𒅕𒃸
-𒂗𒈨𒅕𒃸 (en-me-er-kár, Enmerkar) is a Sumero-Akkadian cuneiform input method.
+𒂗𒈨𒅕𒃸 (en-me-er-kár, Enmerkar) is a Sumero-Akkadian cuneiform input method for Windows.
 
 It is based on the [sample IME from *Windows classic samples* by
 Microsoft Corporation](https://github.com/microsoft/Windows-classic-samples/tree/22b652b35ea19c544b4ee541f91a59e5e8d8c070/Samples/IME),
@@ -16,11 +16,14 @@ Once 𒂗𒈨𒅕𒃸 is installed, the keyboard layout selector should have a n
 > 𒀝 Syriac  
 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Akkadian IME
 
-> ###### Note.
+> ###### Notes.
 > The language of the input method is Syriac, rather than Akkadian, because Windows does not support arbitrary language codes in
 [the relevant API](https://docs.microsoft.com/en-us/windows/win32/api/msctf/nf-msctf-itfinputprocessorprofilemgr-registerprofile),
 and instead uses [the deprecated `LANGID`](https://docs.microsoft.com/en-us/windows/win32/intl/language-identifier-constants-and-strings),
-which only supports a relatively small set of languages, and in particular has no equivalent to `akk`. We apologize for the inconvenience.
+which only supports a relatively small set of languages, and in particular has no equivalent to `akk`. We apologize for the inconvenience.  
+> The icon, which, for keyboard layouts, is normally an abbreviation of the language names (**ΕΛ**, **ENG**, **FRA**, **РУС**, etc.),
+> is here 𒀝, consistent with 𒀝𒅗𒁺𒌑; note that the IME can also be used to type Sumerian, as its default
+> layouts all have the letter ŋ.
 
 Select this IME to type Sumero-Akkadian cuneiform signs.
 
@@ -35,6 +38,12 @@ When using the IME, typing a transliteration will bring up a menu with possible 
 |`d` `␣` `3` `0` `␣` | 𒀭𒌍 |
 |`d` `␣` `s` `i` `n` `␣` | 𒀭𒌍 |
 
+### Spelling
+
+We use j rather than i̯ or y, w rather than u̯, ŋ rather than g̃ or ĝ, ḫ rather than h.
+Keys are assigned to the letters ŋ, ḫ, ṣ, š, ś, and ṭ (see below for their placement); they should not be
+entered as digraphs.
+
 ### Word separation
 
 For the sake of editability, linebreaking, and searchability, we recommend that you separate words; this can
@@ -45,13 +54,17 @@ The Old Assyrian word divider 𒑰 can serve the same function (while it looks s
 different character, recognized by Unicode as punctuation, and thus it breaks words for the purposes of text
 processing). It may be entered as `/v`.
 
-Examples below. Note that thanks to the word separation, if you double-click on the cuneiform text, a single word will be selected, instead of the whole text; in the case of the Sumerian text, a search engine will then readily find those words in ePSD2.
+Examples below. Note that thanks to the word separation, if you double-click on the cuneiform text below, a single word will* be selected, instead of the whole text; in the case of the Sumerian text, a search engine will then readily find the uninflected words in ePSD2.
 
 | Key sequences | Output |
 |---|---|
 | [`e␣` `nu␣` `ma␣` `/␣` `e␣` `liš␣` `/␣` `la␣` `/␣` `na␣` `bu␣` `u2␣` `/␣` `ša2␣` `ma␣` `mu␣` `/␣` `šap␣` `liš␣` `/␣` `am␣` `ma␣` `tum␣` `/␣` `šu␣` `ma␣` `/␣` `la␣` `/␣` `zak␣` `rat␣`](https://cdli.ucla.edu/search/search_results.php?SearchMode=Text&ObjectID=P480701) | 𒂊𒉡𒈠​𒂊𒇺​𒆷​𒈾𒁍𒌑​𒃻𒈠𒈬​𒉺𒅁𒇺​𒄠𒈠𒌈​𒋗𒈠​𒆷​𒍠𒋥 |
-| [`a␣` `na␣` `/␣` `d␣` `en␣` `lil2␣` `ba␣` `ni␣` `/␣` `qi2␣` `bi2␣` `ma␣` `/v␣` `um␣` `ma␣` `/␣` `ta␣` `ri␣` `iš␣` `ma␣` `tum␣` `ma␣`](https://cdli.ucla.edu/search/search_results.php?SearchMode=Text&ObjectID=P360975) | 𒀀𒈾​𒀭𒂗𒆤𒁀𒉌​𒆠𒉈𒈣𒑰𒌝𒈠​𒋫𒊑𒅖𒈠𒌈𒈠 |
+| [`a␣` `na␣` `/␣` `d␣` `en␣` `lil2␣` `ba␣` `ni␣` `/␣` `qi2␣` `bi2␣` `ma␣` `/v␣` `um␣` `ma␣` `/␣` `ta␣` `ri␣` `iš␣` `ma␣` `tum␣` `ma␣`](https://cdli.ucla.edu/search/search_results.php?SearchMode=Text&ObjectID=P360975) | 𒀀𒈾​𒀭𒂗𒆤𒁀𒉌​𒆠𒉈𒈠𒑰𒌝𒈠​𒋫𒊑𒅖𒈠𒌈𒈠 |
 | [`ud␣` `bi␣` `ta␣` `/␣` `inim␣` `/␣` `im␣` `ma␣` `/␣` `gub␣` `bu␣` `/␣` `nu␣` `ub␣` `ta␣` `ŋal2␣` `la␣` `/␣` `i3␣` `ne␣` `še3␣` `/␣` `d␣` `utu␣` `/␣` `ud␣` `ne␣` `a␣` `/␣` `ur5␣` `/␣` `ḫe2␣` `en␣` `na␣` `nam␣` `ma␣` `am3␣`](https://etcsl.orinst.ox.ac.uk/section1/c1823.htm#line500) | 𒌓𒁉𒋫​𒅗​𒅎𒈠​𒁺𒁍𒉡𒌒𒋫𒅅𒆷​𒉌𒉈𒂠​𒀭𒌓​𒌓​𒉈𒀀​𒄯​𒃶𒂗𒈾𒉆𒈠𒀀𒀭 |
+
+
+---
+\* We are told this does not work on Firefox, though it works fine on Chrome, Edge, and even Internet Explorer.
 
 ### Typing transliterated Sumerian and Akkadian
 
@@ -72,11 +85,12 @@ full stop are mapped to the shifted versions of `2`, `3`, and `-`; see below).
 | `a` `-` `n` `a` `␣`  `⇧k` `⇧a` `⇧2` `⇧-` `⇧d` `⇧i` `⇧n` `⇧g` `⇧i` `⇧r` `⇧-` `⇧r` `⇧a` `⇧k` `⇧i`  | a-na KÁ.DINGIR.RA.KI |
 
 The key `¹` (a shifted key in the default layouts; see below for its placement) has the special effect of making a following
-`+`, `-`, `d`, `f`, or `m` superscript, and a following digit non-subscript:
+`+`, `-`, `d`, `f`, or `m` superscript, and a following digit non-subscript; typing it twice yields an actual superscript 1:
 | Keys (caps lock on) | Output |
 |---|---|
 | `d` `u` `n` `3` `¹` `+` | dun₃⁺ |
-| `¹` `d` `S` `i` `◌̂` `n` | ᵈSîn |
+| `¹` `d` `¹` `3` `¹` `0` | ᵈ30 |
+| `¹` `¹` `⇧a` `⇧n` `⇧-` `⇧š` `⇧a` `⇧2` `⇧r` `⇧-` `⇧d` `⇧u` `⇧3` `⇧-` `⇧a` | ¹AN.ŠÁR.DÙ.A |
 
 ### Layout
 
