@@ -83,7 +83,7 @@ The key `¹` (a shifted key in the default layouts; see below for its placement)
 | Keys (caps lock on) | Output |
 |---|---|
 | `d` `u` `n` `3` `¹` `+` | dun₃⁺ |
-| `¹` `d` `S` `i` `◌̂` `n` | ᵈSîn |
+| `¹` `d` `¹` `3` `¹` `0` | ᵈ30 |
 
 ### Layout
 
