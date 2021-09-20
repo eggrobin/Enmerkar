@@ -1,5 +1,5 @@
 # 𒂗𒈨𒅕𒃸
-𒂗𒈨𒅕𒃸 (en-me-er-kár, Enmerkar) is a Sumero-Akkadian cuneiform input method.
+𒂗𒈨𒅕𒃸 (en-me-er-kár, Enmerkar) is a Sumero-Akkadian cuneiform input method for Windows.
 
 It is based on the [sample IME from *Windows classic samples* by
 Microsoft Corporation](https://github.com/microsoft/Windows-classic-samples/tree/22b652b35ea19c544b4ee541f91a59e5e8d8c070/Samples/IME),
@@ -45,7 +45,7 @@ The Old Assyrian word divider 𒑰 can serve the same function (while it looks s
 different character, recognized by Unicode as punctuation, and thus it breaks words for the purposes of text
 processing). It may be entered as `/v`.
 
-Examples below. Note that thanks to the word separation, if you double-click on the cuneiform text, a single word will be selected, instead of the whole text; in the case of the Sumerian text, a search engine will then readily find those words in ePSD2.
+Examples below. Note that thanks to the word separation, if you double-click on the cuneiform text in Chrome, a single word will be selected, instead of the whole text; in the case of the Sumerian text, a search engine will then readily find those words in ePSD2.
 
 | Key sequences | Output |
 |---|---|
