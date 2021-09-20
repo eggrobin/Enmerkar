@@ -40,8 +40,8 @@ When using the IME, typing a transliteration will bring up a menu with possible 
 
 ### Spelling
 
-We use j rather than i̯ or y, w rather than u̯, ŋ rather than g̃ or ĝ.
-Keys are assigned to the letters ŋ, ṣ, š, ś, and ṭ (see below for their placement); they should not be
+We use j rather than i̯ or y, w rather than u̯, ŋ rather than g̃ or ĝ, ḫ rather than h.
+Keys are assigned to the letters ŋ, ḫ, ṣ, š, ś, and ṭ (see below for their placement); they should not be
 entered as digraphs.
 
 ### Word separation
