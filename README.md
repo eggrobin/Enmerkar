@@ -16,11 +16,14 @@ Once 𒂗𒈨𒅕𒃸 is installed, the keyboard layout selector should have a n
 > 𒀝 Syriac  
 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Akkadian IME
 
-> ###### Note.
+> ###### Notes.
 > The language of the input method is Syriac, rather than Akkadian, because Windows does not support arbitrary language codes in
 [the relevant API](https://docs.microsoft.com/en-us/windows/win32/api/msctf/nf-msctf-itfinputprocessorprofilemgr-registerprofile),
 and instead uses [the deprecated `LANGID`](https://docs.microsoft.com/en-us/windows/win32/intl/language-identifier-constants-and-strings),
-which only supports a relatively small set of languages, and in particular has no equivalent to `akk`. We apologize for the inconvenience.
+which only supports a relatively small set of languages, and in particular has no equivalent to `akk`. We apologize for the inconvenience.  
+> The icon, which, for keyboard layouts, is normally an abbreviation of the language names (**ΕΛ**, **ENG**, **FRA**, **РУС**, etc.),
+> is here 𒀝, consistent with 𒀝𒅗𒁺𒌑; note that the IME can also be used to type Sumerian, as its default
+> layouts all have the letter ŋ.
 
 Select this IME to type Sumero-Akkadian cuneiform signs.
 
