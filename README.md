@@ -45,7 +45,7 @@ The Old Assyrian word divider 𒑰 can serve the same function (while it looks s
 different character, recognized by Unicode as punctuation, and thus it breaks words for the purposes of text
 processing). It may be entered as `/v`.
 
-Examples below. Note that thanks to the word separation, if you double-click on the cuneiform text in Chrome, a single word will be selected, instead of the whole text; in the case of the Sumerian text, a search engine will then readily find those words in ePSD2.
+Examples below. Note that thanks to the word separation, if you double-click on the cuneiform text in Chrome, a single word will be selected, instead of the whole text; in the case of the Sumerian text, a search engine will then readily find the uninflected words in ePSD2.
 
 | Key sequences | Output |
 |---|---|
