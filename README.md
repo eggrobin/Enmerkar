@@ -55,7 +55,7 @@ Examples below. Note that thanks to the word separation, if you double-click on 
 
 
 ---
-* We are told this does not work on Firefox, though it works fine on Chrome, Edge, and even Internet Explorer.
+\* We are told this does not work on Firefox, though it works fine on Chrome, Edge, and even Internet Explorer.
 
 ### Typing transliterated Sumerian and Akkadian
 
