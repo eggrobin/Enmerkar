@@ -79,11 +79,12 @@ full stop are mapped to the shifted versions of `2`, `3`, and `-`; see below).
 | `a` `-` `n` `a` `␣`  `⇧k` `⇧a` `⇧2` `⇧-` `⇧d` `⇧i` `⇧n` `⇧g` `⇧i` `⇧r` `⇧-` `⇧r` `⇧a` `⇧k` `⇧i`  | a-na KÁ.DINGIR.RA.KI |
 
 The key `¹` (a shifted key in the default layouts; see below for its placement) has the special effect of making a following
-`+`, `-`, `d`, `f`, or `m` superscript, and a following digit non-subscript:
+`+`, `-`, `d`, `f`, or `m` superscript, and a following digit non-subscript; typing it twice yields an actual superscript 1:
 | Keys (caps lock on) | Output |
 |---|---|
 | `d` `u` `n` `3` `¹` `+` | dun₃⁺ |
 | `¹` `d` `¹` `3` `¹` `0` | ᵈ30 |
+| `¹` `¹` `⇧a` `⇧n` `⇧-` `⇧š` `⇧a` `⇧2` `⇧r` `⇧-` `⇧d` `⇧u` `⇧3` `⇧-` `⇧a` | ¹AN.ŠÁR.DÙ.A |
 
 ### Layout
 
