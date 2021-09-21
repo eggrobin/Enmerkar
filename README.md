@@ -10,9 +10,13 @@ available under the CC BY-SA 3.0 license.
 Adjustments were made to the sign list, in particular to take into account
 [signs](https://www.unicode.org/wg2/docs/n4277.pdf) newly encoded in Unicode 7.0 (2014).
 
+## Installation
+
+Download the latest release from https://github.com/eggrobin/Enmerkar/releases, and run the installer; select an appropriate keyboard layout (be that one in which you touch type, or the one matching your physical keyboard) in the installer.
+
 ## Usage
 
-Once 𒂗𒈨𒅕𒃸 is installed, the keyboard layout selector should have a new entry.
+Once 𒂗𒈨𒅕𒃸 is installed, the list of keyboard layouts in the [Language bar](https://support.microsoft.com/en-us/topic/switch-between-languages-using-the-language-bar-1c2242c0-fe15-4bc3-99bc-535de6f4f258) should have a new entry.
 > 𒀝 Syriac  
 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Akkadian IME
 
