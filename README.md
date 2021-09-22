@@ -12,7 +12,7 @@ Adjustments were made to the sign list, in particular to take into account
 
 ## Installation
 
-Download the latest release from https://github.com/eggrobin/Enmerkar/releases, and run the installer; select an appropriate keyboard layout (be that one in which you touch type, or the one matching your physical keyboard) in the installer.
+Download the installer (`Enmerkar.msi`) for the latest release from https://github.com/eggrobin/Enmerkar/releases, and run the installer; select an appropriate keyboard layout (be that one in which you touch type, or the one matching your physical keyboard) in the installer.
 
 ## Usage
 
