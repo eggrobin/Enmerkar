@@ -10,9 +10,13 @@ available under the CC BY-SA 3.0 license.
 Adjustments were made to the sign list, in particular to take into account
 [signs](https://www.unicode.org/wg2/docs/n4277.pdf) newly encoded in Unicode 7.0 (2014).
 
+## Installation
+
+Download the installer (`Enmerkar.msi`) for the latest release from https://github.com/eggrobin/Enmerkar/releases, and run the installer; select an appropriate keyboard layout (be that one in which you touch type, or the one matching your physical keyboard) in the installer.
+
 ## Usage
 
-Once 𒂗𒈨𒅕𒃸 is installed, the keyboard layout selector should have a new entry.
+Once 𒂗𒈨𒅕𒃸 is installed, the list of keyboard layouts in the [Language bar](https://support.microsoft.com/en-us/topic/switch-between-languages-using-the-language-bar-1c2242c0-fe15-4bc3-99bc-535de6f4f258) should have a new entry.
 > 𒀝 Syriac  
 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Akkadian IME
 
@@ -60,7 +64,7 @@ Examples below. Note that thanks to the word separation, if you double-click on 
 |---|---|
 | [`e␣` `nu␣` `ma␣` `/␣` `e␣` `liš␣` `/␣` `la␣` `/␣` `na␣` `bu␣` `u2␣` `/␣` `ša2␣` `ma␣` `mu␣` `/␣` `šap␣` `liš␣` `/␣` `am␣` `ma␣` `tum␣` `/␣` `šu␣` `ma␣` `/␣` `la␣` `/␣` `zak␣` `rat␣`](https://cdli.ucla.edu/search/search_results.php?SearchMode=Text&ObjectID=P480701) | 𒂊𒉡𒈠​𒂊𒇺​𒆷​𒈾𒁍𒌑​𒃻𒈠𒈬​𒉺𒅁𒇺​𒄠𒈠𒌈​𒋗𒈠​𒆷​𒍠𒋥 |
 | [`a␣` `na␣` `/␣` `d␣` `en␣` `lil2␣` `ba␣` `ni␣` `/␣` `qi2␣` `bi2␣` `ma␣` `/v␣` `um␣` `ma␣` `/␣` `ta␣` `ri␣` `iš␣` `ma␣` `tum␣` `ma␣`](https://cdli.ucla.edu/search/search_results.php?SearchMode=Text&ObjectID=P360975) | 𒀀𒈾​𒀭𒂗𒆤𒁀𒉌​𒆠𒉈𒈠𒑰𒌝𒈠​𒋫𒊑𒅖𒈠𒌈𒈠 |
-| [`ud␣` `bi␣` `ta␣` `/␣` `inim␣` `/␣` `im␣` `ma␣` `/␣` `gub␣` `bu␣` `/␣` `nu␣` `ub␣` `ta␣` `ŋal2␣` `la␣` `/␣` `i3␣` `ne␣` `še3␣` `/␣` `d␣` `utu␣` `/␣` `ud␣` `ne␣` `a␣` `/␣` `ur5␣` `/␣` `ḫe2␣` `en␣` `na␣` `nam␣` `ma␣` `am3␣`](https://etcsl.orinst.ox.ac.uk/section1/c1823.htm#line500) | 𒌓𒁉𒋫​𒅗​𒅎𒈠​𒁺𒁍𒉡𒌒𒋫𒅅𒆷​𒉌𒉈𒂠​𒀭𒌓​𒌓​𒉈𒀀​𒄯​𒃶𒂗𒈾𒉆𒈠𒀀𒀭 |
+| [`ud␣` `bi␣` `ta␣` `/␣` `inim␣` `/␣` `im␣` `ma␣` `/␣` `gub␣` `bu␣` `/␣` `nu␣` `ub␣` `ta␣` `ŋal2␣` `la␣` `/␣` `i3␣` `ne␣` `eš2␣` `/␣` `d␣` `utu␣` `/␣` `ud␣` `ne␣` `a␣` `/␣` `ur5␣` `/␣` `ḫe2␣` `en␣` `na␣` `nam␣` `ma␣` `am3␣`](https://etcsl.orinst.ox.ac.uk/cgi-bin/etcsl.cgi?text=c.1.8.2.3&display=Crit&charenc=gtilde&lineid=c1823.504#c1823.504) | 𒌓𒁉𒋫​𒅗​𒅎𒈠​𒁺𒁍​𒉡𒌒𒋫𒅅𒆷​𒉌𒉈𒂠​𒀭𒌓​𒌓​𒉈𒀀​𒄯​𒃶𒂗𒈾𒉆𒈠𒀀𒀭 |
 
 
 ---
