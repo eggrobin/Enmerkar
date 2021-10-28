@@ -477,56 +477,6 @@ for name, forms in forms_by_name.items():
   for form in forms:
     if name == "LAK212":
       form.codepoints = "𒀷"
-    if name == "|A₂.ZA.AN.MUŠ₃|":
-      if form.codepoints != "𒀀𒍝𒀭𒈹":
-        raise ValueError("OGSL bug fixed")
-      else:
-        # TODO(egg): check Emar 6/2, p. 508-515 and Emar 6/2, p. 730, Msk 74209a: o i 33–36',
-        # see http://oracc.museum.upenn.edu/epsd2/o0024610,
-        # https://cdli.ucla.edu/search/search_results.php?SearchMode=Text&ObjectID=P271911.
-        form.codepoints = "𒀉𒍝𒀭𒈹"
-    if name == "|DAG.KISIM₅×GA|":
-      # Off by one codepoint.
-      if form.codepoints != "𒁜":
-        raise ValueError("OGSL bug fixed")
-      form.codepoints = "𒁛"
-    if name in ("|BI.ZIZ₂|", "|BI.ZIZ₂.A.AN|", "|BI.ZIZ₂.AN|", "|BI.ZIZ₂.AN.NA|"):
-      # OGSL sometimes (but not always) uses 𒀾 AŠ₂ for 𒍩 ZIZ₂).
-      if "𒀾" not in form.codepoints:
-        raise ValueError("OGSL bug fixed")
-      form.codepoints = form.codepoints.replace("𒀾", "𒍩")
-    if name == "|LU₂.SU|":
-      # šimašgi is very blatantly LU₂.SU, not LU.SU.
-      # https://cdli.ucla.edu/search/search_results.php?SearchMode=Text&PrimaryPublication=&MuseumNumber=&Provenience=&Period=&TextSearch=szimaszgi&ObjectID=&requestFrom=Submit
-      if form.codepoints != "𒇻𒋢":
-        raise ValueError("OGSL bug fixed")
-      form.codepoints = "𒇽𒋢"
-    if name == "|LU₂.SU.A|":
-      # Same as above.
-      # https://cdli.ucla.edu/search/search_results.php?SearchMode=Text&PrimaryPublication=&MuseumNumber=&Provenience=&Period=&TextSearch=szimaszgi2&ObjectID=&requestFrom=Submit
-      if form.codepoints != "𒇻𒋢𒀀":
-        raise ValueError("OGSL bug fixed")
-      form.codepoints = "𒇽𒋢𒀀"
-    if name == "|LU₃.PAP.PAP|":
-      # The entry has the encoding for BARA₂.PAP.PAP (which exists as its own form).
-      # See http://oracc.museum.upenn.edu/epsd2/cbd/sux/o0040424.html, see, e.g.,
-      # http://oracc.museum.upenn.edu/epsd2/sux
-      # https://cdli.ucla.edu/dl/lineart/P221674_l.jpg,
-      # titab₂ is pretty clearly meant to be 𒈖𒉽𒉽 (especially since 𒁈𒉽𒉽 is
-      # titab already).
-      if form.codepoints != "𒁈𒉽𒉽":
-        raise ValueError("OGSL bug fixed")
-      form.codepoints = "𒈖𒉽𒉽"
-    if name == "|PA.DAG.KISIM₅×GUD|":
-      # DAG instead of DAG.KISIM₅×GUD.
-      if form.codepoints != "𒉺𒁖":
-        raise ValueError("OGSL bug fixed")
-      form.codepoints = "𒉺𒁟"
-    if name == "|PA.DAG.KISIM₅×KAK|":
-      # DAG instead of DAG.KISIM₅×KAK.
-      if form.codepoints != "𒉺𒁖":
-        raise ValueError("OGSL bug fixed")
-      form.codepoints = "𒉺𒁣"
     if name == "|ŠITA.GIŠ|" and not form.form_id:
       # ŠITA₂ before the renaming pass above.
       # Note that OGSL gives |ŠITA.GIŠ| as a valueless form ~c.
@@ -539,37 +489,6 @@ for name, forms in forms_by_name.items():
       if form.codepoints != "𒂷𒄑":
         raise ValueError("OGSL bug fixed")
       form.codepoints = "𒋖𒄑"
-    if name == "|BAR.3×AN|":  # Weirdly decomposing 𒀯.
-      if form.codepoints != "𒁇𒀮𒀭":
-        raise ValueError("OGSL bug fixed")
-      form.codepoints = "𒁇𒀯"
-    if name == "|ŠU₂.DUN₃@g@g@s|":
-      # Missing DUN₃@g@g@s seems to just be DUN₄.
-      if form.codepoints != "𒋙":
-        raise ValueError("OGSL bug fixed")
-      form.codepoints = "𒋙𒂈"
-    if name == "|ŠEŠ.KI.DIM×ŠE|":
-      # Probably copied over from another munzerₓ, see http://oracc.museum.upenn.edu/epsd2/cbd/sux/o0034493.html.
-      # Attested in https://cdli.ucla.edu/search/search_results.php?SearchMode=Text&ObjectID=P010677 (RTL?)
-      # and https://cdli.ucla.edu/search/search_results.php?SearchMode=Text&ObjectID=P010087 (partial).
-      if form.codepoints != "𒀖𒀭𒋀𒆠":
-        raise ValueError("OGSL bug fixed")
-      form.codepoints = "𒋀𒆠𒁵"
-    if name == "|UD.MA₂.AB×(U.U.U).ŠIR|":
-      # http://oracc.museum.upenn.edu/epsd2/o0047595. No source for that form,
-      # so can’t check, but let’s trust the description and assume there is a
-      # stray U and None in the encoding.
-      if form.codepoints != "𒌓𒈣𒀔𒌋None𒋓":
-        raise ValueError("OGSL bug fixed")
-      form.codepoints = "𒌓𒈣𒀔𒋓"
-    if name == "|U.GIŠ%GIŠ|":
-      # http://oracc.museum.upenn.edu/epsd2/o0039173.
-      # Attested in http://oracc.iaas.upenn.edu/epsd2/praxis/P273907 where it is
-      # transliterated U.KIB, clearly looks like KIB=GIŠ%GIŠ in
-      # https://cdli.ucla.edu/search/search_results.php?SearchMode=Text&ObjectID=P273907.
-      if form.codepoints != "𒌋𒉣":
-        raise ValueError("OGSL bug fixed")
-      form.codepoints = "𒌋𒄒"
 
     # Unicode and OGSL have both  𒋲 4×TAB and 𒅄 4×(IDIM&IDIM), with the same
     # values, namely burₓ, buruₓ, gurinₓ, gurunₓ, and kurunₓ.
