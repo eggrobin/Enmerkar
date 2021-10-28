@@ -1098,7 +1098,9 @@ for composition, encodings in compositions.items():
         raise ValueError(f"Inconsistent numeric readings: {composition}={encodings[0]},"
                          f" {composition[1:]}={compositions[composition[1:]][0]}")
 
-with open(r".\Samples\IME\cpp\SampleIME\Dictionary\sign_list.txt",
-          "w", encoding="utf-16") as f:
-  for composition, encodings in compositions.items():
-    print(f'"{composition}"="{encodings[0]}"', file=f)
+for filename, encoding in (("sign_list.txt", "utf-16"),
+                           ("sign_list.utf-8.txt", "utf-8")):
+  with open(fr".\Samples\IME\cpp\SampleIME\Dictionary\{filename}",
+            "w", encoding=encoding) as f:
+    for composition, encodings in compositions.items():
+      print(f'"{composition}"="{encodings[0]}"', file=f)

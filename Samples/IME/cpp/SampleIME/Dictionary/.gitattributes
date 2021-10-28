@@ -1,3 +1,4 @@
-# The *.txt files in this directory are UTF-16-encoded and should
+# The file sign_list.txt is UTF-16-encoded and should
 # therefore be treated as pure binary data.
-*.txt binary
+sign_list.txt binary
+sign_list.utf-8.txt text
