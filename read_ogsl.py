@@ -477,18 +477,6 @@ for name, forms in forms_by_name.items():
   for form in forms:
     if name == "LAK212":
       form.codepoints = "𒀷"
-    if name == "|ŠITA.GIŠ|" and not form.form_id:
-      # ŠITA₂ before the renaming pass above.
-      # Note that OGSL gives |ŠITA.GIŠ| as a valueless form ~c.
-      # TODO(egg): Consult Labat.
-      # GA₂.GIŠ seems pretty clearly wrong for the OB form, see, e.g.,
-      # https://cdli.ucla.edu/search/archival_view.php?ObjectID=P241971,
-      # https://cdli.ucla.edu/search/archival_view.php?ObjectID=P345503.
-      # Šašková goes with ŠITA.GIŠ which looks more like it.
-      # In NA ŠITA = GA₂ which may explain the confusion.
-      if form.codepoints != "𒂷𒄑":
-        raise ValueError("OGSL bug fixed")
-      form.codepoints = "𒋖𒄑"
 
     # Unicode and OGSL have both  𒋲 4×TAB and 𒅄 4×(IDIM&IDIM), with the same
     # values, namely burₓ, buruₓ, gurinₓ, gurunₓ, and kurunₓ.
