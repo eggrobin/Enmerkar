@@ -966,7 +966,7 @@ for encoding, composition in {
     '𒑱' : ':',
     # MesZL 576: Trennungszeichen (wie n592; Umschrift :).  Disunified from GAM
     # in Unicode.
-    '𒑲' : ':v',
+    '𒑲' : ':v1',
     # MesZL 577: Trennungs- und Wiederholungszeichen (Umschrift mit Parpola,
     # LASEA pXX ⫶).  Disunified from ILIMMU4 in Unicode.
     '𒑳' : '⫶',
