@@ -471,6 +471,21 @@ for name in list(forms_by_name.keys()):
 
 rename("|SAL.KU|", "NIN₉")
 
+pr_3_table = []
+
+class PR3Row:
+  def __init__(self, sign, old_ucode, old_uname, new_ucode, new_uname):
+    self.sign = sign
+    self.old_ucode = old_ucode
+    self.old_uname = old_uname
+    self.new_ucode = new_ucode
+    self.new_uname = new_uname
+
+  def __lt__(self, other):
+    if self.new_ucode and other.new_ucode:
+      return ''.join(c for c in self.new_ucode if ord(c) >= 0x12480) < ''.join(c for c in other.new_ucode if ord(c) >= 0x12480)
+    else:
+      return ''.join(c for c in self.old_ucode if ord(c) >= 0x12480) < ''.join(c for c in other.old_ucode if ord(c) >= 0x12480)
 
 # OGSL encoding bugs handled here.
 for name, forms in forms_by_name.items():
@@ -644,6 +659,8 @@ for name, forms in forms_by_name.items():
     if (name == "|GA₂×ZIZ₂|" or
         form.codepoints and any(ord(sign) >= 0x12480 for sign in form.codepoints) or
         name in ("LAK617", "|LAK648×NI|", "|ŠE.NAM₂|")):
+      original_ucode = form.codepoints
+      original_uname = '.'.join(unicodedata.name(c, "unassigned").replace('CUNEIFORM SIGN ', '') for c in form.codepoints) if form.codepoints else ''
       # The Early Dynastic block is garbled in OGSL.
       if name == "|ŠE&ŠE.NI|":
         form.codepoints = chr(0x12532) + "𒉌"
@@ -665,7 +682,20 @@ for name, forms in forms_by_name.items():
         except KeyError:
           form.codepoints = unicodedata.lookup(
               "CUNEIFORM SIGN " + compute_expected_unicode_name(name, inner_plus=True))
+      new_ucode = form.codepoints
+      new_uname = '.'.join(unicodedata.name(c, "unassigned").replace('CUNEIFORM SIGN ', '') for c in form.codepoints) if form.codepoints else ''
+      if original_ucode != new_ucode:
+        pr_3_table.append(PR3Row('`'+name.replace('|', r'\|')+'`', original_ucode, original_uname, new_ucode, new_uname))
 
+for row in sorted(pr_3_table):
+  print(" | ".join(
+      (row.sign,
+       '.'.join('x%4X' % ord(c) for c in row.old_ucode) if row.old_ucode else '',
+       row.old_uname,
+       '.'.join('x%4X' % ord(c) for c in row.new_ucode) if row.new_ucode else '',
+       row.new_uname)))
+
+#exit()
 
 # Assign encodings from components.
 for name, forms in forms_by_name.items():
@@ -907,7 +937,11 @@ NON_SIGNS = set((
   "𒎘",
   # Mystery ED things.
   # TODO(egg): Do another pass over these.
-  "𒔯", "𒔵", "𒔹", "𒔼", "𒕀",
+  "𒔯",  # SAG TIMES SHE AT LEFT
+  "𒔵",  # SHE PLUS SAR
+  "𒔹",  # TAK4 PLUS SAG
+  "𒔼",  # UR2 INVERTED
+  "𒕀",  # URU TIMES LU3
   # Unified in favour of the numeric versions.
   "𒀼", "𒅓", "𒇹"
 ))
