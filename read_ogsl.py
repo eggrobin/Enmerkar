@@ -658,7 +658,7 @@ for name, forms in forms_by_name.items():
 
     if (name == "|GA₂×ZIZ₂|" or
         form.codepoints and any(ord(sign) >= 0x12480 for sign in form.codepoints) or
-        name in ("LAK617", "|LAK648×NI|", "|ŠE.NAM₂|")):
+        name in ("LAK617", "|LAK648×NI|")):
       original_ucode = form.codepoints
       original_uname = '.'.join(unicodedata.name(c, "unassigned").replace('CUNEIFORM SIGN ', '') for c in form.codepoints) if form.codepoints else ''
       # The Early Dynastic block is garbled in OGSL.
@@ -668,11 +668,28 @@ for name, forms in forms_by_name.items():
         form.codepoints = "𒈹" + chr(0x12541)
       elif name == "|ŠE&ŠE.KIN|":
         form.codepoints = chr(0x12532) + "𒆥"
-      elif name in ("|KA×ŠE@f|", "|KUŠU₂×SAL|", "LAK20", "|SAG×TAK₄@f|", "|SAR×ŠE|",
-                    "|ŠE@v+NAM₂|", "URU@g"):
-        # Seemingly unencoded, |KUŠU₂×SAL| is present an early proposal,
-        # http://unicode.org/wg2/docs/n4179.pdf.
-        # Post-scriptum: It looks like some of those got renamed from × to +…
+      elif name == "|SAG×TAK₄@f|":
+        # LAK 310 in the OGSL and in N4278.
+        form.codepoints = "𒔹"  # TAK4 PLUS SAG
+      elif name == "|SAR×ŠE|":
+        # LAK 216 in the OGSL and in N4278.
+        form.codepoints = "𒔵"  # SHE PLUS SAR
+      elif name == "URU@g":
+        # No catalogue number here, but the @ucode entry matches URU TIMES LU3
+        # in N4179, and the reference glyph seems close enough to
+        # https://cdli.ucla.edu/dl/photo/P226011.jpg referenced in the @note.
+        form.codepoints = "𒕀"  # URU TIMES LU3
+      elif name == "|ŠE@v+NAM₂|":
+        # No catalogue number here, but the @ucode entry matches SHE PLUS NAM2
+        # in N4179; since this is a separate form from |ŠE.NAM₂|, that code 
+        # point is probably meant to encode this.
+        form.codepoints = "𒔴"  # SHE PLUS NAM2
+      elif name in ("|KA×ŠE@f|", "|KUŠU₂×SAL|", "LAK20"):
+        # The @ucode entry for LAK20 maps to a <reserved> entry in N4179.
+        # That of |KA×ŠE@f| is SANG TIMES SHE AT LEFT there, and
+        # KUSHU2 TIMES SAL is present too.
+        # All of that is gone in N4278: these are unencoded (but see below re. 
+        # LAK20).
         form.codepoints = None
       else:
         # For some reason Unicode has unpredictable rules for PLUS in the ED block.
@@ -824,6 +841,23 @@ for name, forms in forms_by_name.items():
   if expected_unicode_name == "SHU2 DUN3 GUNU GUNU SHESHIG":
     expected_unicode_name = "SHU2 DUN4"
 
+  # ED oddities.
+  if expected_unicode_name == "SAG TIMES TAK4 AT LEFT":
+    # LAK 310 in the OGSL and in N4278, despite the different description.
+    expected_unicode_name = "TAK4 PLUS SAG"
+  if expected_unicode_name == "SAR TIMES SHE":
+    # LAK 216 in the OGSL and in N4278, despite the different description.
+    expected_unicode_name = "SHE PLUS SAR"
+  if expected_unicode_name == "URU GUNU":
+    # The mangled @ucode entry matched URU TIMES LU3 in N4179, and the reference
+    # glyph seems close enough to https://cdli.ucla.edu/dl/photo/P226011.jpg
+    # referenced in the @note.
+    expected_unicode_name = "URU TIMES LU3"
+  if expected_unicode_name == "SHE VARIANT NAM2":
+    # At some point prior to N4179 the word variant was lost.
+    # The @uname entry has SHE VARIANT FORM JOINING NAM2.
+    expected_unicode_name = "SHE PLUS NAM2"
+
   actual_unicode_name = " ".join(unicodedata.name(c).replace("CUNEIFORM SIGN ", "") if ord(c) >= 0x12000 else c for c in encoding)
   if ("CUNEIFORM NUMERIC SIGN" in actual_unicode_name or
       "CUNEIFORM PUNCTUATION SIGN" in actual_unicode_name):
@@ -938,10 +972,7 @@ NON_SIGNS = set((
   # Mystery ED things.
   # TODO(egg): Do another pass over these.
   "𒔯",  # SAG TIMES SHE AT LEFT
-  "𒔵",  # SHE PLUS SAR
-  "𒔹",  # TAK4 PLUS SAG
-  "𒔼",  # UR2 INVERTED
-  "𒕀",  # URU TIMES LU3
+  "𒔼",  # UR2 INVERTED  (maybe UR₂@h?)
   # Unified in favour of the numeric versions.
   "𒀼", "𒅓", "𒇹"
 ))
