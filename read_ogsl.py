@@ -20,6 +20,7 @@ MODIFIERS = {
   "90": "ROTATED NINETY DEGREES",
   "n": "NUTILLU",
   "180": "INVERTED",
+  "h": "INVERTED",
   "v": "VARIANT",
 }
 
@@ -658,7 +659,7 @@ for name, forms in forms_by_name.items():
 
     if (name == "|GA₂×ZIZ₂|" or
         form.codepoints and any(ord(sign) >= 0x12480 for sign in form.codepoints) or
-        name in ("LAK617", "|LAK648×NI|")):
+        name in ("LAK617", "|LAK648×NI|", "UR₂@h")):
       original_ucode = form.codepoints
       original_uname = '.'.join(unicodedata.name(c, "unassigned").replace('CUNEIFORM SIGN ', '') for c in form.codepoints) if form.codepoints else ''
       # The Early Dynastic block is garbled in OGSL.
@@ -684,12 +685,15 @@ for name, forms in forms_by_name.items():
         # in N4179; since this is a separate form from |ŠE.NAM₂|, that code 
         # point is probably meant to encode this.
         form.codepoints = "𒔴"  # SHE PLUS NAM2
-      elif name in ("|KA×ŠE@f|", "|KUŠU₂×SAL|", "LAK20"):
+      elif name == "|KA×ŠE@f|":
+        # The @ucode entry for |KA×ŠE@f| is SANG TIMES SHE AT LEFT in N4179.
+        # That gets renamed (that SANG looks like a typo) and in N4278 and moved
+        # to its place in alphabetical order.
+        form.codepoints = "𒔯"  # SAG TIMES SHE AT LEFT
+      elif name in ("|KUŠU₂×SAL|", "LAK20"):
         # The @ucode entry for LAK20 maps to a <reserved> entry in N4179.
-        # That of |KA×ŠE@f| is SANG TIMES SHE AT LEFT there, and
-        # KUSHU2 TIMES SAL is present too.
-        # All of that is gone in N4278: these are unencoded (but see below re. 
-        # LAK20).
+        # KUSHU2 TIMES SAL is present in N4179.
+        # Both are gone in N4278 (but see below re. LAK20).
         form.codepoints = None
       else:
         # For some reason Unicode has unpredictable rules for PLUS in the ED block.
@@ -857,6 +861,10 @@ for name, forms in forms_by_name.items():
     # At some point prior to N4179 the word variant was lost.
     # The @uname entry has SHE VARIANT FORM JOINING NAM2.
     expected_unicode_name = "SHE PLUS NAM2"
+  if expected_unicode_name == "KA TIMES SHE AT LEFT":
+    # At some point prior to N4179 this was renamed; note the typo in N4179
+    # which has SANG for SAG.
+    expected_unicode_name = "SAG TIMES SHE AT LEFT"
 
   actual_unicode_name = " ".join(unicodedata.name(c).replace("CUNEIFORM SIGN ", "") if ord(c) >= 0x12000 else c for c in encoding)
   if ("CUNEIFORM NUMERIC SIGN" in actual_unicode_name or
@@ -969,10 +977,6 @@ NON_SIGNS = set((
   # TODO(egg): should it take its place (and should the UM.ME rendition be a
   # matter for the font?)
   "𒎘",
-  # Mystery ED things.
-  # TODO(egg): Do another pass over these.
-  "𒔯",  # SAG TIMES SHE AT LEFT
-  "𒔼",  # UR2 INVERTED  (maybe UR₂@h?)
   # Unified in favour of the numeric versions.
   "𒀼", "𒅓", "𒇹"
 ))
