@@ -716,6 +716,25 @@ for row in sorted(pr_3_table):
        '.'.join('x%4X' % ord(c) for c in row.new_ucode) if row.new_ucode else '',
        row.new_uname)))
 
+for row in sorted(pr_3_table):
+  if row.old_ucode and row.new_ucode:
+    print(r"s/@ucode\s\+" +
+          r'\.'.join('x%4X' % ord(c) for c in row.old_ucode) +
+          '/@NEWucode ' +
+          '.'.join('x%4X' % ord(c) for c in row.new_ucode) +
+          '/g')
+
+for row in sorted(pr_3_table):
+  if not row.old_ucode and row.new_ucode:
+    print(r"INSERT in " + row.sign + ": @ucode " +
+          '.'.join('x%4X' % ord(c) for c in row.new_ucode))
+
+for row in sorted(pr_3_table):
+  if row.old_ucode and not row.new_ucode:
+    print(r"DELETE /@ucode\s+" +
+          r'\.'.join('x%4X' % ord(c) for c in row.old_ucode),
+          '/')
+
 #exit()
 
 # Assign encodings from components.
