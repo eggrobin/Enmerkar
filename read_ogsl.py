@@ -483,21 +483,6 @@ for name in list(forms_by_name.keys()):
 
 rename("|SAL.KU|", "NIN₉")
 
-pr_3_table = []
-
-class PR3Row:
-  def __init__(self, line, ucode_line, sign, old_ucode, old_uname, new_ucode, new_uname):
-    self.line = line
-    self.ucode_line = ucode_line
-    self.sign = sign
-    self.old_ucode = old_ucode
-    self.old_uname = old_uname
-    self.new_ucode = new_ucode
-    self.new_uname = new_uname
-
-  def __lt__(self, other):
-    return self.line < other.line
-
 # OGSL encoding bugs handled here.
 for name, forms in forms_by_name.items():
   for form in forms:
@@ -666,87 +651,6 @@ for name, forms in forms_by_name.items():
       form.codepoints = "𒎓"
     if name == "|U.U|":
       form.codepoints = "𒎙"
-
-    if (name == "|GA₂×ZIZ₂|" or
-        form.codepoints and any(ord(sign) >= 0x12480 for sign in form.codepoints) or
-        name in ("LAK617", "|LAK648×NI|", "UR₂@h")):
-      original_ucode = form.original_codepoints or ''
-      original_uname = '.'.join(unicodedata.name(c, "unassigned").replace('CUNEIFORM SIGN ', '') for c in original_ucode)
-      # The Early Dynastic block is garbled in OGSL.
-      if name == "|ŠE&ŠE.NI|":
-        form.codepoints = chr(0x12532) + "𒉌"
-      elif name == "|MUŠ₃.ZA₇|":
-        form.codepoints = "𒈹" + chr(0x12541)
-      elif name == "|ŠE&ŠE.KIN|":
-        form.codepoints = chr(0x12532) + "𒆥"
-      elif name == "|SAG×TAK₄@f|":
-        # LAK 310 in the OGSL and in N4278.
-        form.codepoints = "𒔹"  # TAK4 PLUS SAG
-      elif name == "|SAR×ŠE|":
-        # LAK 216 in the OGSL and in N4278.
-        form.codepoints = "𒔵"  # SHE PLUS SAR
-      elif name == "URU@g":
-        # No catalogue number here, but the @ucode entry matches URU TIMES LU3
-        # in N4179, and the reference glyph seems close enough to
-        # https://cdli.ucla.edu/dl/photo/P226011.jpg referenced in the @note.
-        form.codepoints = "𒕀"  # URU TIMES LU3
-      elif name == "|ŠE@v+NAM₂|":
-        # No catalogue number here, but the @ucode entry matches SHE PLUS NAM2
-        # in N4179; since this is a separate form from |ŠE.NAM₂|, that code 
-        # point is probably meant to encode this.
-        form.codepoints = "𒔴"  # SHE PLUS NAM2
-      elif name == "|KA×ŠE@f|":
-        # The @ucode entry for |KA×ŠE@f| is SANG TIMES SHE AT LEFT in N4179.
-        # That gets renamed (that SANG looks like a typo) and in N4278 and moved
-        # to its place in alphabetical order.
-        form.codepoints = "𒔯"  # SAG TIMES SHE AT LEFT
-      elif name in ("|KUŠU₂×SAL|", "LAK20"):
-        # The @ucode entry for LAK20 maps to a <reserved> entry in N4179.
-        # KUSHU2 TIMES SAL is present in N4179.
-        # Both are gone in N4278 (but see below re. LAK20).
-        form.codepoints = None
-      else:
-        # For some reason Unicode has unpredictable rules for PLUS in the ED block.
-        try:
-          form.codepoints = unicodedata.lookup(
-              "CUNEIFORM SIGN " + compute_expected_unicode_name(name, inner_plus=False))
-        except KeyError:
-          form.codepoints = unicodedata.lookup(
-              "CUNEIFORM SIGN " + compute_expected_unicode_name(name, inner_plus=True))
-      new_ucode = form.codepoints
-      new_uname = '.'.join(unicodedata.name(c, "unassigned").replace('CUNEIFORM SIGN ', '') for c in form.codepoints) if form.codepoints else ''
-      if original_ucode != new_ucode:
-        pr_3_table.append(PR3Row(form.sign_or_form_line, form.ucode_line, '`'+form.original_name.replace('|', r'\|')+'`', original_ucode, original_uname, new_ucode, new_uname))
-
-for row in sorted(pr_3_table):
-  print(" | ".join(
-      (row.sign,
-       "[%s](https://github.com/oracc/ogsl/pull/3/files#diff-fb2bfb956a6bfa1476fcd15c46acb2661957b996676fbe4bba39f333cc6568fbL%i)" % (
-           re.sub(r'^@ucode\s+(.*)$', r'\1', lines[row.ucode_line - 1]), row.ucode_line) if row.old_ucode else '',
-       row.old_uname,
-       '.'.join('x%4X' % ord(c) for c in row.new_ucode) if row.new_ucode else '',
-       row.new_uname)))
-
-for row in sorted(pr_3_table):
-  if row.old_ucode and row.new_ucode:
-    print(r"%ss/@ucode\s\+" % row.ucode_line +
-          r'\.'.join(r'x\?%4X' % ord(c) for c in row.old_ucode) +
-          '/@ucode ' +
-          '.'.join('x%4X' % ord(c) for c in row.new_ucode) +
-          '/')
-
-for row in sorted(pr_3_table):
-  if row.old_ucode and not row.new_ucode:
-    print(r"%s{/@ucode\s\+" % row.ucode_line +
-          r'\.'.join('x\?%4X' % ord(c) for c in row.old_ucode) +
-          '/d}')
-
-for row in reversed(sorted(pr_3_table)):
-  if not row.old_ucode and row.new_ucode:
-    print(r"INSERT in " + row.sign + "after line %s: @ucode " % row.line +
-          '.'.join('x%4X' % ord(c) for c in row.new_ucode))
-
-#exit()
 
 # Assign encodings from components.
 for name, forms in forms_by_name.items():
