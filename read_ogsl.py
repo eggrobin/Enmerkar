@@ -110,18 +110,24 @@ sign_name = None
 form_id = None
 name = None
 codepoints = None
+sign_or_form_line = None
+ucode_line = None
 values = []
 
 main_forms_by_name = {}
 forms_by_name = {}
 
 class Form:
-  def __init__(self, name, form_id, sign, values, codepoints):
+  def __init__(self, name, form_id, sign, values, codepoints, sign_or_form_line=None, ucode_line=None):
     self.name = name
+    self.original_name = self.name
     self.form_id = form_id
     self.sign = sign
     self.values = values
     self.codepoints = codepoints
+    self.original_codepoints = self.codepoints
+    self.sign_or_form_line = sign_or_form_line
+    self.ucode_line = ucode_line
 
   def __str__(self):
     return (f"{self.name} {self.codepoints} (form {self.form_id} of {self.sign})"
@@ -142,9 +148,9 @@ try:
     if tokens[0] == "@sign" or tokens[0] == "@form" or tokens[:2] == ["@end", "sign"]:
       if name:
         if form_id:
-          form = Form(name, form_id, main_forms_by_name[sign_name], values, codepoints)
+          form = Form(name, form_id, main_forms_by_name[sign_name], values, codepoints, sign_or_form_line, ucode_line)
         else:
-          form = Form(name, form_id, None, values, codepoints)
+          form = Form(name, form_id, None, values, codepoints, sign_or_form_line, ucode_line)
           if name in main_forms_by_name:
             raise ValueError(f"Duplicate signs {name}: {main_forms_by_name[name]} and {form}")
           main_forms_by_name[name] = form
@@ -155,17 +161,21 @@ try:
       name = None
       codepoints = None
       values = []
+      sign_or_form_line = None
+      ucode_line = None
     if tokens[0] == "@sign":
       if len(tokens) != 2:
         raise ValueError(tokens)
       name = tokens[-1]
       sign_name = tokens[-1]
       form_id = None
+      sign_or_form_line = i
     if tokens[0] == "@form":
       if len(tokens) != 3 and not tokens[3][0] in ("x", "["):
         raise ValueError(tokens)
       name = tokens[-1]
       form_id = tokens[1]
+      sign_or_form_line = i
     if tokens[0] == "@v":  # Excluding deprecated values @v-, as well as questionable @v? for now.
       if tokens[1].startswith("%") or tokens[1].startswith("#"):
         if tokens[1] in ("%akk", "%elx", "#nib", "#old", "#struck"):  # What do the # annotations mean?
@@ -217,6 +227,7 @@ try:
 
       values.append(value)
     if tokens[0] == "@ucode":
+      ucode_line = i
       if len(tokens) != 2:
         raise ValueError(tokens)
       codepoints = ''.join((x if x in ("X", "None") else chr(int("0" + x, 16)) for x in tokens[-1].split(".")))
@@ -475,7 +486,9 @@ rename("|SAL.KU|", "NIN₉")
 pr_3_table = []
 
 class PR3Row:
-  def __init__(self, sign, old_ucode, old_uname, new_ucode, new_uname):
+  def __init__(self, line, ucode_line, sign, old_ucode, old_uname, new_ucode, new_uname):
+    self.line = line
+    self.ucode_line = ucode_line
     self.sign = sign
     self.old_ucode = old_ucode
     self.old_uname = old_uname
@@ -483,10 +496,7 @@ class PR3Row:
     self.new_uname = new_uname
 
   def __lt__(self, other):
-    if self.new_ucode and other.new_ucode:
-      return ''.join(c for c in self.new_ucode if ord(c) >= 0x12480) < ''.join(c for c in other.new_ucode if ord(c) >= 0x12480)
-    else:
-      return ''.join(c for c in self.old_ucode if ord(c) >= 0x12480) < ''.join(c for c in other.old_ucode if ord(c) >= 0x12480)
+    return self.line < other.line
 
 # OGSL encoding bugs handled here.
 for name, forms in forms_by_name.items():
@@ -660,8 +670,8 @@ for name, forms in forms_by_name.items():
     if (name == "|GA₂×ZIZ₂|" or
         form.codepoints and any(ord(sign) >= 0x12480 for sign in form.codepoints) or
         name in ("LAK617", "|LAK648×NI|", "UR₂@h")):
-      original_ucode = form.codepoints
-      original_uname = '.'.join(unicodedata.name(c, "unassigned").replace('CUNEIFORM SIGN ', '') for c in form.codepoints) if form.codepoints else ''
+      original_ucode = form.original_codepoints or ''
+      original_uname = '.'.join(unicodedata.name(c, "unassigned").replace('CUNEIFORM SIGN ', '') for c in original_ucode)
       # The Early Dynastic block is garbled in OGSL.
       if name == "|ŠE&ŠE.NI|":
         form.codepoints = chr(0x12532) + "𒉌"
@@ -706,34 +716,35 @@ for name, forms in forms_by_name.items():
       new_ucode = form.codepoints
       new_uname = '.'.join(unicodedata.name(c, "unassigned").replace('CUNEIFORM SIGN ', '') for c in form.codepoints) if form.codepoints else ''
       if original_ucode != new_ucode:
-        pr_3_table.append(PR3Row('`'+name.replace('|', r'\|')+'`', original_ucode, original_uname, new_ucode, new_uname))
+        pr_3_table.append(PR3Row(form.sign_or_form_line, form.ucode_line, '`'+form.original_name.replace('|', r'\|')+'`', original_ucode, original_uname, new_ucode, new_uname))
 
 for row in sorted(pr_3_table):
   print(" | ".join(
       (row.sign,
-       '.'.join('x%4X' % ord(c) for c in row.old_ucode) if row.old_ucode else '',
+       "[%s](https://github.com/oracc/ogsl/pull/3/files#diff-fb2bfb956a6bfa1476fcd15c46acb2661957b996676fbe4bba39f333cc6568fbL%i)" % (
+           re.sub(r'^@ucode\s+(.*)$', r'\1', lines[row.ucode_line - 1]), row.ucode_line) if row.old_ucode else '',
        row.old_uname,
        '.'.join('x%4X' % ord(c) for c in row.new_ucode) if row.new_ucode else '',
        row.new_uname)))
 
 for row in sorted(pr_3_table):
   if row.old_ucode and row.new_ucode:
-    print(r"s/@ucode\s\+" +
-          r'\.'.join('x%4X' % ord(c) for c in row.old_ucode) +
-          '/@NEWucode ' +
+    print(r"%ss/@ucode\s\+" % row.ucode_line +
+          r'\.'.join(r'x\?%4X' % ord(c) for c in row.old_ucode) +
+          '/@ucode ' +
           '.'.join('x%4X' % ord(c) for c in row.new_ucode) +
-          '/g')
-
-for row in sorted(pr_3_table):
-  if not row.old_ucode and row.new_ucode:
-    print(r"INSERT in " + row.sign + ": @ucode " +
-          '.'.join('x%4X' % ord(c) for c in row.new_ucode))
+          '/')
 
 for row in sorted(pr_3_table):
   if row.old_ucode and not row.new_ucode:
-    print(r"DELETE /@ucode\s+" +
-          r'\.'.join('x%4X' % ord(c) for c in row.old_ucode),
-          '/')
+    print(r"%s{/@ucode\s\+" % row.ucode_line +
+          r'\.'.join('x\?%4X' % ord(c) for c in row.old_ucode) +
+          '/d}')
+
+for row in reversed(sorted(pr_3_table)):
+  if not row.old_ucode and row.new_ucode:
+    print(r"INSERT in " + row.sign + "after line %s: @ucode " % row.line +
+          '.'.join('x%4X' % ord(c) for c in row.new_ucode))
 
 #exit()
 
