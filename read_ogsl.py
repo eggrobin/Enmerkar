@@ -743,7 +743,7 @@ for name, forms in forms_by_name.items():
     encoding = ""
     components = []
     for component in re.findall(r"(?:[^.()]|\([^()]+\))+", name[1:-1]):
-      if "×" in component:
+      if "×" in component or "%" in component or "&" in component:
         component = f"|{component}|"
       if component in forms_by_name and forms_by_name[component][0].codepoints:
         encoding += forms_by_name[component][0].codepoints
