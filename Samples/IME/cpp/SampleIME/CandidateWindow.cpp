@@ -14,6 +14,8 @@
 
 #include "𒂗𒈨𒅕𒃸/transcription.h"
 
+COLORREF _AdjustTextColor(_In_ COLORREF crColor, _In_ COLORREF crBkColor);
+
 //+---------------------------------------------------------------------------
 //
 // ctor
@@ -1177,7 +1179,7 @@ HRESULT CCandidateWindow::_GetCurrentPage(_Inout_ UINT *pCurrentPage)
         *pCurrentPage = 0;
          goto Exit;
     }
-
+    {
     UINT i = 0;
     for (i = 1; i < _PageIndex.Count(); i++)
     {
@@ -1190,7 +1192,7 @@ HRESULT CCandidateWindow::_GetCurrentPage(_Inout_ UINT *pCurrentPage)
     }
 
     *pCurrentPage = i - 1;
-
+    }
 Exit:
     return hr;
 }
@@ -1412,6 +1414,7 @@ HRESULT CCandidateWindow::_AdjustPageIndex(_Inout_ UINT & currentPage, _Inout_ U
         goto Exit;
     }
 
+    {
     UINT tempSelection = _currentSelection;
 
     // Last page
@@ -1445,7 +1448,7 @@ HRESULT CCandidateWindow::_AdjustPageIndex(_Inout_ UINT & currentPage, _Inout_ U
 
     _dontAdjustOnEmptyItemPage = FALSE;
     hr = S_OK;
-
+    }
 Exit:
     return hr;
 }

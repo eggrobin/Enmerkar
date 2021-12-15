@@ -239,7 +239,7 @@ struct CCandidateListItem
     CStringRange _FindKeyCode;
     std::wstring full_composition;
 
-	CCandidateListItem& CCandidateListItem::operator =( const CCandidateListItem& rhs)
+	CCandidateListItem& operator =( const CCandidateListItem& rhs)
 	{
 		_ItemString = rhs._ItemString;
 		_FindKeyCode = rhs._FindKeyCode;

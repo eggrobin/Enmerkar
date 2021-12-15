@@ -229,12 +229,13 @@ STDAPI CSampleIME::ActivateEx(ITfThreadMgr *pThreadMgr, TfClientId tfClientId, D
     {
         goto ExitError;
     }
-
+    {
     ITfDocumentMgr* pDocMgrFocus = nullptr;
     if (SUCCEEDED(_pThreadMgr->GetFocus(&pDocMgrFocus)) && (pDocMgrFocus != nullptr))
     {
         _InitTextEditSink(pDocMgrFocus);
         pDocMgrFocus->Release();
+    }
     }
 
     if (!_InitKeyEventSink())

@@ -202,6 +202,7 @@ VOID CFile::NextLine()
     {
         goto SetEOF;
     }
+    {
     const WCHAR *pwch = GetBufferInWChar();
 
     DWORD_PTR indexTrace = 0;       // in char
@@ -238,6 +239,7 @@ VOID CFile::NextLine()
     _filePosPointer += (indexTrace * sizeof(WCHAR));
 
     return;
+    }
 
 SetEOF:
     _filePosPointer = _fileSize;

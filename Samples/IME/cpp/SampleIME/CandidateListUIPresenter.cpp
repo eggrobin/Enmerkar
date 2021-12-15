@@ -101,7 +101,7 @@ HRESULT CSampleIME::_HandleCandidateWorker(TfEditCookie ec, _In_ ITfContext *pCo
     }
 
     candidateString.Set(pCandidateString, candidateLen);
-
+    {
     BOOL fMakePhraseFromText = _pCompositionProcessorEngine->IsMakePhraseFromText();
     if (fMakePhraseFromText)
     {
@@ -188,7 +188,7 @@ HRESULT CSampleIME::_HandleCandidateWorker(TfEditCookie ec, _In_ ITfContext *pCo
     {
         SysFreeString(pbstr);
     }
-
+    }
 Exit:
     return hrReturn;
 }
@@ -1067,7 +1067,7 @@ HRESULT CCandidateListUIPresenter::_CandidateChangeNotification(_In_ enum CANDWN
         pDocumentMgr->Release();
         goto Exit;
     }
-
+    {
     CKeyHandlerEditSession *pEditSession = new (std::nothrow) CKeyHandlerEditSession(_pTextService, pContext, 0, 0, KeyState);
     if (nullptr != pEditSession)
     {
@@ -1082,7 +1082,7 @@ HRESULT CCandidateListUIPresenter::_CandidateChangeNotification(_In_ enum CANDWN
 
     pContext->Release();
     pDocumentMgr->Release();
-
+    }
 Exit:
     return hr;
 }
@@ -1225,12 +1225,14 @@ HRESULT CCandidateListUIPresenter::BeginUIElement()
         goto Exit;
     }
 
+    {
     ITfUIElementMgr* pUIElementMgr = nullptr;
     hr = pThreadMgr->QueryInterface(IID_ITfUIElementMgr, (void **)&pUIElementMgr);
     if (hr == S_OK)
     {
         pUIElementMgr->BeginUIElement(this, &_isShowMode, &_uiElementId);
         pUIElementMgr->Release();
+    }
     }
 
 Exit:
@@ -1247,7 +1249,7 @@ HRESULT CCandidateListUIPresenter::EndUIElement()
         hr = E_FAIL;
         goto Exit;
     }
-
+    {
     ITfUIElementMgr* pUIElementMgr = nullptr;
     hr = pThreadMgr->QueryInterface(IID_ITfUIElementMgr, (void **)&pUIElementMgr);
     if (hr == S_OK)
@@ -1255,7 +1257,7 @@ HRESULT CCandidateListUIPresenter::EndUIElement()
         pUIElementMgr->EndUIElement(_uiElementId);
         pUIElementMgr->Release();
     }
-
+    }
 Exit:
     return hr;
 }
@@ -1275,7 +1277,7 @@ HRESULT CCandidateListUIPresenter::MakeCandidateWindow(_In_ ITfContext *pContext
         hr = E_OUTOFMEMORY;
         goto Exit;
     }
-
+    {
     HWND parentWndHandle = nullptr;
     ITfContextView* pView = nullptr;
     if (SUCCEEDED(pContextDocument->GetActiveView(&pView)))
@@ -1288,7 +1290,7 @@ HRESULT CCandidateListUIPresenter::MakeCandidateWindow(_In_ ITfContext *pContext
         hr = E_OUTOFMEMORY;
         goto Exit;
     }
-
+    }
 Exit:
     return hr;
 }

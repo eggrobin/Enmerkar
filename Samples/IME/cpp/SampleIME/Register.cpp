@@ -127,7 +127,7 @@ BOOL RegisterCategories()
         return FALSE;
     }
 
-    for each(GUID guid in SupportCategories)
+    for (GUID guid : SupportCategories)
     {
         hr = pCategoryMgr->RegisterCategory(Global::SampleIMECLSID, guid, Global::SampleIMECLSID);
     }
@@ -145,7 +145,7 @@ BOOL RegisterCategories()
 
 void UnregisterCategories()
 {
-    ITfCategoryMgr* pCategoryMgr = S_OK;
+    ITfCategoryMgr* pCategoryMgr = nullptr;
     HRESULT hr = S_OK;
 
     hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER, IID_ITfCategoryMgr, (void**)&pCategoryMgr);
@@ -154,7 +154,7 @@ void UnregisterCategories()
         return;
     }
 
-    for each(GUID guid in SupportCategories)
+    for (GUID guid : SupportCategories)
     {
         pCategoryMgr->UnregisterCategory(Global::SampleIMECLSID, guid, Global::SampleIMECLSID);
     }

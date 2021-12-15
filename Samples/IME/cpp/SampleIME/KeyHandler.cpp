@@ -448,6 +448,7 @@ HRESULT CSampleIME::_HandleCompositionBackspace(TfEditCookie ec, _In_ ITfContext
         }
     }
 
+    {
     //
     // Add virtual key to composition processor engine
     //
@@ -468,6 +469,7 @@ HRESULT CSampleIME::_HandleCompositionBackspace(TfEditCookie ec, _In_ ITfContext
         {
             _HandleCancel(ec, pContext);
         }
+    }
     }
 
 Exit:
