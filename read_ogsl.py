@@ -591,64 +591,16 @@ for name, forms in forms_by_name.items():
 
 
     # Unicode 7.0 fanciness, except disunifications.
-    if name == "GIG":
-      form.codepoints = "𒍼"
-    if "GIG" in name and form.codepoints and "X" in form.codepoints:
-      form.codepoints = form.codepoints.replace("X", "𒍼")
-    if name == "KAP₀":
-      form.codepoints = "𒍯"
-    if name == "|AB×NUN|":
-      form.codepoints = "𒍰"
     if "NI.UD" in name:
       raise ValueError(f"NI.UD in {form}")
     if form.codepoints and "𒉌𒌓" in form.codepoints:
       form.codepoints = form.codepoints.replace("𒉌𒌓", "𒎎")
     if name == "|DUB×ŠE|":
       form.codepoints = "𒍶"
-    if name == "|EZEN×GUD|":
-      form.codepoints = "𒍷"
-    if name == "|EZEN×ŠE|":
-      form.codepoints = "𒍸"
     if name == "|GA₂×(AN.KAK.A)|":
       form.codepoints = "𒍹"
-    if name == "|GA₂×AŠ₂|":
-      form.codepoints = "𒍺"
-    if name == "GE₂₂":
-      form.codepoints = "𒍻"
-    if name == "HUŠ":
-      form.codepoints = "𒍽"
-    if name == "|KA×GIŠ|":
-      form.codepoints = "𒎀"
-    if name == "|KA×HI×AŠ₂|":
-      form.codepoints = "𒎂"
-    if name == "|KA×LUM|":
-      form.codepoints = "𒎃"
-    if name == "|KA×PA|":
-      form.codepoints = "𒎄"
-    if name == "|KA×TU|":
-      form.codepoints = "𒎆"
-    if name == "|KA×UR₂|":
-      form.codepoints = "𒎇"
-    if name == "|LU₂@s×BAD|":
-      form.codepoints = "𒎉"
     if name == "|LU₂×(EŠ₂.LAL)|":
       form.codepoints = "𒎊"
-    if name == "|LU₂×ŠU|":
-      form.codepoints = "𒎋"
-    if "MEŠ" in name:
-      form.codepoints = form.codepoints.replace("𒈨𒌍", "𒎌").replace("𒈨𒌋𒌋𒌋", "𒎌")
-    if name == "|MUŠ₃×ZA|":
-      form.codepoints = "𒎍"
-    if form.codepoints and "NIN" in name:
-      form.codepoints = form.codepoints.replace("𒊩𒌆", "𒎏")
-    if name == "NIN₉":
-      form.codepoints = "𒎐"
-    if name == "|NINDA₂×BAL|":
-      form.codepoints = "𒎑"
-    if name == "|NINDA₂×GI|":
-      form.codepoints = "𒎒"
-    if name == "NU₁₁@90":
-      form.codepoints = "𒎓"
     if name == "|U.U|":
       form.codepoints = "𒎙"
 
