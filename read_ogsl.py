@@ -460,16 +460,7 @@ rename("|AŠ.GAN|", "LAK062")
 # 𒄤 gaz=GUM×ŠE perhaps?), not a DUB×EŠ₂ 𒁿.
 rename("|DUB×EŠ₂|", "|DUB×ŠE|")
 
-# Broken precedence for MZL393 usud.
-rename("|GA₂×AN.KAK.A|", "|GA₂×(AN.KAK.A)|")
-
 rename("|HI.GIR₃|", "HUŠ")
-
-# Probably broken precedence for MZL532, see MZL514.
-# TODO(egg): Borger cites MSL 14 461f. and MSL 16 212 42; I think the former
-# is https://cdli.ucla.edu/search/archival_view.php?ObjectID=P258842, check
-# that.
-rename("|LU₂×EŠ₂.LAL|", "|LU₂×(EŠ₂.LAL)|")
 
 rename("|ME.U.U.U|", "MEŠ")
 for name in list(forms_by_name.keys()):
@@ -599,8 +590,6 @@ for name, forms in forms_by_name.items():
       form.codepoints = "𒍶"
     if name == "|GA₂×(AN.KAK.A)|":
       form.codepoints = "𒍹"
-    if name == "|LU₂×(EŠ₂.LAL)|":
-      form.codepoints = "𒎊"
     if name == "|U.U|":
       form.codepoints = "𒎙"
 
