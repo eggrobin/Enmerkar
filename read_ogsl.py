@@ -480,6 +480,9 @@ for name, forms in forms_by_name.items():
     if name == "LAK212":
       form.codepoints = "𒀷"
 
+    if form.codepoints:
+      form.codepoints = form.codepoints.replace("𒌋𒌋𒌋", "𒌍")
+
     # Unicode and OGSL have both  𒋲 4×TAB and 𒅄 4×(IDIM&IDIM), with the same
     # values, namely burₓ, buruₓ, gurinₓ, gurunₓ, and kurunₓ.
     # 4×TAB has an @inote field
