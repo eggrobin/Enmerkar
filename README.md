@@ -9,6 +9,7 @@ by the OGSL Project ([available in machine readable form on GitHub](https://gith
 available under the CC BY-SA 3.0 license.
 Adjustments were made to the sign list, in particular to take into account
 [signs](https://www.unicode.org/wg2/docs/n4277.pdf) newly encoded in Unicode 7.0 (2014).
+We are in the process of [upstreaming](https://github.com/oracc/ogsl/pulls?q=is%3Apr+author%3Aeggrobin) these adjustments.
 
 ## Installation
 
