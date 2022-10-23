@@ -446,20 +446,6 @@ rename("|AŠ.GAN|", "LAK062")
 
 # Unicode 7.0 related things.
 
-# OGSL gives DUB×EŠ₂ the value gaz₃, and has no DUB×ŠE.
-# MZL gives MZL243 DUB×ŠE the value gaz₃, and has no DUB×EŠ₂.
-# MZL cites Revue d’Assyriologie et d’archéologie orientale 60 p. 92, wherein
-# Civil writes DUB×ŠE.
-# Could the origin of DUB×EŠ₂ be a misreading DUB×ŠÈ=DUB×EŠ₂ of DUB×ŠE?
-# The text cited by Civil is TuM 5, 8: IV 2, which means
-# Texte und Materialien der Frau Professor Hilprecht Collection of Babylonian Antiquities 5,
-# Vorsargonische und sargonische Wirtschaftstexte.
-# CDLI abbreviates that to TMH: the relevant tablet is
-# https://cdli.ucla.edu/search/archival_view.php?ObjectID=P020422,
-# Wherein IV 2 clearly is 𒊓𒍶𒉌𒀝𒈨, with a DUB×ŠE 𒍶 (a variant on
-# 𒄤 gaz=GUM×ŠE perhaps?), not a DUB×EŠ₂ 𒁿.
-rename("|DUB×EŠ₂|", "|DUB×ŠE|")
-
 rename("|HI.GIR₃|", "HUŠ")
 
 rename("|ME.U.U.U|", "MEŠ")
