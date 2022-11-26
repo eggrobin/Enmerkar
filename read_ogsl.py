@@ -576,8 +576,6 @@ for name, forms in forms_by_name.items():
       raise ValueError(f"NI.UD in {form}")
     if form.codepoints and "𒉌𒌓" in form.codepoints:
       form.codepoints = form.codepoints.replace("𒉌𒌓", "𒎎")
-    if name == "|DUB×ŠE|":
-      form.codepoints = "𒍶"
     if name == "|GA₂×(AN.KAK.A)|":
       form.codepoints = "𒍹"
     if name == "|U.U|":
@@ -821,8 +819,9 @@ NON_SIGNS = set((
   # See CAD, entry šūši.
   # Numeric, so let’s handle that separately.
   "𒍵",
-  # Probably not actually a thing; see above.
-  "𒁿",
+  # A misreading of MZL for gaz₃, and gaz₃ itself.
+  # See https://github.com/oracc/ogsl/pull/7#issuecomment-1304608990.
+  "𒁿", "𒍶",
   # No idea where that comes from.  Maybe look for it HethZL?
   "𒍾",
   # MZL067, Hittite, no values, not in the OGSL.
