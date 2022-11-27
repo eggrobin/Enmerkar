@@ -350,48 +350,6 @@ for form in forms_by_name["IDIM"]:
 main_forms_by_name["EŠE₃"] = Form("EŠE₃", None, None, ["eše₃"], "𒑘")
 forms_by_name["EŠE₃"] = [main_forms_by_name["EŠE₃"]]
 
-# The history of ḪI, ŠÁR, TÍ, and DIN is confusing; as usual with these
-# questions one should look at Labat.
-# This section must be read with the glyphs in Noto.
-# There are three ancestral forms (archaic & classical Sumerian columns in
-# Labat), 𒄭 ḪI & 𒊹 ŠÁR (MÉA396), and 𒁷 DIN (MÉA465).
-# 𒁷 acquires the value TÍ in OAkk times, see MZL119.
-# See e.g. this UR III tablet https://cdli.ucla.edu/search/archival_view.php?ObjectID=P131069.
-# 𒁷-with-the-value-TÍ then undergoes a change in glyph, and looks like 𒎗 in
-# Assyrian (Labat lists it in 𒆍𒀭𒊏𒆠 only in NB).
-# Meanwhile 𒁷-with-the-values-DIN &c. undergoes different changes, and despite
-# a couple appearances of 𒎗-like DIN in OB/MB, it diverges and ends up looking
-# like 𒌋𒁹𒌋 on top of 𒀸 in NA (I will refer to it as 𒌋𒁹𒌋 below due to the limits
-# of plain text).
-# Meanwhile 𒄭 and 𒊹 converge, first to something like 𒄭, then by MA/MB to 𒎗,
-# so that from those three ancestors two glyphs remain in NA, 𒎗 for ḪI, ŠÁR, TÍ,
-# and 𒌋𒁹𒌋 for DIN.
-# In terms of encoding, this however requires four characters:
-# ḪI 𒄭, ŠÁR 𒊹, TÍ 𒎗, and DIN 𒁷, where the glyphs should be
-# γλ(TÍ)=γλ(DIN)=𒁷 in OAkk,  γλ(ḪI)=𒄭, γλ(ŠÁR)=𒊹, then quickly
-# γλ(ḪI)=γλ(ŠÁR)=𒄭, as is the case, e.g., in
-# https://cdli.ucla.edu/search/archival_view.php?ObjectID=P142654,
-# and by NA γλ(DIN)=𒌋𒁹𒌋≠γλ(ḪI)=γλ(ŠÁR)=γλ(TÍ)=𒎗.
-# The OGSL predates the separate encoding of TÍ 𒎗, so its values (notably tí)
-# are found both in the entries for DIN and ḪI.
-# The following surgery deals with that.
-disunify(["DIN", "HI"],
-         [Form("DIN", None, None,
-               # All OGSL values for DIN except ti₂ and di₂.
-               ["den", "din", "dini", "gurun₈", "kurun₂", "ten₂", "tim₃", "tin",
-                "ṭen"],
-               "𒁷"),
-          Form("TI₂", None, None,
-               # Values given in MÉA396, 231.
-               ["ṭi₂", "ṭe₂", "ti₂", "te₂", "de₈", "di₂"],
-               "𒎗"),
-          Form("HI", None, None,
-               # The OGSL values for HI, with the ones from TI₂ above removed.
-               ["dab₃", "danₓ", "da₁₀", "dub₃", "dugu", "dug₃",
-                "du₁₀", "ha₄", "he", "hi", "i₁₁", "kugu", "muₓ",
-                "ta₈", "ʾi₃", "ṭab₆", "ṭa₃"],
-               "𒄭")])
-
 # OGSL naming bugs handled here.
 
 # Unnormalized |GAD+TAK₄.DUH| (neither has values).
