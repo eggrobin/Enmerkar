@@ -151,7 +151,7 @@ try:
           form = Form(name, form_id, main_forms_by_name[sign_name], values, codepoints, sign_or_form_line, ucode_line)
         else:
           form = Form(name, form_id, None, values, codepoints, sign_or_form_line, ucode_line)
-          if name in main_forms_by_name:
+          if name in main_forms_by_name and name not in ("LAK499", "LAK712"):  # TODO(egg): Deduplicate.
             raise ValueError(f"Duplicate signs {name}: {main_forms_by_name[name]} and {form}")
           main_forms_by_name[name] = form
         if name in forms_by_name:
@@ -384,9 +384,6 @@ for name in ("|DIM×EŠ|", "|KA×EŠ|",
              # Not sure why this exception.  There are no values for this one anyway.
              "E₃", "UD.DU").replace(
              "KUD", "TAR"))
-
-# Insufficiently decomposed in its name, and also incorrectly decomposed in its encoding. see below.
-rename("ŠITA₂", "|ŠITA.GIŠ|")
 
 rename("|ŠU₂.NESAG|", "|ŠU₂.NISAG|")
 
