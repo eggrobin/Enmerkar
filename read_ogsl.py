@@ -692,6 +692,9 @@ for name, forms in forms_by_name.items():
   if expected_unicode_name == "SHU OVER SHU INVERTED":  # Magical Unicode word order.
     expected_unicode_name = "SHU OVER INVERTED SHU"
 
+  if expected_unicode_name == "SILA3 LAK-449a":  # Newly identified interior structure.
+    expected_unicode_name = "LAK-450"
+
   # TODO(egg): Figure out the PLUS dance someday...
   if actual_unicode_name.replace(" PLUS ", " ") != expected_unicode_name.replace(" PLUS ", " "):
     raise ValueError(f"{name} encoded as {encoding}, {expected_unicode_name} != {actual_unicode_name}")
