@@ -1,4 +1,5 @@
-﻿import sys
+﻿from genericpath import samefile
+import sys
 import re
 import codecs
 import unicodedata
@@ -128,6 +129,7 @@ class Form:
     self.original_codepoints = self.codepoints
     self.sign_or_form_line = sign_or_form_line
     self.ucode_line = ucode_line
+    self.lists = []
 
   def __str__(self):
     return (f"{self.name} {self.codepoints} (form {self.form_id} of {self.sign})"
@@ -154,12 +156,14 @@ try:
           if name in main_forms_by_name and name not in ("LAK499", "LAK712"):  # TODO(egg): Deduplicate.
             raise ValueError(f"Duplicate signs {name}: {main_forms_by_name[name]} and {form}")
           main_forms_by_name[name] = form
+        form.lists = lists
         if name in forms_by_name:
           forms_by_name[name].append(form)
         else:
           forms_by_name[name] = [form]
       name = None
       codepoints = None
+      lists = []
       values = []
       sign_or_form_line = None
       ucode_line = None
@@ -176,6 +180,8 @@ try:
       name = tokens[-1]
       form_id = tokens[1]
       sign_or_form_line = i
+    if tokens[0] == "@list" and not tokens[1].startswith("SLLHA"):
+      lists.append(tokens[1].replace("OBZL", "aBZL"))
     if tokens[0] == "@v":  # Excluding deprecated values @v-, as well as questionable @v? for now.
       if tokens[1].startswith("%") or tokens[1].startswith("#"):
         if tokens[1] in ("%akk", "%elx", "#nib", "#old", "#struck"):  # What do the # annotations mean?
@@ -701,6 +707,7 @@ for name, forms in forms_by_name.items():
 
 
 encoded_forms_by_value = {}
+encoded_forms_by_list_number = {}
 
 for name, forms in forms_by_name.items():
   encoding = forms[0].codepoints
@@ -712,6 +719,8 @@ for name, forms in forms_by_name.items():
         if encoding not in encoded_forms_by_value[value]:
           encoded_forms_by_value[value][encoding] = []
         encoded_forms_by_value[value][encoding].append(form)
+      for list_number in form.lists:
+        encoded_forms_by_list_number.setdefault(list_number, {}).setdefault(encoding, []).append(form)
 
 for name, forms in forms_by_name.items():
   values = [value for form in forms for value in form.values]
@@ -846,6 +855,19 @@ for value, forms_by_codepoints in sorted(encoded_forms_by_value.items()):
       compositions.setdefault(f"{normalized_value}v{form_index}", []).append(encoding)
     else:
       compositions.setdefault(normalized_value, []).append(encoding)
+
+
+for list_number, forms_by_codepoints in encoded_forms_by_list_number.items():
+  composition = "x" + list_number.lower().replace("c", "š")
+  main_form_encodings = [form.codepoints for encoding, forms in forms_by_codepoints.items()
+                          for form in forms if not form.form_id]
+  form_index = 0
+  for encoding, forms in forms_by_codepoints.items():
+    if len(forms_by_codepoints) > 1:
+      form_index += 1
+      compositions.setdefault(f"{composition}v{form_index}", []).append(encoding)
+    else:
+      compositions.setdefault(composition, []).append(encoding)
 
 for composition, encoding in numbers.compositions.items():
   compositions.setdefault(composition, []).append(encoding)
