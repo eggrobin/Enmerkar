@@ -800,7 +800,8 @@ NON_SIGNS = set((
   # matter for the font?)
   "𒎘",
   # Unified in favour of the numeric versions.
-  "𒀼", "𒅓", "𒇹"
+  "𒀼", "𒅓", "𒇹",
+  "𒊪", # Turned into a @nosign with: @inote unicode revision needed/deleted; sign is |ZUM×TUG₂| = LAK524.
 ))
 
 for u in range(0x12000, 0x12550):  # Cuneiform, Cuneiform numbers and punctuation, Early Dynastic cuneiform.
