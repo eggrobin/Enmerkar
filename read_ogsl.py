@@ -519,8 +519,6 @@ for name, forms in forms_by_name.items():
     # Unicode 7.0 fanciness, except disunifications.
     if "NI.UD" in name:
       raise ValueError(f"NI.UD in {form}")
-    if name == "|GA₂×(AN.KAK.A)|":
-      form.codepoints = "𒍹"
 
 # Assign encodings from components.
 for name, forms in forms_by_name.items():
