@@ -196,6 +196,8 @@ try:
           continue  # These values seem to be sumerograms in normalized Akkadian spelling, out of scope for now.
         else:
           raise ValueError(tokens)
+      elif '@' in tokens[1]:
+        print(f"@ in value: {tokens}")
       else:
         if len(tokens) > 2 and not tokens[2].startswith("["):
           raise ValueError(tokens)
@@ -363,7 +365,7 @@ for name in ("|DIM×EŠ|", "|KA×EŠ|",
              "|KAR.MUŠ|",
              "|ŠE₃.TU.BU|",
              "|ŠUL.GI|",
-             "|UD.MUD.NUN.KI|",
+#             "|UD.MUD.NUN.KI|",
              "|IM.LAK648|",
              "|E₃.E₃|",
              "|KUD.KUD|"):
@@ -598,6 +600,12 @@ for name, forms in forms_by_name.items():
 
   # OGSL never decomposes LAL₂, so lets’ treat this as intentional.
   expected_unicode_name = expected_unicode_name.replace("LAL2", "LAL TIMES LAL")
+
+  if expected_unicode_name == "SHAR2 TIMES 1U":
+    expected_unicode_name = "HI TIMES U"
+
+  if expected_unicode_name == "GISHGAL TIMES IGI":
+    expected_unicode_name = "LAK-648 TIMES IGI"
 
   if expected_unicode_name == "KU4~a":
     expected_unicode_name = "KU4 VARIANT FORM"
