@@ -180,8 +180,12 @@ try:
       name = tokens[-1]
       form_id = tokens[1]
       sign_or_form_line = i
-    if tokens[0] == "@list" and not tokens[1].startswith("SLLHA"):
-      lists.append(tokens[1].replace("OBZL", "aBZL"))
+    if tokens[0] == "@list" and '"' not in tokens[1]:
+      if tokens[1].startswith("SLLHA"):
+        for l in ("ŠL", "MÉA"):
+          lists.append(tokens[1].replace("SLLHA", l))
+      else:
+        lists.append(tokens[1].replace("OBZL", "aBZL"))
     if tokens[0] == "@v":  # Excluding deprecated values @v-, as well as questionable @v? for now.
       if tokens[1].startswith("%") or tokens[1].startswith("#"):
         if tokens[1] in ("%akk", "%elx", "#nib", "#old", "#struck"):  # What do the # annotations mean?
@@ -844,7 +848,7 @@ for value, forms_by_codepoints in sorted(encoded_forms_by_value.items()):
 
 
 for list_number, forms_by_codepoints in encoded_forms_by_list_number.items():
-  composition = "x" + list_number.lower().replace("c", "š")
+  composition = "x" + list_number.lower().replace("é", "e").replace("c", "š").replace("'", "ʾ")
   main_form_encodings = [form.codepoints for encoding, forms in forms_by_codepoints.items()
                           for form in forms if not form.form_id]
   form_index = 0
