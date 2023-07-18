@@ -309,21 +309,7 @@ def disunify(unified_names, new_forms):
 
 # Unicode 7.0 disunifications.
 
-disunify(["|NI.UD|"],  # Listed as MZL385 in OGSL.
-         [Form("DAG₃", None, None,
-               ["dag₃", "bar₄", "dak₃", "daq₃", "par₇", "tak₃", "taq₃"],  # MZL386.
-               "𒍴"),
-          Form("NA₄", None, None,
-               ["na₄", "i₄", "ia₄", "za₂",  # MZL385.
-               "ya₄",  # OGSL, probably goes with ia₄.
-               # na₄ = abnu, https://oracc.iaas.upenn.edu/dcclt/Q000091,
-               # http://classes.bnf.fr/ecritures/grand/e029.htm.
-               "abnu",
-               # In https://oracc.iaas.upenn.edu/dcclt/signlists/P370411 next to
-               # other na₄ values (and no dag₃ values).
-               "aban", "atumₓ",
-               ],
-               "𒎎")])
+rename("|NI.UD|", "NA₄")
 rename("|IM.NI.UD|", "|IM.NA₄|")
 rename("|NI.UD.EN|", "|NA₄.EN|")
 rename("|NI.UD.KI|", "|NA₄.KI|")
@@ -397,8 +383,8 @@ rename("|ŠU₂.NESAG|", "|ŠU₂.NISAG|")
 # Conventiently Unicode has the former and not the latter.
 rename("|(ŠE&ŠE).HUB₂|", "|ŠE.HUB₂|")
 
-# ASCII ugliness in form ~c |ŠU₂.3xAN| of |BAR.AN|.  OGSL correctly uses 3×AN everywhere else.
-rename("|ŠU₂.3xAN|", "|ŠU₂.3×AN|")
+## ASCII ugliness in form ~c |ŠU₂.3xAN| of |BAR.AN|.  OGSL correctly uses 3×AN everywhere else.
+#rename("|ŠU₂.3xAN|", "|ŠU₂.3×AN|")
 
 # ED, not decomposed in its Unicode name.  Other overdecomposed signs are
 # handled below, but because of the ED garbling we actually rename this one.
@@ -427,7 +413,11 @@ for name, forms in forms_by_name.items():
     if name == "LAK212":
       form.codepoints = "𒀷"
 
-    if form.codepoints:
+    if form.codepoints and form.name in ("|ŠU.DI.U.U.U|",
+                                         "|ŠU.U.U.U.DI|",
+                                         "|U.U.U.AŠ₃|",
+                                         "|ŠU₂.U.U.U|",
+                                         "|U.U.HUB₂|"):
       form.codepoints = form.codepoints.replace("𒌋𒌋𒌋", "𒌍")
       form.codepoints = form.codepoints.replace("𒌋𒌋", "𒎙")
 
@@ -535,12 +525,6 @@ for name, forms in forms_by_name.items():
     # Unicode 7.0 fanciness, except disunifications.
     if "NI.UD" in name:
       raise ValueError(f"NI.UD in {form}")
-    if form.codepoints and "𒉌𒌓" in form.codepoints:
-      form.codepoints = form.codepoints.replace("𒉌𒌓", "𒎎")
-    if name == "|GA₂×(AN.KAK.A)|":
-      form.codepoints = "𒍹"
-    if name == "|U.U|":
-      form.codepoints = "𒎙"
 
 # Assign encodings from components.
 for name, forms in forms_by_name.items():
@@ -809,7 +793,9 @@ NON_SIGNS = set((
   # matter for the font?)
   "𒎘",
   # Unified in favour of the numeric versions.
-  "𒀼", "𒅓", "𒇹"
+  "𒀼", "𒅓", "𒇹",
+  "𒊪", # Turned into a @nosign with: @inote unicode revision needed/deleted; sign is |ZUM×TUG₂| = LAK524.
+  "𒍴", # Baffling disunification.
 ))
 
 for u in range(0x12000, 0x12550):  # Cuneiform, Cuneiform numbers and punctuation, Early Dynastic cuneiform.
