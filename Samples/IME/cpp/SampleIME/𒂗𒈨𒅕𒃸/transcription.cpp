@@ -132,8 +132,52 @@ OrderingKey(
   return key;
 }
 
+std::wstring PrettyListHint(std::wstring_view composition_input,
+                            int entered_size) {
+  std::wstring result;
+  for (auto const [list_composition, list_name] :
+       std::array<std::pair<std::wstring_view, std::wstring_view>, 12>{{
+           {L"abzl", L"aBZL"},
+           {L"bau", L"BAU"},
+           {L"elles", L"ELLes"},
+           {L"hzl", L"HZL"},
+           {L"kwu", L"KWU"},
+           {L"lak", L"LAK"},
+           {L"mea", L"MÉA"},
+           {L"mzl", L"MZL"},
+           {L"reš", L"RÉC"},
+           {L"rsp", L"RSP"},
+           {L"šl", L"ŠL"},
+           {L"zatu", L"ZATU"},
+       }}) {
+    if (composition_input.starts_with(list_composition)) {
+      result += list_name.substr(0, entered_size);
+      if (entered_size >= list_name.size()) {
+        result += ' ';
+        result += composition_input.substr(list_name.size(),
+                                           entered_size - list_name.size());
+        result += L'‸';
+        result += composition_input.substr(entered_size);
+      } else {
+        result += L'‸';
+        result += list_name.substr(entered_size);
+        result += ' ';
+        result += composition_input.substr(list_name.size());
+      }
+      return result;
+    }
+  }
+  result += composition_input.substr(0, entered_size);
+  result += L'‸';
+  result += composition_input.substr(entered_size);
+  return result;
+}
+
 std::wstring PrettyTranscriptionHint(std::wstring_view composition_input,
                                      int entered_size) {
+  if (composition_input.front() == 'x') {
+    return PrettyListHint(composition_input.substr(1), entered_size - 1);
+  }
   const std::set<wchar_t> vowels = {'a', 'e', 'u', 'i'};
   constexpr auto is_reading_character = [](wchar_t c) {
     // Reading alphanumeric, and a handful of symbols for fractions,

@@ -180,12 +180,14 @@ try:
       name = tokens[-1]
       form_id = tokens[1]
       sign_or_form_line = i
-    if tokens[0] == "@list" and '"' not in tokens[1]:
-      if tokens[1].startswith("SLLHA"):
+    if tokens[0] == "@list" and '"' not in tokens[1] and tokens[1] != "KWU":
+      [list_name, number] = re.split(r"(?=\d)", tokens[1], 1)
+      number = number.lstrip("0");
+      if list_name == "SLLHA":
         for l in ("ŠL", "MÉA"):
-          lists.append(tokens[1].replace("SLLHA", l))
+          lists.append(l + number)
       else:
-        lists.append(tokens[1].replace("OBZL", "aBZL"))
+        lists.append(list_name.replace("OBZL", "aBZL") + number)
     if tokens[0] == "@v":  # Excluding deprecated values @v-, as well as questionable @v? for now.
       if tokens[1].startswith("%") or tokens[1].startswith("#"):
         if tokens[1] in ("%akk", "%elx", "#nib", "#old", "#struck"):  # What do the # annotations mean?
