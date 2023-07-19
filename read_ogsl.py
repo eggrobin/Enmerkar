@@ -187,7 +187,7 @@ try:
         for l in ("ŠL", "MÉA"):
           lists.append(l + number)
       else:
-        lists.append(list_name.replace("OBZL", "aBZL") + number)
+        lists.append(list_name.replace("OBZL", "aBZL").replace("HZL", "ḪZL") + number)
     if tokens[0] == "@v":  # Excluding deprecated values @v-, as well as questionable @v? for now.
       if tokens[1].startswith("%") or tokens[1].startswith("#"):
         if tokens[1] in ("%akk", "%elx", "#nib", "#old", "#struck"):  # What do the # annotations mean?
@@ -858,7 +858,10 @@ for value, forms_by_codepoints in sorted(encoded_forms_by_value.items()):
 
 
 for list_number, forms_by_codepoints in encoded_forms_by_list_number.items():
-  composition = "x" + list_number.lower().replace("é", "e").replace("c", "š").replace("'", "ʾ")
+  composition = "x" + list_number.lower().replace("é", "e").replace("c", "š").replace("hzl", "ḫzl").replace("'", "ʾ")
+  if not re.match(r"^[bdgptkʾṭqzšsṣḫmnrlwyaeiuŋśaeui0-9xf]+$", composition):
+    print("Weird characters in list number %s" % list_number)
+    continue
   main_form_encodings = [form.codepoints for encoding, forms in forms_by_codepoints.items()
                           for form in forms if not form.form_id]
   form_index = 0

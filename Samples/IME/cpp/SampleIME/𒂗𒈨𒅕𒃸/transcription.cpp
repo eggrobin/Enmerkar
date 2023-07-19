@@ -11,24 +11,6 @@ namespace 𒂗𒈨𒅕𒃸 {
 
 constexpr wchar_t ʾaleph = L'ʾ';
 
-struct Source {
-  // Name with caret before the input character, e.g., "Borger ‸MesZL".
-  std::wstring_view input_hint;
-  // Year.
-  int publication_date;
-};
-
-std::map<wchar_t, Source> const& Sources() {
-  static const std::map<wchar_t, Source>& sources = ([]() -> auto const& {
-    return *new std::map<wchar_t, Source>{{
-        {L'A', {L"Borger ‸ABZ", 1978}},
-        {L'L', {L"‸Labat", 1976}},
-        {L'M', {L"Borger ‸MesZL", 2004}},
-    }};
-  })();
-  return sources;
-}
-
 std::map<wchar_t, int> const& Alphabet() {
   static const std::map<wchar_t, int>& alphabetical_order =
       ([]() -> auto const& {
@@ -49,23 +31,74 @@ constexpr bool IsDigit(wchar_t const c) {
   return c >= '0' && c <= '9';
 }
 
+std::tuple<std::vector<std::vector<int>>, std::vector<std::vector<int>>, int>
+ListOrderingKey(std::wstring_view composition_input) {
+  std::tuple<std::vector<std::vector<int>>, std::vector<std::vector<int>>, int>
+      key;
+  // TODO(egg): It is dumb that we have to deal with that alephless nonsense
+  // here.
+  auto& [alephless_reading, reading, variant] = key;
+  int name_length = 0;
+  while (!IsDigit(composition_input[name_length])) {
+    ++name_length;
+  }
+  auto const name = composition_input.substr(0, name_length);
+  int number_length = 0;
+  while (name_length + number_length < composition_input.size() &&
+         IsDigit(composition_input[name_length + number_length])) {
+    ++number_length;
+  }
+  auto const number = composition_input.substr(name_length, number_length);
+  int tail_length = 0;
+  while (name_length + number_length + tail_length < composition_input.size() &&
+         composition_input[name_length + number_length + tail_length] != 'v') {
+    ++tail_length;
+  }
+  auto const tail =
+      composition_input.substr(name_length + number_length, tail_length);
+  alephless_reading.emplace_back().push_back(0);
+  reading.emplace_back().push_back(0);
+  for (wchar_t const c : number) {
+    for (int* const n :
+         {&alephless_reading.back().back(), &reading.back().back()}) {
+      *n *= 10;
+      *n += c - L'0';
+    }
+  }
+  alephless_reading.emplace_back();
+  reading.emplace_back();
+  for (wchar_t const c : tail) {
+    alephless_reading.back().emplace_back(c);
+    reading.back().emplace_back(c);
+  }
+  variant = 0;
+  if (name_length + number_length < composition_input.size()) {
+    for (wchar_t const c :
+         composition_input.substr(name_length + number_length + tail_length)) {
+      variant *= 10;
+      variant += c - L'0';
+    }
+  }
+  return key;
+}
+
 std::tuple<std::vector<std::vector<int>>,
            std::vector<std::vector<int>>,
-           std::optional<int>,
            int>
 OrderingKey(
     std::wstring_view composition_input) {
+  if (composition_input.starts_with('x')) {
+    return ListOrderingKey(composition_input.substr(1));
+  }
   std::tuple<std::vector<std::vector<int>>,
              std::vector<std::vector<int>>,
-             std::optional<int>,
              int>
       key;
-  auto& [alephless_reading, reading, source_order, variant] = key;
+  auto& [alephless_reading, reading, variant] = key;
   enum class InputCategory {
     ReadingNumeric,
     FractionSlash,
     ReadingAlphabetic,
-    Source,
     Variant,
   };
   // Note that we want fractions to be ordered after their numerator and by
@@ -112,9 +145,6 @@ OrderingKey(
         last_category = InputCategory::ReadingNumeric;
       }
       reading.back().emplace_back(c == L'-' ? 0 : 1);
-    } else if (Sources().contains(c)) {
-      source_order = -Sources().at(c).publication_date;
-      last_category = InputCategory::Source;
     } else if (c == L'/') {
       last_category = InputCategory::FractionSlash;
     } else if (c == L'v') {
@@ -132,41 +162,68 @@ OrderingKey(
   return key;
 }
 
+constexpr std::array<std::pair<std::wstring_view, std::wstring_view>, 12>
+    sign_lists{{
+        {L"abzl", L"aBZL"},
+        {L"bau", L"BAU"},
+        {L"elles", L"ELLes"},
+        {L"ḫzl", L"HZL"},
+        {L"kwu", L"KWU"},
+        {L"lak", L"LAK"},
+        {L"mea", L"MÉA"},
+        {L"mzl", L"MZL"},
+        {L"reš", L"RÉC"},
+        {L"rsp", L"RSP"},
+        {L"šl", L"ŠL"},
+        {L"zatu", L"ZATU"},
+    }};
+
 std::wstring PrettyListHint(std::wstring_view composition_input,
                             int entered_size) {
-  std::wstring result;
-  for (auto const [list_composition, list_name] :
-       std::array<std::pair<std::wstring_view, std::wstring_view>, 12>{{
-           {L"abzl", L"aBZL"},
-           {L"bau", L"BAU"},
-           {L"elles", L"ELLes"},
-           {L"hzl", L"HZL"},
-           {L"kwu", L"KWU"},
-           {L"lak", L"LAK"},
-           {L"mea", L"MÉA"},
-           {L"mzl", L"MZL"},
-           {L"reš", L"RÉC"},
-           {L"rsp", L"RSP"},
-           {L"šl", L"ŠL"},
-           {L"zatu", L"ZATU"},
-       }}) {
+  std::wstring_view pretty_list;
+  for (auto const [list_composition, list_name] : sign_lists) {
     if (composition_input.starts_with(list_composition)) {
-      result += list_name.substr(0, entered_size);
-      if (entered_size >= list_name.size()) {
-        result += ' ';
-        result += composition_input.substr(list_name.size(),
-                                           entered_size - list_name.size());
-        result += L'‸';
-        result += composition_input.substr(entered_size);
-      } else {
-        result += L'‸';
-        result += list_name.substr(entered_size);
-        result += ' ';
-        result += composition_input.substr(list_name.size());
-      }
-      return result;
+      pretty_list = list_name;
     }
   }
+  std::wstring result;
+  bool in_parenthetical = false;
+  for (int i = 0; i < composition_input.size(); ++i) {
+    wchar_t const c = composition_input[i];
+    if (c == 'v') {
+      result += L" (";
+      in_parenthetical = true;
+    }
+
+    std::wstring token_hint;
+    if (c == 'v') {
+      token_hint += L"‸variant ";
+    } else {
+      token_hint += L'‸';
+      if (i < pretty_list.size()) {
+        token_hint += pretty_list[i];
+      } else if (c == L'š') {
+        token_hint += L'c';
+      } else {
+        token_hint += c;
+      }
+    }
+    if (i == pretty_list.size()) {
+      result += ' ';
+    }
+    for (wchar_t c : token_hint) {
+      if (c != L'‸' || entered_size == i) {
+        result += c;
+      }
+    }
+  }
+  if (in_parenthetical) {
+    result += L')';
+  }
+  if (entered_size == composition_input.size()) {
+    result += L'‸';
+  }
+  return result;
   result += composition_input.substr(0, entered_size);
   result += L'‸';
   result += composition_input.substr(entered_size);
@@ -218,7 +275,6 @@ std::wstring PrettyTranscriptionHint(std::wstring_view composition_input,
   std::wstring result;
   bool in_parenthetical = false;
   bool after_letters = false;
-  bool has_source = false;
   for (int i = 0; i < composition_input.size(); ++i) {
     if (!is_reading_character(composition_input[i])) {
       result += L" (";
@@ -226,12 +282,7 @@ std::wstring PrettyTranscriptionHint(std::wstring_view composition_input,
     }
 
     std::wstring token_hint;
-    if (Sources().contains(composition_input[i])) {
-      token_hint += Sources().at(composition_input[i]).input_hint;
-    } else if (composition_input[i] == 'v') {
-      if (has_source) {
-        token_hint += L", ";
-      }
+    if (composition_input[i] == 'v') {
       token_hint += L"‸variant ";
     } else {
       token_hint += L'‸';
