@@ -11,6 +11,7 @@
 #include "CandidateListUIPresenter.h"
 #include "CompositionProcessorEngine.h"
 #include "SampleIMEBaseStructure.h"
+#include <string>
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -46,7 +47,13 @@ HRESULT CSampleIME::_HandleCandidateFinalize(TfEditCookie ec, _In_ ITfContext *p
 
     if (candidateLen)
     {
-        hr = _AddComposingAndChar(ec, pContext, &candidateString);
+        ITfRange* clone;
+        hr = _AddComposingAndChar(ec, pContext, &candidateString, &clone);
+        if (clone != nullptr) {
+          clone->SetGravity(ec, TF_GRAVITY_FORWARD, TF_GRAVITY_BACKWARD);
+          produced_ranges_.emplace_back(clone, std::wstring_view(pCandidateString, candidateLen));
+        }
+        Global::trace = std::to_wstring(produced_ranges_.size());
 
         if (FAILED(hr))
         {
@@ -142,7 +149,7 @@ HRESULT CSampleIME::_HandleCandidateWorker(TfEditCookie ec, _In_ ITfContext *pCo
             if (pTempCandListUIPresenter)
             {
                 hrStartCandidateList = pTempCandListUIPresenter->_StartCandidateList(_tfClientId, pDocumentMgr, pContext, ec, pRange, _pCompositionProcessorEngine->GetCandidateWindowWidth());
-            } 
+            }
 
             pRange->Release();
         }
@@ -378,12 +385,12 @@ STDAPI CCandidateListUIPresenter::QueryInterface(REFIID riid, _Outptr_ void **pp
     {
         *ppvObj = (ITfCandidateListUIElement*)this;
     }
-    else if (IsEqualIID(riid, IID_IUnknown) || 
-        IsEqualIID(riid, IID_ITfCandidateListUIElementBehavior)) 
+    else if (IsEqualIID(riid, IID_IUnknown) ||
+        IsEqualIID(riid, IID_ITfCandidateListUIElementBehavior))
     {
         *ppvObj = (ITfCandidateListUIElementBehavior*)this;
     }
-    else if (IsEqualIID(riid, __uuidof(ITfIntegratableCandidateListUIElement))) 
+    else if (IsEqualIID(riid, __uuidof(ITfIntegratableCandidateListUIElement)))
     {
         *ppvObj = (ITfIntegratableCandidateListUIElement*)this;
     }

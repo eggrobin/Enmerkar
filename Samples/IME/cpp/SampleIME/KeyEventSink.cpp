@@ -174,7 +174,7 @@ BOOL CSampleIME::_IsKeyboardDisabled()
     if ((_pThreadMgr->GetFocus(&pDocMgrFocus) != S_OK) ||
         (pDocMgrFocus == nullptr))
     {
-        // if there is no focus document manager object, the keyboard 
+        // if there is no focus document manager object, the keyboard
         // is disabled.
         isDisabled = TRUE;
     }
@@ -219,10 +219,6 @@ STDAPI CSampleIME::OnSetFocus(BOOL fForeground)
 
     return S_OK;
 }
-
-static bool LetKeyDownThrough = false;
-static bool LetKeyUpThrough = false;
-static bool Received¹ = false;
 
 //+---------------------------------------------------------------------------
 //

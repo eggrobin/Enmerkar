@@ -9,6 +9,7 @@
 #include "Globals.h"
 #include "SampleIME.h"
 #include "CompositionProcessorEngine.h"
+#include <string>
 
 //+---------------------------------------------------------------------------
 //
@@ -71,7 +72,8 @@ void CSampleIME::_SetComposition(_In_ ITfComposition *pComposition)
 //
 //----------------------------------------------------------------------------
 
-HRESULT CSampleIME::_AddComposingAndChar(TfEditCookie ec, _In_ ITfContext *pContext, _In_ CStringRange *pstrAddString)
+HRESULT CSampleIME::_AddComposingAndChar(TfEditCookie ec, _In_ ITfContext *pContext, _In_ CStringRange *pstrAddString,
+                                         ITfRange** range_clone)
 {
     HRESULT hr = S_OK;
 
@@ -95,6 +97,20 @@ HRESULT CSampleIME::_AddComposingAndChar(TfEditCookie ec, _In_ ITfContext *pCont
             BOOL exist_composing = _FindComposingRange(ec, pContext, pAheadSelection, &pRange);
 
             _SetInputString(ec, pContext, pRange, pstrAddString, exist_composing);
+
+            if (range_clone != nullptr) {
+              int code_point_count = 0;
+              for (wchar_t code_unit : std::wstring_view(pstrAddString->Get(), pstrAddString->GetLength())) {
+                if (code_unit < 0xDC00 || code_unit > 0xDFFF) {
+                  ++code_point_count;
+                }
+              }
+              if (code_point_count > 1) {
+                pRange->Clone(range_clone);
+              } else {
+                *range_clone = nullptr;
+              }
+            }
 
             if (pRange)
             {
@@ -308,7 +324,7 @@ HRESULT CSampleIME::_RemoveDummyCompositionForComposing(TfEditCookie ec, _In_ IT
     HRESULT hr = S_OK;
 
     ITfRange* pRange = nullptr;
-    
+
     if (pComposition)
     {
         hr = pComposition->GetRange(&pRange);
@@ -360,7 +376,7 @@ BOOL CSampleIME::_SetCompositionLanguage(TfEditCookie ec, _In_ ITfContext *pCont
 
     VARIANT var;
     var.vt = VT_I4;   // we're going to set DWORD
-    var.lVal = langidProfile; 
+    var.lVal = langidProfile;
 
     hr = pLanguageProperty->SetValue(ec, pRangeComposition, &var);
     if (FAILED(hr))
