@@ -28,7 +28,7 @@ extern const GUID SampleIMECLSID =
 { 0xf87cb858, 0x5a61, 0x42ff, { 0x98, 0xe4, 0xcf, 0x39, 0x66, 0x45, 0x78, 0x8 } };
 
 
-std::wstring trace = L"test";
+std::wstring trace = L"";
 
 //---------------------------------------------------------------------
 // Profile GUID
