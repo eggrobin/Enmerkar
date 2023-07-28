@@ -269,9 +269,10 @@ private:
 
     bool LetKeyDownThrough = false;
     bool LetKeyUpThrough = false;
+    bool LetBackspaceThrough = false;
     bool Received¹ = false;
 
-    std::list<EmittedRange> produced_ranges_;
+    std::list<EmittedRange> emitted_ranges_;
 
     // Support the search integration
     ITfFnSearchCandidateProvider* _pITfFnSearchCandidateProvider;

@@ -229,6 +229,11 @@ STDAPI CSampleIME::OnSetFocus(BOOL fForeground)
 
 STDAPI CSampleIME::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pIsEaten)
 {
+    if (LetBackspaceThrough && (wParam & 0xff) == VK_BACK) {
+      *pIsEaten = false;
+      LetBackspaceThrough = false;
+      return S_OK;
+    }
     Global::UpdateModifiers(wParam, lParam);
 
     _KEYSTROKE_STATE KeystrokeState;
@@ -263,6 +268,11 @@ STDAPI CSampleIME::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lPa
 
 STDAPI CSampleIME::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pIsEaten)
 {
+    if (LetBackspaceThrough && (wParam & 0xff) == VK_BACK) {
+      *pIsEaten = false;
+      LetBackspaceThrough = false;
+      return S_OK;
+    }
     Global::UpdateModifiers(wParam, lParam);
 
     _KEYSTROKE_STATE KeystrokeState;

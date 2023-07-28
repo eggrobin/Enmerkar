@@ -51,9 +51,8 @@ HRESULT CSampleIME::_HandleCandidateFinalize(TfEditCookie ec, _In_ ITfContext *p
         hr = _AddComposingAndChar(ec, pContext, &candidateString, &clone);
         if (clone != nullptr) {
           clone->SetGravity(ec, TF_GRAVITY_FORWARD, TF_GRAVITY_BACKWARD);
-          produced_ranges_.emplace_back(clone, std::wstring_view(pCandidateString, candidateLen));
+          emitted_ranges_.emplace_back(clone, std::wstring_view(pCandidateString, candidateLen));
         }
-        Global::trace = std::to_wstring(produced_ranges_.size());
 
         if (FAILED(hr))
         {

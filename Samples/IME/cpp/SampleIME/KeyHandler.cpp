@@ -432,7 +432,7 @@ HRESULT CSampleIME::_HandleCompositionBackspace(TfEditCookie ec, _In_ ITfContext
     // Start the new (std::nothrow) compositon if there is no composition.
     if (!_IsComposing())
     {
-      for (auto it = produced_ranges_.begin(); it != produced_ranges_.end(); ++it) {
+      for (auto it = emitted_ranges_.begin(); it != emitted_ranges_.end(); ++it) {
         BOOL match;
         it->range().IsEqualEnd(ec, tfSelection.range, TF_ANCHOR_END, &match);
         std::vector<wchar_t> actual_text;
@@ -442,7 +442,7 @@ HRESULT CSampleIME::_HandleCompositionBackspace(TfEditCookie ec, _In_ ITfContext
           SUCCEEDED(it->range().GetText(ec, 0, actual_text.data(), actual_text.size(), &actual_size)) &&
           it->urtext() == std::wstring_view(actual_text.data(), actual_size)) {
           it->range().SetText(ec, 0, L"", 0);
-          produced_ranges_.erase(it++);
+          emitted_ranges_.erase(it++);
           goto Exit;
         }
       }
@@ -452,7 +452,7 @@ HRESULT CSampleIME::_HandleCompositionBackspace(TfEditCookie ec, _In_ ITfContext
             .wVk = VK_BACK,
             .wScan = 0,
             .dwFlags = 0} };
-      LetKeyDownThrough = true;
+      LetBackspaceThrough = true;
       // TODO(egg): Figure out why this does not work.
       SendInput(1, &input, sizeof(input));
 
