@@ -203,3 +203,6 @@ FakesAssemblies/
 # Custom ignores
 gallery.xml
 project.lock.json
+
+.DS_Store
+xcuserdata

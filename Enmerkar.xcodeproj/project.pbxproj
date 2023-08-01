@@ -1,0 +1,369 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		00B4E0242A7937DF0081B72D /* sign_list.txt in Resources */ = {isa = PBXBuildFile; fileRef = 00B4E0232A7937DF0081B72D /* sign_list.txt */; };
+		00D321562A7817DA001C9BFF /* CandidateWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D321552A7817DA001C9BFF /* CandidateWindow.swift */; };
+		00D321582A781DA1001C9BFF /* CandidateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D321572A781DA1001C9BFF /* CandidateView.swift */; };
+		00D3215A2A781E55001C9BFF /* Candidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D321592A781E55001C9BFF /* Candidate.swift */; };
+		00D5C0A12A76C83500CA7198 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00D5C0A02A76C83500CA7198 /* Assets.xcassets */; };
+		00D5C0A42A76C83500CA7198 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00D5C0A32A76C83500CA7198 /* Preview Assets.xcassets */; };
+		00D5C0AC2A76E12D00CA7198 /* InputController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D5C0AB2A76E12D00CA7198 /* InputController.swift */; };
+		00D5C0AE2A76E16800CA7198 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D5C0AD2A76E16800CA7198 /* AppDelegate.swift */; };
+		00D5C0B32A77BE1D00CA7198 /* main.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 00D5C0B22A77BE1D00CA7198 /* main.tiff */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		00B4E0232A7937DF0081B72D /* sign_list.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = sign_list.txt; path = Samples/IME/cpp/SampleIME/Dictionary/sign_list.txt; sourceTree = "<group>"; };
+		00D321552A7817DA001C9BFF /* CandidateWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CandidateWindow.swift; sourceTree = "<group>"; };
+		00D321572A781DA1001C9BFF /* CandidateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CandidateView.swift; sourceTree = "<group>"; };
+		00D321592A781E55001C9BFF /* Candidate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Candidate.swift; sourceTree = "<group>"; };
+		00D5C0992A76C83400CA7198 /* Enmerkar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Enmerkar.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		00D5C0A02A76C83500CA7198 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		00D5C0A32A76C83500CA7198 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		00D5C0A52A76C83500CA7198 /* Enmerkar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Enmerkar.entitlements; sourceTree = "<group>"; };
+		00D5C0AB2A76E12D00CA7198 /* InputController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputController.swift; sourceTree = "<group>"; };
+		00D5C0AD2A76E16800CA7198 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		00D5C0AF2A76E1A900CA7198 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = mac/Info.plist; sourceTree = SOURCE_ROOT; };
+		00D5C0B22A77BE1D00CA7198 /* main.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = main.tiff; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		00D5C0962A76C83400CA7198 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		00D5C0902A76C83400CA7198 = {
+			isa = PBXGroup;
+			children = (
+				00B4E0232A7937DF0081B72D /* sign_list.txt */,
+				00D5C09B2A76C83400CA7198 /* mac */,
+				00D5C09A2A76C83400CA7198 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		00D5C09A2A76C83400CA7198 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				00D5C0992A76C83400CA7198 /* Enmerkar.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		00D5C09B2A76C83400CA7198 /* mac */ = {
+			isa = PBXGroup;
+			children = (
+				00D5C0B22A77BE1D00CA7198 /* main.tiff */,
+				00D5C0AF2A76E1A900CA7198 /* Info.plist */,
+				00D5C0A02A76C83500CA7198 /* Assets.xcassets */,
+				00D5C0A52A76C83500CA7198 /* Enmerkar.entitlements */,
+				00D5C0A22A76C83500CA7198 /* Preview Content */,
+				00D5C0AB2A76E12D00CA7198 /* InputController.swift */,
+				00D5C0AD2A76E16800CA7198 /* AppDelegate.swift */,
+				00D321592A781E55001C9BFF /* Candidate.swift */,
+				00D321572A781DA1001C9BFF /* CandidateView.swift */,
+				00D321552A7817DA001C9BFF /* CandidateWindow.swift */,
+			);
+			path = mac;
+			sourceTree = "<group>";
+		};
+		00D5C0A22A76C83500CA7198 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				00D5C0A32A76C83500CA7198 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		00D5C0982A76C83400CA7198 /* Enmerkar */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 00D5C0A82A76C83500CA7198 /* Build configuration list for PBXNativeTarget "Enmerkar" */;
+			buildPhases = (
+				00D5C0952A76C83400CA7198 /* Sources */,
+				00D5C0962A76C83400CA7198 /* Frameworks */,
+				00D5C0972A76C83400CA7198 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Enmerkar;
+			productName = Enmerkar;
+			productReference = 00D5C0992A76C83400CA7198 /* Enmerkar.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		00D5C0912A76C83400CA7198 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1430;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					00D5C0982A76C83400CA7198 = {
+						CreatedOnToolsVersion = 14.3.1;
+						LastSwiftMigration = 1430;
+					};
+				};
+			};
+			buildConfigurationList = 00D5C0942A76C83400CA7198 /* Build configuration list for PBXProject "Enmerkar" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 00D5C0902A76C83400CA7198;
+			productRefGroup = 00D5C09A2A76C83400CA7198 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				00D5C0982A76C83400CA7198 /* Enmerkar */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		00D5C0972A76C83400CA7198 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				00B4E0242A7937DF0081B72D /* sign_list.txt in Resources */,
+				00D5C0B32A77BE1D00CA7198 /* main.tiff in Resources */,
+				00D5C0A42A76C83500CA7198 /* Preview Assets.xcassets in Resources */,
+				00D5C0A12A76C83500CA7198 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		00D5C0952A76C83400CA7198 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				00D321562A7817DA001C9BFF /* CandidateWindow.swift in Sources */,
+				00D5C0AE2A76E16800CA7198 /* AppDelegate.swift in Sources */,
+				00D321582A781DA1001C9BFF /* CandidateView.swift in Sources */,
+				00D3215A2A781E55001C9BFF /* Candidate.swift in Sources */,
+				00D5C0AC2A76E12D00CA7198 /* InputController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		00D5C0A62A76C83500CA7198 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		00D5C0A72A76C83500CA7198 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		00D5C0A92A76C83500CA7198 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = mac/Enmerkar.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "/Library/Input Methods";
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"mac/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = mac/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OBJROOT = build;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mockingbirdnest.inputmethod.Enmerkar;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				SYMROOT = "/Library/Input Methods";
+			};
+			name = Debug;
+		};
+		00D5C0AA2A76C83500CA7198 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = mac/Enmerkar.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "/Library/Input Methods";
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"mac/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = mac/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mockingbirdnest.inputmethod.Enmerkar;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		00D5C0942A76C83400CA7198 /* Build configuration list for PBXProject "Enmerkar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				00D5C0A62A76C83500CA7198 /* Debug */,
+				00D5C0A72A76C83500CA7198 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		00D5C0A82A76C83500CA7198 /* Build configuration list for PBXNativeTarget "Enmerkar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				00D5C0A92A76C83500CA7198 /* Debug */,
+				00D5C0AA2A76C83500CA7198 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 00D5C0912A76C83400CA7198 /* Project object */;
+}
