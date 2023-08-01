@@ -89,6 +89,8 @@ class InputController: IMKInputController {
             updateCandidateWindow()
             return true
         }
+        // TODO(egg): Shift passthrough.
+        // TODO(egg): Key remapping.
         if (currentComposition.isEmpty) {
             currentComposition = string;
             client.setMarkedText(currentComposition, selectionRange: NSRange(location: NSNotFound, length: NSNotFound), replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
