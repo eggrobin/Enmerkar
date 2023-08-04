@@ -11,10 +11,10 @@
 	<key>LSBackgroundOnly</key>
 	<true/>
 	<key>tsInputMethodCharacterRepertoireKey</key>
-	<array>
-		<string>Latn</string>
-	</array>
+	<array/>
 	<key>tsInputMethodIconFileKey</key>
 	<string>main.tiff</string>
+	<key>TISIntendedLanguage</key>
+	<string>akk</string>
 </dict>
 </plist>
