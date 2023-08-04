@@ -125,7 +125,8 @@ class InputController: IMKInputController {
                 NSLog("no match")
                 CandidateWindow.shared.setCandidates(
                     [],
-                    originalString: "wat", topLeft: getOriginPoint())
+                    currentComposition: currentComposition,
+                    topLeft: getOriginPoint())
             } else {
                 NSLog("%d", begin!)
                 NSLog("%d", end!)
@@ -133,7 +134,8 @@ class InputController: IMKInputController {
                 // TODO(egg): Sorting, paging.
                 CandidateWindow.shared.setCandidates(
                     [Candidate](currentCandidates.prefix(10)),
-                    originalString: currentComposition, topLeft: getOriginPoint())
+                    currentComposition: currentComposition,
+                    topLeft: getOriginPoint())
             }
         }
     }

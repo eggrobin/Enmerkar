@@ -17,10 +17,11 @@ class CandidateWindow: NSWindow, NSWindowDelegate {
 
     func setCandidates(
         _ candidates: [Candidate],
-        originalString: String,
+        currentComposition: String,
         topLeft: NSPoint
     ) {
         hostingView.rootView.candidates = candidates
+        hostingView.rootView.currentComposition = currentComposition
         self.setFrameTopLeftPoint(topLeft)
         self.orderFront(nil)
     }
