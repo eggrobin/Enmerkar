@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		009225822A80621A00BAD9AB /* ʾṣṭpŋf.keylayout in Resources */ = {isa = PBXBuildFile; fileRef = 009225812A80621A00BAD9AB /* ʾṣṭpŋf.keylayout */; };
 		00B4E0242A7937DF0081B72D /* sign_list.txt in Resources */ = {isa = PBXBuildFile; fileRef = 00B4E0232A7937DF0081B72D /* sign_list.txt */; };
 		00D321562A7817DA001C9BFF /* CandidateWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D321552A7817DA001C9BFF /* CandidateWindow.swift */; };
 		00D321582A781DA1001C9BFF /* CandidateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D321572A781DA1001C9BFF /* CandidateView.swift */; };
@@ -19,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		009225812A80621A00BAD9AB /* ʾṣṭpŋf.keylayout */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "ʾṣṭpŋf.keylayout"; sourceTree = "<group>"; };
 		00B4E0232A7937DF0081B72D /* sign_list.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = sign_list.txt; path = Samples/IME/cpp/SampleIME/Dictionary/sign_list.txt; sourceTree = "<group>"; };
 		00D321552A7817DA001C9BFF /* CandidateWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CandidateWindow.swift; sourceTree = "<group>"; };
 		00D321572A781DA1001C9BFF /* CandidateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CandidateView.swift; sourceTree = "<group>"; };
@@ -64,6 +66,7 @@
 		00D5C09B2A76C83400CA7198 /* mac */ = {
 			isa = PBXGroup;
 			children = (
+				009225812A80621A00BAD9AB /* ʾṣṭpŋf.keylayout */,
 				00D5C0B22A77BE1D00CA7198 /* main.tiff */,
 				00D5C0AF2A76E1A900CA7198 /* Info.plist */,
 				00D5C0A02A76C83500CA7198 /* Assets.xcassets */,
@@ -145,6 +148,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				009225822A80621A00BAD9AB /* ʾṣṭpŋf.keylayout in Resources */,
 				00B4E0242A7937DF0081B72D /* sign_list.txt in Resources */,
 				00D5C0B32A77BE1D00CA7198 /* main.tiff in Resources */,
 				00D5C0A42A76C83500CA7198 /* Preview Assets.xcassets in Resources */,

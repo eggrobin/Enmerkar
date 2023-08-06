@@ -38,8 +38,17 @@ class InputController: IMKInputController {
             } catch {}
         }
         CandidateWindow.shared.inputController = self;
-        // TODO(egg): configurability.
-        client.overrideKeyboard(withKeyboardNamed: "com.apple.keylayout.Dvorak")
+        //TISRegisterInputSource(NSURL(fileURLWithPath: Bundle.main.bundlePath))
+        /*
+        let inputSources = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
+        for inputSource in inputSources {
+            let id = Unmanaged<NSString>
+                .fromOpaque(TISGetInputSourceProperty(inputSource, kTISPropertyInputSourceID)).takeUnretainedValue() as String
+            if (id.contains(/mock/)) {
+                NSLog(id)
+            }
+        }*/
+        client.overrideKeyboard(withKeyboardNamed: "com.mockingbirdnest.inputmethod.Enmerkar.keylayout.ʾṣṭpŋf")
     }
     
     override func deactivateServer(_ sender: Any!) {
