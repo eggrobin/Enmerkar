@@ -12,6 +12,8 @@
 #include "CompositionProcessorEngine.h"
 #include "Compartment.h"
 
+#include "logging.h"
+
 //+---------------------------------------------------------------------------
 //
 // CreateInstance
@@ -57,6 +59,7 @@ HRESULT CSampleIME::CreateInstance(_In_ IUnknown *pUnkOuter, REFIID riid, _Outpt
 
 CSampleIME::CSampleIME()
 {
+    𒂗𒈨𒅕𒃸::Log(L"CSampleIME Constructor...");
     DllAddRef();
 
     _pThreadMgr = nullptr;
@@ -219,6 +222,7 @@ STDAPI_(ULONG) CSampleIME::Release()
 
 STDAPI CSampleIME::ActivateEx(ITfThreadMgr *pThreadMgr, TfClientId tfClientId, DWORD dwFlags)
 {
+    𒂗𒈨𒅕𒃸::Log(L"ActivateEx...");
     _pThreadMgr = pThreadMgr;
     _pThreadMgr->AddRef();
 
@@ -291,7 +295,7 @@ STDAPI CSampleIME::Deactivate()
 
     ITfContext* pContext = _pContext;
     if (_pContext)
-    {   
+    {
         pContext->AddRef();
         _EndComposition(_pContext);
     }
@@ -386,7 +390,7 @@ HRESULT CSampleIME::GetFunction(__RPC__in REFGUID rguid, __RPC__in REFIID riid, 
 {
     HRESULT hr = E_NOINTERFACE;
 
-    if ((IsEqualGUID(rguid, GUID_NULL)) 
+    if ((IsEqualGUID(rguid, GUID_NULL))
         && (IsEqualGUID(riid, __uuidof(ITfFnSearchCandidateProvider))))
     {
         hr = _pITfFnSearchCandidateProvider->QueryInterface(riid, (void**)ppunk);

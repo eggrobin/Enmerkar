@@ -188,7 +188,7 @@ void FreeGlobalObjects(void)
             classFactoryObjects[i] = nullptr;
         }
     }
-    
+
     DeleteObject(Global::CuneiformFont);
     DeleteObject(Global::LatinFont);
 }
@@ -200,8 +200,8 @@ void FreeGlobalObjects(void)
 //----------------------------------------------------------------------------
 _Check_return_
 STDAPI  DllGetClassObject(
-	_In_ REFCLSID rclsid, 
-	_In_ REFIID riid, 
+	_In_ REFCLSID rclsid,
+	_In_ REFIID riid,
 	_Outptr_ void** ppv)
 {
     if (classFactoryObjects[0] == nullptr)

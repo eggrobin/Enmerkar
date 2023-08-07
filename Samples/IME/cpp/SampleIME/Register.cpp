@@ -8,6 +8,8 @@
 #include "Private.h"
 #include "Globals.h"
 
+#include "logging.h"
+
 static const WCHAR RegInfo_Prefix_CLSID[] = L"CLSID\\";
 static const WCHAR RegInfo_Key_InProSvr32[] = L"InProcServer32";
 static const WCHAR RegInfo_Key_ThreadModel[] = L"ThreadingModel";
@@ -17,12 +19,12 @@ static const WCHAR TEXTSERVICE_DESC[] = L"𒂗𒈨𒅕𒃸 Cuneiform IME";
 static const GUID SupportCategories[] = {
     GUID_TFCAT_TIP_KEYBOARD,
     GUID_TFCAT_DISPLAYATTRIBUTEPROVIDER,
-    GUID_TFCAT_TIPCAP_UIELEMENTENABLED,
+    //GUID_TFCAT_TIPCAP_UIELEMENTENABLED,
     GUID_TFCAT_TIPCAP_SECUREMODE,
     GUID_TFCAT_TIPCAP_COMLESS,
-    GUID_TFCAT_TIPCAP_INPUTMODECOMPARTMENT,
+    //GUID_TFCAT_TIPCAP_INPUTMODECOMPARTMENT,
     GUID_TFCAT_TIPCAP_IMMERSIVESUPPORT,
-    GUID_TFCAT_TIPCAP_SYSTRAYSUPPORT,
+    //GUID_TFCAT_TIPCAP_SYSTRAYSUPPORT,
 };
 //+---------------------------------------------------------------------------
 //
@@ -32,7 +34,9 @@ static const GUID SupportCategories[] = {
 
 BOOL RegisterProfiles()
 {
+    𒂗𒈨𒅕𒃸::Log(L"Registering profiles...");
     HRESULT hr = S_FALSE;
+    LANGID langid = TEXTSERVICE_LANGID;
 
     ITfInputProcessorProfileMgr *pITfInputProcessorProfileMgr = nullptr;
     hr = CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER,
@@ -53,20 +57,41 @@ BOOL RegisterProfiles()
     if (hr != S_OK)
     {
         goto Exit;
+    } else {
+#if 0
+        HKEY international_user_profile;
+        auto const status = RegOpenKeyEx(
+            HKEY_CURRENT_USER,
+            LR"(Control Panel\International\User Profile)",
+            /*ulOptions=*/0, KEY_ALL_ACCESS, & international_user_profile);
+            if (status == ERROR_SUCCESS) {
+              std::vector<wchar_t> languages(1024, '\0');
+              DWORD size;
+              RegGetValue(
+                HKEY_CURRENT_USER,
+                ,
+                L"Languages",
+                RRF_RT_REG_MULTI_SZ,
+                /*pdwType=*/nullptr,
+                languages.data(),
+                &size);
+            }
+ #endif
+      hr = pITfInputProcessorProfileMgr->RegisterProfile(Global::SampleIMECLSID,
+          langid,
+          Global::SampleIMEGuidProfile,
+          TEXTSERVICE_DESC,
+          static_cast<ULONG>(lenOfDesc),
+          achIconFile,
+          cchA,
+          (UINT)TEXTSERVICE_ICON_INDEX, NULL, 0, TRUE, 0);
     }
-    hr = pITfInputProcessorProfileMgr->RegisterProfile(Global::SampleIMECLSID,
-        TEXTSERVICE_LANGID,
-        Global::SampleIMEGuidProfile,
-        TEXTSERVICE_DESC,
-        static_cast<ULONG>(lenOfDesc),
-        achIconFile,
-        cchA,
-        (UINT)TEXTSERVICE_ICON_INDEX, NULL, 0, TRUE, 0);
 
     if (FAILED(hr))
     {
         goto Exit;
     }
+    𒂗𒈨𒅕𒃸::Log(L"Success");
 
 Exit:
     if (pITfInputProcessorProfileMgr)
@@ -86,6 +111,7 @@ Exit:
 void UnregisterProfiles()
 {
     HRESULT hr = S_OK;
+    LANGID langid = TEXTSERVICE_LANGID;
 
     ITfInputProcessorProfileMgr *pITfInputProcessorProfileMgr = nullptr;
     hr = CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER,
@@ -93,12 +119,12 @@ void UnregisterProfiles()
     if (FAILED(hr))
     {
         goto Exit;
-    }
-
-    hr = pITfInputProcessorProfileMgr->UnregisterProfile(Global::SampleIMECLSID, TEXTSERVICE_LANGID, Global::SampleIMEGuidProfile, 0);
-    if (FAILED(hr))
-    {
-        goto Exit;
+    } else {
+      hr = pITfInputProcessorProfileMgr->UnregisterProfile(Global::SampleIMECLSID, langid, Global::SampleIMEGuidProfile, 0);
+      if (FAILED(hr))
+      {
+          goto Exit;
+      }
     }
 
 Exit:
@@ -118,6 +144,7 @@ Exit:
 
 BOOL RegisterCategories()
 {
+    𒂗𒈨𒅕𒃸::Log(L"Registering categories...");
     ITfCategoryMgr* pCategoryMgr = nullptr;
     HRESULT hr = S_OK;
 
@@ -133,7 +160,9 @@ BOOL RegisterCategories()
     }
 
     pCategoryMgr->Release();
-
+    if ((hr == S_OK)) {
+    𒂗𒈨𒅕𒃸::Log(L"Success");
+    }
     return (hr == S_OK);
 }
 
