@@ -48,6 +48,7 @@ class InputController: IMKInputController {
                 NSLog(id)
             }
         }*/
+        // TODO(egg): Configurability.
         client.overrideKeyboard(withKeyboardNamed: "com.mockingbirdnest.inputmethod.Enmerkar.keylayout.ʾṣṭpŋf")
     }
     
@@ -71,7 +72,8 @@ class InputController: IMKInputController {
         return NSPoint(x: rect.minX + xd, y: rect.minY - yd)
     }
     
-    override func inputText(_ string: String!, key keyCode: Int, modifiers flags: Int, client sender: Any!) -> Bool {
+    override func inputText(_ string: String!, key keyCode: Int, modifiers rawFlags: Int, client sender: Any!) -> Bool {
+        let flags = NSEvent.ModifierFlags(rawValue: UInt(rawFlags))
         NSLog(string)
         guard let client = sender as? IMKTextInput else {
             return false
@@ -98,7 +100,10 @@ class InputController: IMKInputController {
             updateCandidateWindow()
             return true
         }
-        // TODO(egg): Shift passthrough.
+        if flags.contains(.capsLock) || flags.contains(.shift) {
+            // TODO(egg): Subscript digits and the ¹ dead key thing; though it is admittedly questionable whether that belongs here.
+            return false
+        }
         // TODO(egg): Key remapping.
         if (currentComposition.isEmpty) {
             currentComposition = string;
