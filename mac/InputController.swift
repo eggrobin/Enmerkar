@@ -102,6 +102,7 @@ class InputController: IMKInputController {
         }
         if flags.contains(.capsLock) || flags.contains(.shift) {
             // TODO(egg): Subscript digits and the ¹ dead key thing; though it is admittedly questionable whether that belongs here.
+            // Maybe just have the subscripts and dead key in the shifted & caps-locked states of the layout.
             return false
         }
         // TODO(egg): Key remapping.
