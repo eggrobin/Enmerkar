@@ -105,7 +105,6 @@ class InputController: IMKInputController {
             // Maybe just have the subscripts and dead key in the shifted & caps-locked states of the layout.
             return false
         }
-        // TODO(egg): Key remapping.
         if (currentComposition.isEmpty) {
             currentComposition = string;
             client.setMarkedText(currentComposition, selectionRange: NSRange(location: NSNotFound, length: NSNotFound), replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
