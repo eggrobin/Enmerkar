@@ -78,7 +78,7 @@ class InputController: IMKInputController {
         guard let client = sender as? IMKTextInput else {
             return false
         }
-        if (keyCode == kVK_Space || keyCode == kVK_Return) {
+        if keyCode == kVK_Space || keyCode == kVK_Return {
             if currentComposition.isEmpty {
                 return false
             }
@@ -90,7 +90,7 @@ class InputController: IMKInputController {
             }
             return true;
         }
-        if (keyCode == kVK_Delete) {
+        if keyCode == kVK_Delete {
             if currentComposition.isEmpty {
                 // TODO(egg): 𒋛𒀀 backspacing.
                 return false
@@ -103,7 +103,7 @@ class InputController: IMKInputController {
         if flags.contains(.capsLock) || flags.contains(.shift) {
             return false
         }
-        if (currentComposition.isEmpty) {
+        if currentComposition.isEmpty {
             currentComposition = string;
             client.setMarkedText(currentComposition, selectionRange: NSRange(location: NSNotFound, length: NSNotFound), replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
         } else {
@@ -120,35 +120,23 @@ class InputController: IMKInputController {
             currentCandidates = []
             CandidateWindow.shared.close()
         } else {
-            var begin: Array<Candidate>.Index?
-            var end: Array<Candidate>.Index?
+            var begin: Array<Candidate>.Index = signList.count
+            var end: Array<Candidate>.Index = signList.count
             for i in signList.indices {
-                if begin == nil && signList[i].composition.starts(with: currentComposition) {
+                if begin > i && signList[i].composition.starts(with: currentComposition) {
                     begin = i
                 }
-                if begin != nil && !signList[i].composition.starts(with: currentComposition) {
+                if begin < i && !signList[i].composition.starts(with: currentComposition) {
                     end = i
+                    break
                 }
             }
-            if begin != nil && end == nil {
-                end = signList.count
-            }
-            if begin == nil || end == nil {
-                NSLog("no match")
-                CandidateWindow.shared.setCandidates(
-                    [],
-                    currentComposition: currentComposition,
-                    topLeft: getOriginPoint())
-            } else {
-                NSLog("%d", begin!)
-                NSLog("%d", end!)
-                currentCandidates = signList[begin!...end!]
-                // TODO(egg): Sorting, paging.
-                CandidateWindow.shared.setCandidates(
-                    [Candidate](currentCandidates.prefix(10)),
-                    currentComposition: currentComposition,
-                    topLeft: getOriginPoint())
-            }
+            currentCandidates = signList[begin..<end]
+            // TODO(egg): Sorting, paging.
+            CandidateWindow.shared.setCandidates(
+                [Candidate](currentCandidates.prefix(10)),
+                currentComposition: currentComposition,
+                topLeft: getOriginPoint())
         }
     }
 }

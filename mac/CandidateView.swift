@@ -89,7 +89,7 @@ struct CandidateView: View {
                 if !afterLetters || inParenthetical {
                     tokenHint.append(String(c))
                 } else if accent.isEmpty {
-                    if (c == "x") {
+                    if c == "x" {
                         tokenHint += "ₓ";
                     } else {
                         tokenHint += String(UnicodeScalar(subscriptZero.value + (c.value - zero.value))!)
