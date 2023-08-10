@@ -75,6 +75,7 @@ class InputController: IMKInputController {
     }
     
     override func inputText(_ string: String!, key keyCode: Int, modifiers rawFlags: Int, client sender: Any!) -> Bool {
+        // TODO(egg): Ignore ESC, etc.
         let flags = NSEvent.ModifierFlags(rawValue: UInt(rawFlags))
         NSLog(string)
         guard let client = sender as? IMKTextInput else {

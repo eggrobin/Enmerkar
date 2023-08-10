@@ -127,8 +127,68 @@ struct CandidateView: View {
         return result
     }
     
+    let signLists = [
+        ("abzl", "aBZL"),
+        ("bau", "BAU"),
+        ("elles", "ELLes"),
+        ("ḫzl", "HZL"),
+        ("kwu", "KWU"),
+        ("lak", "LAK"),
+        ("mea", "MÉA"),
+        ("mzl", "MZL"),
+        ("reš", "RÉC"),
+        ("rsp", "RSP"),
+        ("šl", "ŠL"),
+        ("zatu", "ZATU"),
+    ]
+    
     private func prettyListHint() -> String {
-        return "TODO"
+        let currentComposition = currentComposition.suffix(from: currentComposition.index(after: currentComposition.startIndex))
+        let candidateComposition = candidate.composition.suffix(from: candidate.composition.index(after: candidate.composition.startIndex))
+        var prettyList : [UnicodeScalar] = []
+        for (listComposition, listName) in signLists {
+            if currentComposition.starts(with: listComposition) {
+                prettyList = Array(listName.unicodeScalars)
+            }
+        }
+        var result = ""
+        var inParenthetical = false
+        let enteredSize = currentComposition.unicodeScalars.count
+        for (i, c) in candidateComposition.unicodeScalars.enumerated() {
+            if c == "v" {
+                result += " ("
+                inParenthetical = true
+            }
+            
+            var tokenHint = ""
+            if c == "v" {
+                tokenHint += "‸variant "
+            } else {
+                tokenHint += "‸"
+                if i < prettyList.count {
+                    tokenHint += String(prettyList[i])
+                } else if c == "š" {
+                    tokenHint += "c"
+                } else {
+                    tokenHint += String(c)
+                }
+            }
+            if i == prettyList.count {
+                result += " "
+            }
+            if enteredSize == i {
+                result += tokenHint
+            } else {
+                result += tokenHint.suffix(from: tokenHint.index(after:tokenHint.startIndex))
+            }
+        }
+        if inParenthetical {
+            result += ")"
+        }
+        if enteredSize == candidateComposition.unicodeScalars.count {
+            result += "‸"
+        }
+        return result
     }
 }
 
