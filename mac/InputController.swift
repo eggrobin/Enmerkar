@@ -4,8 +4,10 @@ import InputMethodKit
 
 @objc(InputController)
 class InputController: IMKInputController {
+    let pageSize = 10
     var currentComposition: String = ""
     var currentCandidates: ArraySlice<Candidate> = []
+    var selectedIndex: Int? = nil
     var signList: [Candidate] = []
     
     func insertCandidate(_: Candidate) {
@@ -78,13 +80,25 @@ class InputController: IMKInputController {
         guard let client = sender as? IMKTextInput else {
             return false
         }
+        if (keyCode == kVK_UpArrow || keyCode == kVK_DownArrow) &&
+            selectedIndex != nil {
+            let increment = keyCode == kVK_UpArrow ? -1 : 1
+            selectedIndex! += increment;
+            selectedIndex = min(max(selectedIndex!, currentCandidates.indices.min()!), currentCandidates.indices.max()!)
+            let pageStart = (selectedIndex! - currentCandidates.startIndex) / pageSize * pageSize + currentCandidates.startIndex;
+            CandidateWindow.shared.setCandidates(
+                [Candidate](currentCandidates.suffix(from: pageStart).prefix(10)),
+                selectedIndex: selectedIndex! - pageStart,
+                currentComposition: currentComposition,
+                topLeft: getOriginPoint())
+            return true
+        }
         if keyCode == kVK_Space || keyCode == kVK_Return {
             if currentComposition.isEmpty {
                 return false
             }
             if !currentCandidates.isEmpty {
-                // TODO(egg): index with the arrow keys.
-                let text = currentCandidates.first!.text
+                let text = currentCandidates[selectedIndex!].text
                 let marked = client.markedRange()
                 client.insertText(text, replacementRange: marked)
                 // Wrong in the terminal...
@@ -95,6 +109,8 @@ class InputController: IMKInputController {
                 NSLog(emitted.description)
                 NSLog(client.uniqueClientIdentifierString())
                 currentComposition = "";
+                currentCandidates = []
+                selectedIndex = nil
                 CandidateWindow.shared.close()
             }
             return true;
@@ -128,8 +144,10 @@ class InputController: IMKInputController {
         NSLog(currentComposition)
         if currentComposition.isEmpty {
             currentCandidates = []
+            selectedIndex = nil
             CandidateWindow.shared.close()
         } else {
+            // TODO(egg): Binary search.
             var begin: Array<Candidate>.Index = signList.count
             var end: Array<Candidate>.Index = signList.count
             for i in signList.indices {
@@ -142,16 +160,18 @@ class InputController: IMKInputController {
                 }
             }
             currentCandidates = signList[begin..<end]
-            // TODO(egg): Paging.
+            selectedIndex = currentCandidates.startIndex
             currentCandidates.sort(by: candidatesOrdered)
             CandidateWindow.shared.setCandidates(
-                [Candidate](currentCandidates.prefix(10)),
+                [Candidate](currentCandidates.prefix(pageSize)),
+                selectedIndex: 0,
                 currentComposition: currentComposition,
                 topLeft: getOriginPoint())
         }
     }
     
     private func candidatesOrdered(_ left: Candidate, _ right: Candidate) -> Bool {
+        // TODO(egg): List compositions.
         let left = valueKey(left.composition)
         let right = valueKey(right.composition)
         if left.primary.lexicographicallyPrecedes(right.primary, by: {l,r in l.keys.lexicographicallyPrecedes(r.keys)}) {
@@ -197,7 +217,7 @@ class InputController: IMKInputController {
                 if lastCategory != InputCategory.ValueAlphabetic {
                     key.secondary.append(WordCollationKey())
                 }
-                var lastWord =
+                let lastWord =
                     key.secondary[key.secondary.indices.last!]
                 lastWord.keys.append(alphabeticalOrder[c]!)
                 lastCategory = InputCategory.ValueAlphabetic
@@ -207,17 +227,17 @@ class InputController: IMKInputController {
                     key.variant += Int(c.properties.numericValue!)
                 } else {
                     if lastCategory == InputCategory.ValueNumeric {
-                        var lastWord =
+                        let lastWord =
                             key.secondary[key.secondary.indices.last!]
                         lastWord.keys[lastWord.keys.indices.last!] *= 10
                     } else if lastCategory == InputCategory.FractionSlash {
-                        var lastWord =
+                        let lastWord =
                             key.secondary[key.secondary.indices.last!]
                         lastWord.keys.append(0)
                     } else {
                         key.secondary.append(WordCollationKey([0]))
                     }
-                    var lastWord =
+                    let lastWord =
                     key.secondary[key.secondary.indices.last!]
                     lastWord.keys[lastWord.keys.indices.last!] +=
                         Int(c.properties.numericValue!)
@@ -231,7 +251,7 @@ class InputController: IMKInputController {
                     key.secondary.append(WordCollationKey([-1]))
                     lastCategory = InputCategory.ValueNumeric
                 }
-                var lastWord =
+                let lastWord =
                     key.secondary[key.secondary.indices.last!]
                 lastWord.keys.append(c == "-" ? 0 : 1)
             } else if c == "/" {

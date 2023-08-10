@@ -2,7 +2,7 @@ import SwiftUI
 import InputMethodKit
 
 class CandidateWindow: NSWindow, NSWindowDelegate {
-    let hostingView = NSHostingView(rootView: CandidatesView(candidates: [], currentComposition: ""))
+    let hostingView = NSHostingView(rootView: CandidatesView(candidates: [], currentComposition: "", selectedIndex: 0))
     var inputController: InputController?
 
     func windowDidMove(_ notification: Notification) {
@@ -17,10 +17,12 @@ class CandidateWindow: NSWindow, NSWindowDelegate {
 
     func setCandidates(
         _ candidates: [Candidate],
+        selectedIndex: Int,
         currentComposition: String,
         topLeft: NSPoint
     ) {
         hostingView.rootView.candidates = candidates
+        hostingView.rootView.selectedIndex = selectedIndex
         hostingView.rootView.currentComposition = currentComposition
         self.setFrameTopLeftPoint(topLeft)
         self.orderFront(nil)

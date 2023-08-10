@@ -137,6 +137,7 @@ struct CandidatesView: View {
 
     var candidates: [Candidate]
     var currentComposition: String
+    var selectedIndex: Int
 
     var _candidatesView: some View {
         ForEach(Array(candidates.enumerated()), id: \.offset) { (index, candidate) -> CandidateView in
@@ -144,7 +145,7 @@ struct CandidatesView: View {
                 candidate: candidate,
                 index: index,
                 currentComposition: currentComposition,
-                selected: index == 0
+                selected: index == selectedIndex
             )
         }
     }
@@ -173,23 +174,23 @@ struct ContentView_Previews: PreviewProvider {
             Candidate(composition: "ṣab", text: "𒂟"),
             Candidate(composition: "ṣaḫ", text: "𒉈"),
             Candidate(composition: "ṣaḫ5", text: "𒆤"),
-        ], currentComposition: "ṣa")
+        ], currentComposition: "ṣa", selectedIndex: 2)
         CandidatesView(candidates: [
             Candidate(composition: "ṣa3", text: "𒀭"),
-        ], currentComposition: "ṣa3")
+        ], currentComposition: "ṣa3", selectedIndex: 0)
         CandidatesView(candidates: [
             Candidate(composition: "/", text: "\u{200B}"),
             Candidate(composition: "/v1", text: "𒑰"),
-        ], currentComposition: "/")
+        ], currentComposition: "/", selectedIndex: 0)
         CandidatesView(candidates: [
             Candidate(composition: "gag5", text: "𒈙")
-        ], currentComposition: "gag5")
+        ], currentComposition: "gag5", selectedIndex: 0)
         CandidatesView(candidates: [
             Candidate(composition: "enku", text: "𒍠𒄩"),
             Candidate(composition: "enkux",text: "𒄩𒍠"),
             Candidate(composition: "enkud", text: "𒍠𒄩"),
             Candidate(composition: "enkudx", text: "𒍠"),
             Candidate(composition: "enkum", text: "𒂗𒉽𒅊𒉣𒈨𒂬")
-        ], currentComposition: "enku")
+        ], currentComposition: "enku", selectedIndex: 0)
     }
 }
