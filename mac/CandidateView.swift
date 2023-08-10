@@ -1,11 +1,5 @@
 import SwiftUI
 
-
-private let subscriptZero: Unicode.Scalar = "₀"
-private let zero: Unicode.Scalar = "0"
-private let vowels = CharacterSet(charactersIn: "aeui")
-private let alphabet = CharacterSet(charactersIn: "abdegŋḫijklmnpqrsṣšśtṭuwzʾ")
-
 struct CandidateView: View {
     var candidate: Candidate
     var index: Int

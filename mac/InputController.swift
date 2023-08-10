@@ -109,7 +109,8 @@ class InputController: IMKInputController {
             updateCandidateWindow()
             return true
         }
-        if flags.contains(.capsLock) || flags.contains(.shift) {
+        if flags.contains(.capsLock) || flags.contains(.shift) ||
+            flags.contains(.command) || flags.contains(.control) {
             return false
         }
         if currentComposition.isEmpty {
@@ -141,11 +142,113 @@ class InputController: IMKInputController {
                 }
             }
             currentCandidates = signList[begin..<end]
-            // TODO(egg): Sorting, paging.
+            // TODO(egg): Paging.
+            currentCandidates.sort(by: candidatesOrdered)
             CandidateWindow.shared.setCandidates(
                 [Candidate](currentCandidates.prefix(10)),
                 currentComposition: currentComposition,
                 topLeft: getOriginPoint())
         }
+    }
+    
+    private func candidatesOrdered(_ left: Candidate, _ right: Candidate) -> Bool {
+        let left = valueKey(left.composition)
+        let right = valueKey(right.composition)
+        if left.primary.lexicographicallyPrecedes(right.primary, by: {l,r in l.keys.lexicographicallyPrecedes(r.keys)}) {
+            return true
+        } else if right.primary.lexicographicallyPrecedes(left.primary, by: {l,r in l.keys.lexicographicallyPrecedes(r.keys)}) {
+            return false
+        } else if left.secondary.lexicographicallyPrecedes(right.secondary, by: {l,r in l.keys.lexicographicallyPrecedes(r.keys)}) {
+            return true
+        } else if right.secondary.lexicographicallyPrecedes(left.secondary, by: {l,r in l.keys.lexicographicallyPrecedes(r.keys)}) {
+            return false
+        } else {
+            return left.variant < right.variant
+        }
+    }
+    
+    class WordCollationKey {
+        var keys: [Int] = []
+        
+        init() {}
+        
+        init(_ k: [Int]) {
+            keys = k
+        }
+    }
+    
+    struct CollationKeys {
+        var primary: [WordCollationKey]
+        var secondary: [WordCollationKey]
+        var variant: Int
+    }
+    
+    private func valueKey(_ s: String) -> CollationKeys {
+        var key = CollationKeys(primary: [], secondary: [], variant: 0)
+        enum InputCategory {
+            case ValueNumeric
+            case FractionSlash
+            case ValueAlphabetic
+            case Variant
+        }
+        var lastCategory: InputCategory?
+        for c in s.unicodeScalars {
+            if alphabet.contains(c) {
+                if lastCategory != InputCategory.ValueAlphabetic {
+                    key.secondary.append(WordCollationKey())
+                }
+                var lastWord =
+                    key.secondary[key.secondary.indices.last!]
+                lastWord.keys.append(alphabeticalOrder[c]!)
+                lastCategory = InputCategory.ValueAlphabetic
+            } else if CharacterSet.decimalDigits.contains(c) {
+                if lastCategory == InputCategory.Variant {
+                    key.variant *= 10
+                    key.variant += Int(c.properties.numericValue!)
+                } else {
+                    if lastCategory == InputCategory.ValueNumeric {
+                        var lastWord =
+                            key.secondary[key.secondary.indices.last!]
+                        lastWord.keys[lastWord.keys.indices.last!] *= 10
+                    } else if lastCategory == InputCategory.FractionSlash {
+                        var lastWord =
+                            key.secondary[key.secondary.indices.last!]
+                        lastWord.keys.append(0)
+                    } else {
+                        key.secondary.append(WordCollationKey([0]))
+                    }
+                    var lastWord =
+                    key.secondary[key.secondary.indices.last!]
+                    lastWord.keys[lastWord.keys.indices.last!] +=
+                        Int(c.properties.numericValue!)
+                    lastCategory = InputCategory.ValueNumeric
+                }
+            } else if c == "x" {
+                key.secondary.append(WordCollationKey([Int.max]))
+                lastCategory = InputCategory.ValueNumeric
+            } else if c == "+" || c == "-" {
+                if lastCategory != InputCategory.ValueNumeric {
+                    key.secondary.append(WordCollationKey([-1]))
+                    lastCategory = InputCategory.ValueNumeric
+                }
+                var lastWord =
+                    key.secondary[key.secondary.indices.last!]
+                lastWord.keys.append(c == "-" ? 0 : 1)
+            } else if c == "/" {
+                lastCategory = InputCategory.FractionSlash
+            } else if c == "v" {
+                lastCategory = InputCategory.Variant
+            }
+        }
+        for word in key.secondary {
+            var nextPrimaryWord : [Int] = []
+            for c in word.keys {
+                if c != Unicode.Scalar("ʾ").value {
+                    nextPrimaryWord.append(c)
+                }
+            }
+            key.primary.append(WordCollationKey(nextPrimaryWord))
+        }
+        return key
     }
 }

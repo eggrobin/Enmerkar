@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		009225822A80621A00BAD9AB /* ʾṣṭpŋf.keylayout in Resources */ = {isa = PBXBuildFile; fileRef = 009225812A80621A00BAD9AB /* ʾṣṭpŋf.keylayout */; };
+		009B746A2A846F4100F5A831 /* Characters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 009B74692A846F4100F5A831 /* Characters.swift */; };
 		00B4E0242A7937DF0081B72D /* sign_list.txt in Resources */ = {isa = PBXBuildFile; fileRef = 00B4E0232A7937DF0081B72D /* sign_list.txt */; };
 		00D321562A7817DA001C9BFF /* CandidateWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D321552A7817DA001C9BFF /* CandidateWindow.swift */; };
 		00D321582A781DA1001C9BFF /* CandidateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D321572A781DA1001C9BFF /* CandidateView.swift */; };
@@ -21,6 +22,7 @@
 
 /* Begin PBXFileReference section */
 		009225812A80621A00BAD9AB /* ʾṣṭpŋf.keylayout */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "ʾṣṭpŋf.keylayout"; sourceTree = "<group>"; };
+		009B74692A846F4100F5A831 /* Characters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Characters.swift; sourceTree = "<group>"; };
 		00B4E0232A7937DF0081B72D /* sign_list.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = sign_list.txt; path = Samples/IME/cpp/SampleIME/Dictionary/sign_list.txt; sourceTree = "<group>"; };
 		00D321552A7817DA001C9BFF /* CandidateWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CandidateWindow.swift; sourceTree = "<group>"; };
 		00D321572A781DA1001C9BFF /* CandidateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CandidateView.swift; sourceTree = "<group>"; };
@@ -77,6 +79,7 @@
 				00D321592A781E55001C9BFF /* Candidate.swift */,
 				00D321572A781DA1001C9BFF /* CandidateView.swift */,
 				00D321552A7817DA001C9BFF /* CandidateWindow.swift */,
+				009B74692A846F4100F5A831 /* Characters.swift */,
 			);
 			path = mac;
 			sourceTree = "<group>";
@@ -164,6 +167,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				00D321562A7817DA001C9BFF /* CandidateWindow.swift in Sources */,
+				009B746A2A846F4100F5A831 /* Characters.swift in Sources */,
 				00D5C0AE2A76E16800CA7198 /* AppDelegate.swift in Sources */,
 				00D321582A781DA1001C9BFF /* CandidateView.swift in Sources */,
 				00D3215A2A781E55001C9BFF /* Candidate.swift in Sources */,
