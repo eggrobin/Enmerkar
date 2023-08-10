@@ -80,10 +80,21 @@ class InputController: IMKInputController {
         guard let client = sender as? IMKTextInput else {
             return false
         }
-        if (keyCode == kVK_UpArrow || keyCode == kVK_DownArrow) &&
-            selectedIndex != nil {
-            let increment = keyCode == kVK_UpArrow ? -1 : 1
-            selectedIndex! += increment;
+
+        let increment = { () -> Int? in
+            if selectedIndex == nil {
+                return nil
+            }
+            switch keyCode {
+            case kVK_UpArrow:return -1
+            case kVK_DownArrow:return +1
+            case kVK_PageUp:return -self.pageSize
+            case kVK_PageDown:return +self.pageSize
+            default:return nil
+            }
+        }()
+        if let Δ = increment {
+            selectedIndex! += Δ;
             selectedIndex = min(max(selectedIndex!, currentCandidates.indices.min()!), currentCandidates.indices.max()!)
             let pageStart = (selectedIndex! - currentCandidates.startIndex) / pageSize * pageSize + currentCandidates.startIndex;
             CandidateWindow.shared.setCandidates(
