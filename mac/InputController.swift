@@ -84,7 +84,16 @@ class InputController: IMKInputController {
             }
             if !currentCandidates.isEmpty {
                 // TODO(egg): index with the arrow keys.
-                client.insertText(currentCandidates.first!.text, replacementRange: client.markedRange())
+                let text = currentCandidates.first!.text
+                let marked = client.markedRange()
+                client.insertText(text, replacementRange: marked)
+                // Wrong in the terminal...
+                let emitted = NSRange.init(location: marked.location, length: text.utf16.count)
+                if let s = client.attributedSubstring(from: emitted) {
+                    NSLog(s.string)
+                }
+                NSLog(emitted.description)
+                NSLog(client.uniqueClientIdentifierString())
                 currentComposition = "";
                 CandidateWindow.shared.close()
             }
