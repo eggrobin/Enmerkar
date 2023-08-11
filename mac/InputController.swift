@@ -164,7 +164,7 @@ class InputController: IMKInputController {
                         }
                     }
                 }
-                // TODO(egg): 𒋛𒀀 backspacing.
+                // TODO(egg): Update emittedSequences.
                 return false
             }
             currentComposition = String(currentComposition.prefix(currentComposition.count - 1))
@@ -174,6 +174,7 @@ class InputController: IMKInputController {
         }
         if flags.contains(.capsLock) || flags.contains(.shift) ||
             flags.contains(.command) || flags.contains(.control) {
+            // TODO(egg): In the shifted or caps-locked case, update emittedSequences.
             return false
         }
         if string.unicodeScalars.contains(where:{ $0.properties.generalCategory == .control ||
