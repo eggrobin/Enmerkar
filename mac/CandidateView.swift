@@ -147,7 +147,7 @@ struct CandidateView: View {
         let candidateComposition = candidate.composition.suffix(from: candidate.composition.index(after: candidate.composition.startIndex))
         var prettyList : [UnicodeScalar] = []
         for (listComposition, listName) in signLists {
-            if currentComposition.starts(with: listComposition) {
+            if candidateComposition.starts(with: listComposition) {
                 prettyList = Array(listName.unicodeScalars)
             }
         }
