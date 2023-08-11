@@ -10,11 +10,24 @@ class InputController: IMKInputController {
     var selectedIndex: Int? = nil
     var signList: [Candidate] = []
     
+    class EmittedSequence {
+        var range: Range<Int>
+        let text: String
+        
+        init(range: Range<Int>, text: String) {
+            self.range = range
+            self.text = text
+        }
+    }
+    
+    var emittedSequences: [EmittedSequence] = []
+    
     func insertCandidate(_: Candidate) {
         
     }
 
     override func activateServer(_ sender: Any!) {
+        emittedSequences = []
         guard let client = sender as? IMKTextInput else {
             return;
         }
@@ -86,11 +99,11 @@ class InputController: IMKInputController {
                 return nil
             }
             switch keyCode {
-            case kVK_UpArrow:return -1
-            case kVK_DownArrow:return +1
-            case kVK_PageUp:return -self.pageSize
-            case kVK_PageDown:return +self.pageSize
-            default:return nil
+                case kVK_UpArrow: return -1
+                case kVK_DownArrow: return +1
+                case kVK_PageUp: return -self.pageSize
+                case kVK_PageDown: return +self.pageSize
+                default: return nil
             }
         }()
         if let Δ = increment {
@@ -114,13 +127,18 @@ class InputController: IMKInputController {
                 let text = currentCandidates[selectedIndex!].text
                 let marked = client.markedRange()
                 client.insertText(text, replacementRange: marked)
-                // Wrong in the terminal...
-                let emitted = NSRange.init(location: marked.location, length: text.utf16.count)
-                if let s = client.attributedSubstring(from: emitted) {
-                    NSLog(s.string)
+                for s in emittedSequences {
+                    if s.range.startIndex >= marked.location {
+                        s.range = (s.range.startIndex+text.utf16.count)..<(s.range.endIndex+text.utf16.count)
+                    }
                 }
-                NSLog(emitted.description)
-                NSLog(client.uniqueClientIdentifierString())
+                if text.unicodeScalars.count > 1 {
+                    let emitted = NSRange.init(location: marked.location, length: text.utf16.count)
+                    emittedSequences.append(EmittedSequence(range:Range(emitted)!, text: text))
+                    NSLog("Added diri at " + Range(emitted)!.description)
+                    NSLog(emitted.description)
+                    NSLog(client.uniqueClientIdentifierString())
+                }
                 currentComposition = "";
                 currentCandidates = []
                 selectedIndex = nil
@@ -130,6 +148,22 @@ class InputController: IMKInputController {
         }
         if keyCode == kVK_Delete {
             if currentComposition.isEmpty {
+                if client.selectedRange().length == 0 {
+                    NSLog("Backspacing at " + client.selectedRange().location.description)
+                    for (i, s) in emittedSequences.enumerated() {
+                        if s.range.endIndex == client.selectedRange().location {
+                            NSLog("Could be " + s.range.description)
+                            if let actualText = client.attributedSubstring(from: NSRange(s.range)) {
+                                if actualText.string == s.text {
+                                    NSLog("Deleting")
+                                    client.setMarkedText("", selectionRange: NSRange(s.range), replacementRange: NSRange(s.range))
+                                    emittedSequences.remove(at: i)
+                                    return true
+                                }
+                            }
+                        }
+                    }
+                }
                 // TODO(egg): 𒋛𒀀 backspacing.
                 return false
             }
