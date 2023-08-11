@@ -183,9 +183,8 @@ class InputController: IMKInputController {
     }
     
     private func candidatesOrdered(_ left: Candidate, _ right: Candidate) -> Bool {
-        // TODO(egg): List compositions.
-        let left = valueKey(left.composition)
-        let right = valueKey(right.composition)
+        let left = left.composition.starts(with: "x") ? listKey(left.composition) : valueKey(left.composition)
+        let right = right.composition.starts(with: "x") ? listKey(right.composition) : valueKey(right.composition)
         if left.primary.lexicographicallyPrecedes(right.primary, by: {l,r in l.keys.lexicographicallyPrecedes(r.keys)}) {
             return true
         } else if right.primary.lexicographicallyPrecedes(left.primary, by: {l,r in l.keys.lexicographicallyPrecedes(r.keys)}) {
@@ -280,6 +279,24 @@ class InputController: IMKInputController {
                 }
             }
             key.primary.append(WordCollationKey(nextPrimaryWord))
+        }
+        return key
+    }
+    
+    private func listKey(_ s: String) -> CollationKeys {
+        var key = CollationKeys(primary: [], secondary: [], variant: 0)
+        let nameEnd = s.unicodeScalars.firstIndex(where: {CharacterSet.decimalDigits.contains($0)})!
+        let name = s[..<nameEnd]
+        let numberEnd = (s[nameEnd...].unicodeScalars.firstIndex(where: {!CharacterSet.decimalDigits.contains($0)}) ?? s.endIndex)
+        let number = s[nameEnd..<numberEnd]
+        let tailEnd = (s[numberEnd...].unicodeScalars.firstIndex(where: {$0 == "v"}) ?? s.endIndex)
+        let tail = s[numberEnd..<tailEnd]
+        key.primary.append(WordCollationKey([Int(number)!]))
+        key.primary.append(WordCollationKey(Array(tail.unicodeScalars.map({Int($0.value)}))))
+        key.secondary = key.primary
+        let variant = s[tailEnd...]
+        if !variant.isEmpty {
+            key.variant = Int(variant[variant.index(after: tailEnd)...])!
         }
         return key
     }
