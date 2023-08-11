@@ -75,7 +75,6 @@ class InputController: IMKInputController {
     }
     
     override func inputText(_ string: String!, key keyCode: Int, modifiers rawFlags: Int, client sender: Any!) -> Bool {
-        // TODO(egg): Ignore ESC, etc.
         let flags = NSEvent.ModifierFlags(rawValue: UInt(rawFlags))
         NSLog(string)
         guard let client = sender as? IMKTextInput else {
@@ -105,7 +104,9 @@ class InputController: IMKInputController {
                 topLeft: getOriginPoint())
             return true
         }
-        if keyCode == kVK_Space || keyCode == kVK_Return {
+        if keyCode == kVK_Space ||
+            keyCode == kVK_Return ||
+            keyCode == kVK_ANSI_KeypadEnter {
             if currentComposition.isEmpty {
                 return false
             }
@@ -139,6 +140,11 @@ class InputController: IMKInputController {
         }
         if flags.contains(.capsLock) || flags.contains(.shift) ||
             flags.contains(.command) || flags.contains(.control) {
+            return false
+        }
+        if string.unicodeScalars.contains(where:{ $0.properties.generalCategory == .control ||
+            $0.properties.generalCategory == .privateUse
+        }) {
             return false
         }
         if currentComposition.isEmpty {
