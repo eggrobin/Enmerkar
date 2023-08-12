@@ -174,13 +174,13 @@ signs can also be entered by their sign list number, prefixed by the key `x` and
 as illustrated in the following table for 𒂗.
 | Keys | Sign list |
 |---|---|
-|`x` `m` `e` `a` `9` `9` `␣` | René Labat, _Manuel d'épigraphie akkadienne_ |
-|`x` `l` `a` `k` `5` `3` `2` `␣` | Anton Deimel, _Liste der archaischen Keilschriftzeichen von Fara_ |
-|`x` `r` `s` `p` `2` `7` `1` `␣` | Yvonne Rosengarten, _Répertoire commenté des signes présargoniques sumériens de Lagash_ |
-|`x` `b` `a` `u` `2` `9` `6` `␣` | Eric Burrows, _Archaic Texts_ |
-|`x` `ḫ` `z` `l` `0` `4` `0` `␣` | Christel Rüster & Erich Neu, _Hethitisches Zeichenlexikon_ |
-|`x` `m` `z` `l` `1` `6` `4` `␣` | Rykle Borger, _Mesopotamisches Zeichenlexikon_ |
-|`x` `a` `b` `z` `l` `6` `2` `␣` | Catherine Mittermayer, _Altbabylonische Zeichenliste der sumerisch-literarische Texte_ |
-|`x` `k` `w` `u` `7` `5` `␣` | Nikolaus Schneider, _Die Keilschriftzeichen der Wirtschaftsurkunden von Ur III_ |
+|`x`&nbsp;`m`&nbsp;`e`&nbsp;`a`&nbsp;`9`&nbsp;`9`&nbsp;`␣` | René Labat, _Manuel d'épigraphie akkadienne_ |
+|`x`&nbsp;`l`&nbsp;`a`&nbsp;`k`&nbsp;`5`&nbsp;`3`&nbsp;`2`&nbsp;`␣` | Anton Deimel, _Liste der archaischen Keilschriftzeichen von Fara_ |
+|`x`&nbsp;`r`&nbsp;`s`&nbsp;`p`&nbsp;`2`&nbsp;`7`&nbsp;`1`&nbsp;`␣` | Yvonne Rosengarten, _Répertoire commenté des signes présargoniques sumériens de Lagash_ |
+|`x`&nbsp;`b`&nbsp;`a`&nbsp;`u`&nbsp;`2`&nbsp;`9`&nbsp;`6`&nbsp;`␣` | Eric Burrows, _Archaic Texts_ |
+|`x`&nbsp;`ḫ`&nbsp;`z`&nbsp;`l`&nbsp;`0`&nbsp;`4`&nbsp;`0`&nbsp;`␣` | Christel Rüster & Erich Neu, _Hethitisches Zeichenlexikon_ |
+|`x`&nbsp;`m`&nbsp;`z`&nbsp;`l`&nbsp;`1`&nbsp;`6`&nbsp;`4`&nbsp;`␣` | Rykle Borger, _Mesopotamisches Zeichenlexikon_ |
+|`x`&nbsp;`a`&nbsp;`b`&nbsp;`z`&nbsp;`l`&nbsp;`6`&nbsp;`2`&nbsp;`␣` | Catherine Mittermayer, _Altbabylonische Zeichenliste der sumerisch-literarische Texte_ |
+|`x`&nbsp;`k`&nbsp;`w`&nbsp;`u`&nbsp;`7`&nbsp;`5`&nbsp;`␣` | Nikolaus Schneider, _Die Keilschriftzeichen der Wirtschaftsurkunden von Ur III_ |
 
 This makes it possible to enter signs that have no known values, such as `x` `m` `z` `l` `4` `0` `␣` for 𒎄.
