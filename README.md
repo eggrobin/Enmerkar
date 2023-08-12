@@ -174,7 +174,7 @@ signs can also be entered by their sign list number, prefixed by the key `x` and
 as illustrated in the following table for 𒂗.
 | Keys | Sign list |
 |---|---|
-|`xm` `e` `a` `9` `9` `␣` | René Labat, _Manuel d'épigraphie akkadienne_ |
+|`x` `m` `e` `a` `9` `9` `␣` | René Labat, _Manuel d'épigraphie akkadienne_ |
 |`x` `l` `a` `k` `5` `3` `2` `␣` | Anton Deimel, _Liste der archaischen Keilschriftzeichen von Fara_ |
 |`x` `r` `s` `p` `2` `7` `1` `␣` | Yvonne Rosengarten, _Répertoire commenté des signes présargoniques sumériens de Lagash_ |
 |`x` `b` `a` `u` `2` `9` `6` `␣` | Eric Burrows, _Archaic Texts_ |
