@@ -1,4 +1,3 @@
-//import Carbon.HIToolbox
 import Cocoa
 import InputMethodKit
 
@@ -149,8 +148,11 @@ class InputController: IMKInputController {
                 let marked = client.markedRange()
                 client.insertText(text, replacementRange: marked)
                 for s in emittedSequences {
+                    if s.range.endIndex > marked.location {
+                        s.range = s.range.startIndex..<(s.range.endIndex+text.utf16.count)
+                    }
                     if s.range.startIndex >= marked.location {
-                        s.range = (s.range.startIndex+text.utf16.count)..<(s.range.endIndex+text.utf16.count)
+                        s.range = (s.range.startIndex+text.utf16.count)..<s.range.endIndex
                     }
                 }
                 if text.unicodeScalars.count > 1 {
@@ -169,6 +171,7 @@ class InputController: IMKInputController {
         }
         if keyCode == kVK_Delete {
             if currentComposition.isEmpty {
+                var deletedRange: NSRange? = nil
                 if client.selectedRange().length == 0 {
                     NSLog("Backspacing at " + client.selectedRange().location.description)
                     for (i, s) in emittedSequences.enumerated() {
@@ -177,15 +180,29 @@ class InputController: IMKInputController {
                             if let actualText = client.attributedSubstring(from: NSRange(s.range)) {
                                 if actualText.string == s.text {
                                     NSLog("Deleting")
-                                    client.setMarkedText("", selectionRange: NSRange(s.range), replacementRange: NSRange(s.range))
+                                    deletedRange = NSRange(s.range)
+                                    client.setMarkedText("", selectionRange: deletedRange!, replacementRange: deletedRange!)
                                     emittedSequences.remove(at: i)
-                                    return true
                                 }
                             }
                         }
                     }
+                    if deletedRange == nil && client.selectedRange().location > 0 {
+                        deletedRange = NSRange(location: client.selectedRange().location - 1,length: 1)
+                        if let deletedText = client.attributedSubstring(from: deletedRange!) {
+                            deletedRange = NSRange(location: client.selectedRange().location - deletedText.string.utf16.count, length: deletedText.string.utf16.count)
+                        }
+                        client.setMarkedText("", selectionRange: deletedRange!, replacementRange: deletedRange!)
+                    }
+                    if let deleted = deletedRange {
+                        for s in emittedSequences {
+                            if s.range.startIndex >= deleted.location {
+                                s.range = (s.range.startIndex-deleted.length)..<(s.range.endIndex-deleted.length)
+                            }
+                        }
+                        return true
+                    }
                 }
-                // TODO(egg): Update emittedSequences.
                 return false
             }
             currentComposition = String(currentComposition.prefix(currentComposition.count - 1))
