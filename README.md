@@ -167,9 +167,25 @@ the placement of `Ṣ` and `Ṭ` is more haphazard. The table below shows the la
 
 The layout may be customized by editing the file `%APPDATA%\mockingbirdnest\Enmerkar\layout.txt` according to the instructions in that file.
 
+### Backspacing
+
+Since version [𒀭𒄑𒉈𒂵𒈩](https://github.com/eggrobin/Enmerkar/releases/tag/𒀭𒄑𒉈𒂵𒈩),
+recently entered signs that are represented as sequences of Unicode code points are backspaced as they have been typed.
+Thus, typing `d` `i` `r` `i` `␣` `⌫` emits the text 𒋛𒀀 and then removes all of it,
+whereas typing `s` `i`  `␣` `a` `␣` `⌫` emits the same text, but backspaces only the 𒀀, leaving 𒋛.
+
+| Key sequences | Output | Notes|
+|---|---|---|
+| `lu2␣` `ra␣` `geme␣` `⌫` `gi␣` `me␣` | 𒇽𒊏𒄀𒈨 | GEME₂ 𒊩𒆳 is backspaced atomically. |
+| `dumu␣` `mi2␣` `mat␣` `⌫` `meš␣` | 𒌉𒊩𒎌 | Only the 𒆳 in 𒊩𒆳 is backspaced. |
+| `babilim2␣` `⌫` `babilim␣` | 𒆍𒀭 | 𒆍𒀭𒊏 is backspaced atomically. |
+| `ka2␣` `dingir␣` `ra␣` `⌫` | 𒆍𒀭 | Only the 𒊏 in 𒆍𒀭𒊏 is backspaced. |
+
+> Note: version 𒀭𒄑𒉈𒂵𒈩 is not yet released.
+
 ### Entry by sign list number
 
-Since version [𒀭𒌉𒍣](https://github.com/eggrobin/Enmerkar/releases/tag/%F0%92%80%AD%F0%92%8C%89%F0%92%8D%A3),
+Since version [𒀭𒌉𒍣](https://github.com/eggrobin/Enmerkar/releases/tag/𒀭𒌉𒍣),
 signs can also be entered by their sign list number, prefixed by the key `x` and the abbreviation for the sign list,
 as illustrated in the following table for 𒂗.
 | Keys | Sign list |
