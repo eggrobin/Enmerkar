@@ -63,9 +63,9 @@ class InputController: IMKInputController {
                 NSLog(id)
             }
         }*/
-        let lastKeyboard = TISCopyCurrentASCIICapableKeyboardInputSource().takeRetainedValue()
+        let lastInputSource = TISCopyCurrentASCIICapableKeyboardInputSource().takeRetainedValue()
         let lastKeyboardLayout =
-        Unmanaged<CFData>.fromOpaque(TISGetInputSourceProperty(lastKeyboard, kTISPropertyUnicodeKeyLayoutData)).takeUnretainedValue()
+        Unmanaged<CFData>.fromOpaque(TISGetInputSourceProperty(lastInputSource, kTISPropertyUnicodeKeyLayoutData)).takeUnretainedValue()
         let getLayoutKey = {(vkey: Int) in
             var deadKeyState: UInt32 = 0
             var s: [UniChar] = Array(repeating: 0, count: 255)
@@ -73,8 +73,19 @@ class InputController: IMKInputController {
             UCKeyTranslate(unsafeBitCast(CFDataGetBytePtr(lastKeyboardLayout), to: UnsafePointer<UCKeyboardLayout>.self), UInt16(vkey), UInt16(kUCKeyActionDown), 0, UInt32(LMGetKbdType()), UInt32(kUCKeyTranslateNoDeadKeysMask), &deadKeyState, 255, &actualLength, &s)
             return CFStringCreateWithCharacters(kCFAllocatorDefault, s, actualLength) as String
         }
-        NSLog([kVK_ANSI_Q,kVK_ANSI_W,kVK_ANSI_E,kVK_ANSI_R,kVK_ANSI_T,kVK_ANSI_Y].map(getLayoutKey).joined())
-        client.overrideKeyboard(withKeyboardNamed: "com.mockingbirdnest.inputmethod.Enmerkar.keylayout.ʾṣṭpŋf")
+        let layoutMnemonic = [kVK_ANSI_Q,kVK_ANSI_W,kVK_ANSI_E,kVK_ANSI_R,kVK_ANSI_T,kVK_ANSI_Y].map(getLayoutKey).joined()
+        if layoutMnemonic == "',.pyf" {
+            client.overrideKeyboard(withKeyboardNamed: "com.mockingbirdnest.inputmethod.Enmerkar.keylayout.ʾṣṭpŋf")
+        } else if layoutMnemonic == "qwerty" {
+            client.overrideKeyboard(withKeyboardNamed: "com.mockingbirdnest.inputmethod.Enmerkar.keylayout.qwertŋ")
+        } else if layoutMnemonic == "qwertz" {
+            client.overrideKeyboard(withKeyboardNamed: "com.mockingbirdnest.inputmethod.Enmerkar.keylayout.qwertz")
+        } else if layoutMnemonic == "azerty" {
+            client.overrideKeyboard(withKeyboardNamed: "com.mockingbirdnest.inputmethod.Enmerkar.keylayout.azertŋ")
+        } else {
+            NSLog("Unknown layout " + layoutMnemonic + ", using qwertŋ")
+            client.overrideKeyboard(withKeyboardNamed: "com.mockingbirdnest.inputmethod.Enmerkar.keylayout.qwertŋ")
+        }
     }
     
     override func deactivateServer(_ sender: Any!) {
