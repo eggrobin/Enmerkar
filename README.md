@@ -166,3 +166,21 @@ the placement of `Ṣ` and `Ṭ` is more haphazard. The table below shows the la
 </td></tr></tbody></table>
 
 The layout may be customized by editing the file `%APPDATA%\mockingbirdnest\Enmerkar\layout.txt` according to the instructions in that file.
+
+### Entry by sign list number
+
+Since version [𒀭𒌉𒍣](https://github.com/eggrobin/Enmerkar/releases/tag/%F0%92%80%AD%F0%92%8C%89%F0%92%8D%A3),
+signs can also be entered by their sign list number, prefixed by the key `x` and the abbreviation for the sign list,
+as illustrated in the following table for 𒂗.
+| Keys | Sign list |
+|---|---|
+|`x`&nbsp;`m`&nbsp;`e`&nbsp;`a`&nbsp;`9`&nbsp;`9`&nbsp;`␣` | René Labat, _Manuel d'épigraphie akkadienne_ |
+|`x`&nbsp;`l`&nbsp;`a`&nbsp;`k`&nbsp;`5`&nbsp;`3`&nbsp;`2`&nbsp;`␣` | Anton Deimel, _Liste der archaischen Keilschriftzeichen von Fara_ |
+|`x`&nbsp;`r`&nbsp;`s`&nbsp;`p`&nbsp;`2`&nbsp;`7`&nbsp;`1`&nbsp;`␣` | Yvonne Rosengarten, _Répertoire commenté des signes présargoniques sumériens de Lagash_ |
+|`x`&nbsp;`b`&nbsp;`a`&nbsp;`u`&nbsp;`2`&nbsp;`9`&nbsp;`6`&nbsp;`␣` | Eric Burrows, _Archaic Texts_ |
+|`x`&nbsp;`ḫ`&nbsp;`z`&nbsp;`l`&nbsp;`0`&nbsp;`4`&nbsp;`0`&nbsp;`␣` | Christel Rüster & Erich Neu, _Hethitisches Zeichenlexikon_ |
+|`x`&nbsp;`m`&nbsp;`z`&nbsp;`l`&nbsp;`1`&nbsp;`6`&nbsp;`4`&nbsp;`␣` | Rykle Borger, _Mesopotamisches Zeichenlexikon_ |
+|`x`&nbsp;`a`&nbsp;`b`&nbsp;`z`&nbsp;`l`&nbsp;`6`&nbsp;`2`&nbsp;`␣` | Catherine Mittermayer, _Altbabylonische Zeichenliste der sumerisch-literarische Texte_ |
+|`x`&nbsp;`k`&nbsp;`w`&nbsp;`u`&nbsp;`7`&nbsp;`5`&nbsp;`␣` | Nikolaus Schneider, _Die Keilschriftzeichen der Wirtschaftsurkunden von Ur III_ |
+
+This makes it possible to enter signs that have no known values, such as `x` `m` `z` `l` `4` `0` `␣` for 𒎄.
