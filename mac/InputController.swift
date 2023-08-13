@@ -30,15 +30,13 @@ class InputController: IMKInputController {
         guard let client = sender as? IMKTextInput else {
             return;
         }
-        NSLog("activateServer")
         if let path = Bundle.main.path(forResource: "sign_list", ofType: "txt") {
-            NSLog(path)
+            
             do {
                 let file = try String(contentsOfFile: path)
-                NSLog("Reading sign list (%d characters)...", signList.count)
+                
                 let lines = file.components(separatedBy: CharacterSet.newlines)
                 signList.removeAll()
-                NSLog("%d compositions...", lines.count)
                 for line in lines {
                     if line.isEmpty {
                         continue
@@ -52,16 +50,6 @@ class InputController: IMKInputController {
             } catch {}
         }
         CandidateWindow.shared.inputController = self;
-        //TISRegisterInputSource(NSURL(fileURLWithPath: Bundle.main.bundlePath))
-        /*
-        let inputSources = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
-        for inputSource in inputSources {
-            let id = Unmanaged<NSString>
-                .fromOpaque(TISGetInputSourceProperty(inputSource, kTISPropertyInputSourceID)).takeUnretainedValue() as String
-            if (id.contains(/mock/)) {
-                NSLog(id)
-            }
-        }*/
         let lastInputSource = TISCopyCurrentASCIICapableKeyboardInputSource().takeRetainedValue()
         let lastKeyboardLayout =
         Unmanaged<CFData>.fromOpaque(TISGetInputSourceProperty(lastInputSource, kTISPropertyUnicodeKeyLayoutData)).takeUnretainedValue()
@@ -109,7 +97,6 @@ class InputController: IMKInputController {
     
     override func inputText(_ string: String!, key keyCode: Int, modifiers rawFlags: Int, client sender: Any!) -> Bool {
         let flags = NSEvent.ModifierFlags(rawValue: UInt(rawFlags))
-        NSLog(string)
         guard let client = sender as? IMKTextInput else {
             return false
         }
@@ -158,9 +145,6 @@ class InputController: IMKInputController {
                 if text.unicodeScalars.count > 1 {
                     let emitted = NSRange.init(location: marked.location, length: text.utf16.count)
                     emittedSequences.append(EmittedSequence(range:Range(emitted)!, text: text))
-                    NSLog("Added diri at " + Range(emitted)!.description)
-                    NSLog(emitted.description)
-                    NSLog(client.uniqueClientIdentifierString())
                 }
                 currentComposition = "";
                 currentCandidates = []
@@ -173,13 +157,10 @@ class InputController: IMKInputController {
             if currentComposition.isEmpty {
                 var deletedRange: NSRange? = nil
                 if client.selectedRange().length == 0 {
-                    NSLog("Backspacing at " + client.selectedRange().location.description)
                     for (i, s) in emittedSequences.enumerated() {
                         if s.range.endIndex == client.selectedRange().location {
-                            NSLog("Could be " + s.range.description)
                             if let actualText = client.attributedSubstring(from: NSRange(s.range)) {
                                 if actualText.string == s.text {
-                                    NSLog("Deleting")
                                     deletedRange = NSRange(s.range)
                                     client.setMarkedText("", selectionRange: deletedRange!, replacementRange: deletedRange!)
                                     emittedSequences.remove(at: i)
@@ -232,7 +213,6 @@ class InputController: IMKInputController {
     }
     
     private func updateCandidateWindow() {
-        NSLog(currentComposition)
         if currentComposition.isEmpty {
             currentCandidates = []
             selectedIndex = nil
