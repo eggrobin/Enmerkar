@@ -16,7 +16,7 @@ Once the above installation steps are complete, 𒂗𒈨𒅕𒃸 is installed, t
 
 
 **macOS:**
-> 𒀝 𒂗𒈨𒅕𒃸 TODO(egg): Make this a screenshot.
+> ![𒀝 𒂗𒈨𒅕𒃸](https://github.com/eggrobin/Enmerkar/assets/2284290/9ed9acc3-a735-4d33-ab5e-fb0f8c3536b8)
 
 > ###### Notes.
 > On Windows, the language of the input method is Syriac, rather than Akkadian, because Windows does not support arbitrary language codes in
