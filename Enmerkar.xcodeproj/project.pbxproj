@@ -318,12 +318,13 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = mac/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "𒂗𒈨𒅕𒃸 Cuneiform IME";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = "𒀭𒄑𒉈𒂵𒈩";
 				OBJROOT = build;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mockingbirdnest.inputmethod.Enmerkar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -349,12 +350,13 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = mac/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "𒂗𒈨𒅕𒃸 Cuneiform IME";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = "𒀭𒄑𒉈𒂵𒈩";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mockingbirdnest.inputmethod.Enmerkar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
