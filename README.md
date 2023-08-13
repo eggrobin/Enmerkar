@@ -12,11 +12,11 @@
 Once the above installation steps are complete, 𒂗𒈨𒅕𒃸 is installed, the list of keyboard layouts in the [Windows Language bar](https://support.microsoft.com/en-us/topic/switch-between-languages-using-the-language-bar-1c2242c0-fe15-4bc3-99bc-535de6f4f258) or [macOS Input menu](https://support.apple.com/en-gb/guide/mac-help/aside/glos52ed78a0/13.0/mac/13.0) should have a new entry.
 
 **Windows:**
-> 𒀝 Syriac  
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;𒂗𒈨𒅕𒃸 Cuneiform IME
+> ![𒀝 Syriac 𒂗𒈨𒅕𒃸 Cuneiform IME](https://github.com/eggrobin/Enmerkar/assets/2284290/8b4f70a2-9a3f-4d9a-ae75-99389eb25950)
+
 
 **macOS:**
-> 𒀝 𒂗𒈨𒅕𒃸
+> 𒀝 𒂗𒈨𒅕𒃸 TODO(egg): Make this a screenshot.
 
 > ###### Notes.
 > On Windows, the language of the input method is Syriac, rather than Akkadian, because Windows does not support arbitrary language codes in
