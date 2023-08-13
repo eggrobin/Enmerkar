@@ -144,6 +144,9 @@ class InputController: IMKInputController {
                 }
                 if text.unicodeScalars.count > 1 {
                     let emitted = NSRange.init(location: marked.location, length: text.utf16.count)
+                    if emittedSequences.count >= 128 {
+                        emittedSequences.removeFirst()
+                    }
                     emittedSequences.append(EmittedSequence(range:Range(emitted)!, text: text))
                 }
                 currentComposition = "";
