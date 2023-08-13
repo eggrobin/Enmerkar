@@ -11,12 +11,12 @@
 
 Once the above installation steps are complete, 𒂗𒈨𒅕𒃸 is installed, the list of keyboard layouts in the [Windows Language bar](https://support.microsoft.com/en-us/topic/switch-between-languages-using-the-language-bar-1c2242c0-fe15-4bc3-99bc-535de6f4f258) or [macOS Input menu](https://support.apple.com/en-gb/guide/mac-help/aside/glos52ed78a0/13.0/mac/13.0) should have a new entry.
 
-> ###### Windows:
+**Windows:**
 > 𒀝 Syriac  
 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;𒂗𒈨𒅕𒃸 Cuneiform IME
 
-> ###### macOS:
-> 𒀝 Enmerkar
+**macOS:**
+> 𒀝 𒂗𒈨𒅕𒃸
 
 > ###### Notes.
 > On Windows, the language of the input method is Syriac, rather than Akkadian, because Windows does not support arbitrary language codes in
@@ -98,7 +98,13 @@ The key `¹` (a shifted key in the default layouts; see below for its placement)
 
 The letters that are not part of the basic latin alphabet may have been assigned various keys;
 the otherwise unused letters `C`, `H`, `O`, `Y` have consistently been repurposed as `Š`, `Ḫ`, `Ś`, `Ŋ` respectively;
-the placement of `Ṣ` and `Ṭ` is more haphazard. The table below shows the layouts offered by the installer.
+the placement of `Ṣ` and `Ṭ` is more haphazard. The table below shows the default layouts.
+
+**Windows:** The layout is chosen as part of the installation process.
+
+**macOS:** The layout is chosen based on the last used keyboard layout:
+switching to 𒂗𒈨𒅕𒃸 from a QWERTY keyboard means that 𒂗𒈨𒅕𒃸 uses the QWERTŊ layout.
+
 <table>
 <thead><tr><th>AZERTŊ</th><th>QWERTŊ</th><th>QWERTZ</th><th>ʾṢṬPŊF (Dvorak)</th></tr></thead>
 <tbody><tr><td>
@@ -162,12 +168,12 @@ the placement of `Ṣ` and `Ṭ` is more haphazard. The table below shows the la
 </pre>
 </td></tr></tbody></table>
 
-The layout may be customized by editing the file `%APPDATA%\mockingbirdnest\Enmerkar\layout.txt` according to the instructions in that file.
+**Windows:** The layout may be customized by editing the file `%APPDATA%\mockingbirdnest\Enmerkar\layout.txt` according to the instructions in that file.
 
 ### Backspacing
 
 Since version [𒀭𒄑𒉈𒂵𒈩](https://github.com/eggrobin/Enmerkar/releases/tag/𒀭𒄑𒉈𒂵𒈩),
-recently entered signs that are represented as sequences of Unicode code points are backspaced as they have been typed.
+recently* entered signs that are represented as sequences of Unicode code points are backspaced as they have been typed.
 Thus, typing `d` `i` `r` `i` `␣` `⌫` emits the text 𒋛𒀀 and then removes all of it,
 whereas typing `s` `i`  `␣` `a` `␣` `⌫` emits the same text, but backspaces only the 𒀀, leaving 𒋛.
 
@@ -178,7 +184,22 @@ whereas typing `s` `i`  `␣` `a` `␣` `⌫` emits the same text, but backspace
 | `babilim2␣` `⌫` `babilim␣` | 𒆍𒀭 | 𒆍𒀭𒊏 is backspaced atomically. |
 | `ka2␣` `dingir␣` `ra␣` `⌫` | 𒆍𒀭 | Only the 𒊏 in 𒆍𒀭𒊏 is backspaced. |
 
-> Note: version 𒀭𒄑𒉈𒂵𒈩 is not yet released.
+Backspacing is otherwise by code point; in particular,
+the combining marks ◌́, ◌̀, ◌̄, and ◌̂ , which are entered separately using the default layouts,
+are accordingly backspaced separately from their base.
+
+| Keys (caps lock on) | Output |
+|---|---|
+| `r` `e` `◌̄` `ʾ` `u` `◌̄` `⌫` `◌̂ ` `m` | rēʾûm |
+
+---
+
+\* On Windows, the IME remembers sequences 128 sequences per document as long as the process is running; it does not recognize sequences if they are copy-pasted.
+The macOS implementation is more limited: sequences will be forgotten as soon as another input source is selected, or as soon as the focus moves to another text field, and many text editing operations even within the IME will disrupt the sequence backspacing behaviour.
+The reason for this discrepancy is that the Windows implementation can make use of [ITfRange objects](https://learn.microsoft.com/en-us/windows/win32/api/msctf/nn-msctf-itfrange),
+which track a range of text as the document is edited;
+to our knowledge there is no macOS equivalent, so the macOS IME needs keep track of the emitted ranges itself.
+Nevertheless, we expect that this should work well enough for the common use case of backspacing a recent typo.
 
 ### Entry by sign list number
 
