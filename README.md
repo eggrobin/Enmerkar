@@ -1,32 +1,29 @@
 # 𒂗𒈨𒅕𒃸
-𒂗𒈨𒅕𒃸 (en-me-er-kár, Enmerkar) is a Sumero-Akkadian cuneiform input method for Windows.
-
-It is based on the [sample IME from *Windows classic samples* by
-Microsoft Corporation](https://github.com/microsoft/Windows-classic-samples/tree/22b652b35ea19c544b4ee541f91a59e5e8d8c070/Samples/IME),
-available under the MIT license.
-Its sign list is based on the [Oracc Global Sign List](http://oracc.museum.upenn.edu/ogsl/)
-by the OGSL Project ([available in machine readable form on GitHub](https://github.com/oracc/ogsl)),
-available under the CC BY-SA 3.0 license.
-Adjustments were made to the sign list, in particular to take into account
-[signs](https://www.unicode.org/wg2/docs/n4277.pdf) newly encoded in Unicode 7.0 (2014).
-We are in the process of [upstreaming](https://github.com/oracc/ogsl/pulls?q=is%3Apr+author%3Aeggrobin) these adjustments.
+𒂗𒈨𒅕𒃸 (en-me-er-kár, Enmerkar) is a Sumero-Akkadian cuneiform input method for macOS and Windows.
 
 ## Installation
 
-Download the installer (`Enmerkar.msi`) for the latest release from https://github.com/eggrobin/Enmerkar/releases, and run the installer; select an appropriate keyboard layout (be that one in which you touch type, or the one matching your physical keyboard) in the installer.
+**Windows:** Download `Enmerkar.msi` for the latest release from https://github.com/eggrobin/Enmerkar/releases, and run it. In the installer, select an appropriate keyboard layout (be that one in which you touch type, or the one matching your physical keyboard).
+
+**macOS:** Download `Enmerkar.pkg` for the latest release from https://github.com/eggrobin/Enmerkar/releases, and run it.  Log out, and log back in.  In the [Input Sources settings](https://support.apple.com/guide/mac-help/mchl84525d76/13.0/mac/13.0), press the `+` button to add an input source; choose Enmerkar from the list of input methods for the Akkadian language, and press `Add`.
 
 ## Usage
 
-Once 𒂗𒈨𒅕𒃸 is installed, the list of keyboard layouts in the [Language bar](https://support.microsoft.com/en-us/topic/switch-between-languages-using-the-language-bar-1c2242c0-fe15-4bc3-99bc-535de6f4f258) should have a new entry.
+Once the above installation steps are complete, 𒂗𒈨𒅕𒃸 is installed, the list of keyboard layouts in the [Windows Language bar](https://support.microsoft.com/en-us/topic/switch-between-languages-using-the-language-bar-1c2242c0-fe15-4bc3-99bc-535de6f4f258) or [macOS Input menu](https://support.apple.com/en-gb/guide/mac-help/aside/glos52ed78a0/13.0/mac/13.0) should have a new entry.
+
+> ###### Windows:
 > 𒀝 Syriac  
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Akkadian IME
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;𒂗𒈨𒅕𒃸 Cuneiform IME
+
+> ###### macOS:
+> 𒀝 Enmerkar
 
 > ###### Notes.
-> The language of the input method is Syriac, rather than Akkadian, because Windows does not support arbitrary language codes in
+> On Windows, the language of the input method is Syriac, rather than Akkadian, because Windows does not support arbitrary language codes in
 [the relevant API](https://docs.microsoft.com/en-us/windows/win32/api/msctf/nf-msctf-itfinputprocessorprofilemgr-registerprofile),
 and instead uses [the deprecated `LANGID`](https://docs.microsoft.com/en-us/windows/win32/intl/language-identifier-constants-and-strings),
 which only supports a relatively small set of languages, and in particular has no equivalent to `akk`. We apologize for the inconvenience.  
-> The icon, which, for keyboard layouts, is normally an abbreviation of the language names (**ΕΛ**, **ENG**, **FRA**, **РУС**, etc.),
+> The icon, which, for Windows keyboard layouts, is normally an abbreviation of the language names (**ΕΛ**, **ENG**, **FRA**, **РУС**, etc.),
 > is here 𒀝, consistent with 𒀝𒅗𒁺𒌑; note that the IME can also be used to type Elamite, Hittite, or Sumerian (its default
 > layouts all have the letter ŋ).
 
@@ -69,7 +66,7 @@ Examples below. Note that thanks to the word separation, if you double-click on 
 
 
 ---
-\* We are told this does not work on Firefox, though it works fine on Chrome, Edge, and even Internet Explorer.
+\* We are told this does not work on Firefox, though it works fine on Chrome, Edge, Safari, and even Internet Explorer.
 
 ### Typing transliterated Sumerian and Akkadian
 
@@ -194,9 +191,26 @@ as illustrated in the following table for 𒂗.
 |`x`&nbsp;`l`&nbsp;`a`&nbsp;`k`&nbsp;`5`&nbsp;`3`&nbsp;`2`&nbsp;`␣` | Anton Deimel, _Liste der archaischen Keilschriftzeichen von Fara_ |
 |`x`&nbsp;`r`&nbsp;`s`&nbsp;`p`&nbsp;`2`&nbsp;`7`&nbsp;`1`&nbsp;`␣` | Yvonne Rosengarten, _Répertoire commenté des signes présargoniques sumériens de Lagash_ |
 |`x`&nbsp;`b`&nbsp;`a`&nbsp;`u`&nbsp;`2`&nbsp;`9`&nbsp;`6`&nbsp;`␣` | Eric Burrows, _Archaic Texts_ |
-|`x`&nbsp;`ḫ`&nbsp;`z`&nbsp;`l`&nbsp;`0`&nbsp;`4`&nbsp;`0`&nbsp;`␣` | Christel Rüster & Erich Neu, _Hethitisches Zeichenlexikon_ |
+|`x`&nbsp;`ḫ`&nbsp;`z`&nbsp;`l`&nbsp;`4`&nbsp;`0`&nbsp;`␣` | Christel Rüster & Erich Neu, _Hethitisches Zeichenlexikon_ |
 |`x`&nbsp;`m`&nbsp;`z`&nbsp;`l`&nbsp;`1`&nbsp;`6`&nbsp;`4`&nbsp;`␣` | Rykle Borger, _Mesopotamisches Zeichenlexikon_ |
 |`x`&nbsp;`a`&nbsp;`b`&nbsp;`z`&nbsp;`l`&nbsp;`6`&nbsp;`2`&nbsp;`␣` | Catherine Mittermayer, _Altbabylonische Zeichenliste der sumerisch-literarische Texte_ |
 |`x`&nbsp;`k`&nbsp;`w`&nbsp;`u`&nbsp;`7`&nbsp;`5`&nbsp;`␣` | Nikolaus Schneider, _Die Keilschriftzeichen der Wirtschaftsurkunden von Ur III_ |
 
 This makes it possible to enter signs that have no known values, such as `x` `m` `z` `l` `4` `0` `␣` for 𒎄.
+
+## Acknowledgements
+
+The Windows implementation is based on the [sample IME from *Windows classic samples* by
+Microsoft Corporation](https://github.com/microsoft/Windows-classic-samples/tree/22b652b35ea19c544b4ee541f91a59e5e8d8c070/Samples/IME),
+available under the MIT license.
+
+Parts of the macOS implementation are based on the [业火 IME](https://github.com/qwertyyb/Fire/tree/89e3ccfb49de824d875721ed5479ee0644093dfa) by [@qwertyyb](https://github.com/qwertyyb), available under the MIT license.
+
+The sign list is based on the [Oracc Global Sign List](http://oracc.museum.upenn.edu/ogsl/)
+by the OGSL Project ([available in machine readable form on GitHub](https://github.com/oracc/ogsl)),
+available under the CC BY-SA 3.0 license.
+Adjustments were made to the sign list, in particular to take into account
+[signs](https://www.unicode.org/wg2/docs/n4277.pdf) newly encoded in Unicode 7.0 (2014).
+We are in the process of [upstreaming](https://github.com/oracc/ogsl/pulls?q=is%3Apr+author%3Aeggrobin) these adjustments.
+
+We thank [@Zaikarion](https://github.com/Zaikarion) for testing and providing feedback on many early prototypes of the Windows version. 
