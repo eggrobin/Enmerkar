@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <list>
+
 #include "KeyHandlerEditSession.h"
 #include "SampleIMEBaseStructure.h"
 
@@ -146,7 +148,7 @@ private:
     BOOL _IsComposing();
     BOOL _IsKeyboardDisabled();
 
-    HRESULT _AddComposingAndChar(TfEditCookie ec, _In_ ITfContext *pContext, _In_ CStringRange *pstrAddString);
+    HRESULT _AddComposingAndChar(TfEditCookie ec, _In_ ITfContext *pContext, _In_ CStringRange *pstrAddString, ITfRange** range_clone = nullptr);
     HRESULT _AddCharAndFinalize(TfEditCookie ec, _In_ ITfContext *pContext, _In_ CStringRange *pstrAddString);
 
     BOOL _FindComposingRange(TfEditCookie ec, _In_ ITfContext *pContext, _In_ ITfRange *pSelection, _Outptr_result_maybenull_ ITfRange **ppRange);
@@ -239,9 +241,38 @@ private:
     ITfCompartment* _pSIPIMEOnOffCompartment;
     DWORD _dwSIPIMEOnOffCompartmentSinkCookie;
 
-    HWND _msgWndHandle; 
+    HWND _msgWndHandle;
 
     LONG _refCount;
+
+    class EmittedRange {
+     public:
+      EmittedRange(ITfRange* range, std::wstring_view urtext)
+        : range_(range), urtext_(urtext) {}
+      ~EmittedRange() {
+        if (range_ != nullptr) {
+          range_->Release();
+        }
+      }
+
+      ITfRange& range() {
+        return *range_;
+      }
+
+      std::wstring_view urtext() const {
+        return urtext_;
+      }
+     private:
+      ITfRange* range_;
+      std::wstring urtext_;
+    };
+
+    bool LetKeyDownThrough = false;
+    bool LetKeyUpThrough = false;
+    bool LetBackspaceThrough = false;
+    bool Received¹ = false;
+
+    std::list<EmittedRange> emitted_ranges_;
 
     // Support the search integration
     ITfFnSearchCandidateProvider* _pITfFnSearchCandidateProvider;

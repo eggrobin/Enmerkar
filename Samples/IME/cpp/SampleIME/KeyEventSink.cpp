@@ -174,7 +174,7 @@ BOOL CSampleIME::_IsKeyboardDisabled()
     if ((_pThreadMgr->GetFocus(&pDocMgrFocus) != S_OK) ||
         (pDocMgrFocus == nullptr))
     {
-        // if there is no focus document manager object, the keyboard 
+        // if there is no focus document manager object, the keyboard
         // is disabled.
         isDisabled = TRUE;
     }
@@ -220,10 +220,6 @@ STDAPI CSampleIME::OnSetFocus(BOOL fForeground)
     return S_OK;
 }
 
-static bool LetKeyDownThrough = false;
-static bool LetKeyUpThrough = false;
-static bool Received¹ = false;
-
 //+---------------------------------------------------------------------------
 //
 // ITfKeyEventSink::OnTestKeyDown
@@ -233,6 +229,11 @@ static bool Received¹ = false;
 
 STDAPI CSampleIME::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pIsEaten)
 {
+    if (LetBackspaceThrough && (wParam & 0xff) == VK_BACK) {
+      *pIsEaten = false;
+      LetBackspaceThrough = false;
+      return S_OK;
+    }
     Global::UpdateModifiers(wParam, lParam);
 
     _KEYSTROKE_STATE KeystrokeState;
@@ -267,6 +268,11 @@ STDAPI CSampleIME::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lPa
 
 STDAPI CSampleIME::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pIsEaten)
 {
+    if (LetBackspaceThrough && (wParam & 0xff) == VK_BACK) {
+      *pIsEaten = false;
+      LetBackspaceThrough = false;
+      return S_OK;
+    }
     Global::UpdateModifiers(wParam, lParam);
 
     _KEYSTROKE_STATE KeystrokeState;

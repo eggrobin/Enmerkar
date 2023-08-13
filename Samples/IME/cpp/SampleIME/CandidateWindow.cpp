@@ -153,7 +153,7 @@ BOOL CCandidateWindow::_CreateVScrollWindow()
         _DeleteShadowWnd();
         goto Exit;
     }
-    
+
     ret = TRUE;
 
 Exit:
@@ -374,15 +374,15 @@ LRESULT CALLBACK CCandidateWindow::_WindowProcCallback(_In_ HWND wndHandle, UINT
             // handle mouse message
             _HandleMouseMsg(uMsg, point);
         }
-		// we processes this message, it should return zero. 
+		// we processes this message, it should return zero.
         return 0;
 
     case WM_MOUSEACTIVATE:
         {
             WORD mouseEvent = HIWORD(lParam);
-            if (mouseEvent == WM_LBUTTONDOWN || 
-                mouseEvent == WM_RBUTTONDOWN || 
-                mouseEvent == WM_MBUTTONDOWN) 
+            if (mouseEvent == WM_LBUTTONDOWN ||
+                mouseEvent == WM_RBUTTONDOWN ||
+                mouseEvent == WM_MBUTTONDOWN)
             {
                 return MA_NOACTIVATE;
             }
@@ -443,7 +443,7 @@ void CCandidateWindow::_OnPaint(_In_ HDC dcHandle, _In_ PAINTSTRUCT *pPaintStruc
     {
         goto cleanup;
     }
-    
+
     _AdjustPageIndex(currentPage, currentPageIndex);
 
     _DrawList(dcHandle, currentPageIndex, &pPaintStruct->rcPaint);
@@ -464,7 +464,7 @@ void CCandidateWindow::_OnLButtonDown(POINT pt)
     _GetClientRect(&rcWindow);
 
     int cyLine = _cyRow;
-    
+
     UINT candidateListPageCnt = _pIndexRange->Count();
     UINT index = 0;
     int currentPage = 0;
@@ -646,7 +646,7 @@ void CCandidateWindow::_DrawList(_In_ HDC dcHandle, _In_ UINT iIndex, _In_ RECT 
         std::wstring_view sign(pItemList->_ItemString.Get(), pItemList->_ItemString.GetLength());
         std::wstring_view composition = pItemList->full_composition;
         std::wstring_view tail(pItemList->_FindKeyCode.Get(), pItemList->_FindKeyCode.GetLength());
-        
+
         if (_currentSelection != iIndex)
         {
             SetTextColor(dcHandle, _crTextColor);
@@ -710,7 +710,7 @@ void CCandidateWindow::_DrawBorder(_In_ HWND wndHandle, _In_ int cx)
 
     GetWindowRect(wndHandle, &rcWnd);
     // zero based
-    OffsetRect(&rcWnd, -rcWnd.left, -rcWnd.top); 
+    OffsetRect(&rcWnd, -rcWnd.left, -rcWnd.top);
 
     HPEN hPen = CreatePen(PS_DOT, cx, CANDWND_BORDER_COLOR);
     HPEN hPenOld = (HPEN)SelectObject(dcHandle, hPen);
@@ -849,7 +849,7 @@ DWORD CCandidateWindow::_GetCandidateString(_In_ int iIndex, _Outptr_result_mayb
     }
 
     UINT index = static_cast<UINT>(iIndex);
-	
+
 	if (index >= _candidateList.Count())
     {
         *ppwchCandidateString = nullptr;
@@ -895,7 +895,7 @@ DWORD CCandidateWindow::_GetSelectedCandidateString(_Outptr_result_maybenull_ co
 //----------------------------------------------------------------------------
 
 BOOL CCandidateWindow::_SetSelectionInPage(int nPos)
-{	
+{
     if (nPos < 0)
     {
         return FALSE;
@@ -1018,13 +1018,13 @@ BOOL CCandidateWindow::_MovePage(_In_ int offSet, _In_ BOOL isNotify)
         return FALSE;
     }
 
-    // If current selection is at the top of the page AND 
+    // If current selection is at the top of the page AND
     // we are on the "default" page border, then we don't
     // want adjustment to eliminate empty entries.
     //
     // We do this for keeping behavior inline with downlevel.
-    if (_currentSelection % _pIndexRange->Count() == 0 && 
-        _currentSelection == *_PageIndex.GetAt(currentPage)) 
+    if (_currentSelection % _pIndexRange->Count() == 0 &&
+        _currentSelection == *_PageIndex.GetAt(currentPage))
     {
         _dontAdjustOnEmptyItemPage = TRUE;
     }
@@ -1207,7 +1207,7 @@ HRESULT CCandidateWindow::_GetCurrentPage(_Inout_ int *pCurrentPage)
 {
     HRESULT hr = E_FAIL;
     UINT needCastCurrentPage = 0;
-    
+
     if (nullptr == pCurrentPage)
     {
         goto Exit;
@@ -1252,7 +1252,7 @@ BOOL CCandidateWindow::_AdjustPageIndexForSelection()
     // B is number of pages before the current page
     // A is number of pages after the current page
     // uNewPageCount is A + B + 1;
-    // A is (uItemsAfter - 1) / candidateListPageCnt + 1 -> 
+    // A is (uItemsAfter - 1) / candidateListPageCnt + 1 ->
     //      (_CandidateListCount - _currentSelection - CandidateListPageCount - 1) / candidateListPageCnt + 1->
     //      (_CandidateListCount - _currentSelection - 1) / candidateListPageCnt
     // B is (uItemsBefore - 1) / candidateListPageCnt + 1 ->
@@ -1263,7 +1263,7 @@ BOOL CCandidateWindow::_AdjustPageIndexForSelection()
     BOOL isAfter = _candidateList.Count() > _currentSelection + candidateListPageCnt;
 
     // only have current page
-    if (!isBefore && !isAfter) 
+    if (!isBefore && !isAfter)
     {
         newPageCnt = 1;
     }
@@ -1289,7 +1289,7 @@ BOOL CCandidateWindow::_AdjustPageIndexForSelection()
     }
     pNewPageIndex[0] = 0;
     UINT firstPage = _currentSelection % candidateListPageCnt;
-    if (firstPage && newPageCnt > 1) 
+    if (firstPage && newPageCnt > 1)
     {
         pNewPageIndex[1] = firstPage;
     }
@@ -1346,7 +1346,7 @@ HRESULT CCandidateWindow::_CurrentPageHasEmptyItems(_Inout_ BOOL *hasEmptyItems)
     {
         *hasEmptyItems = TRUE;
     }
-    else 
+    else
     {
         *hasEmptyItems = FALSE;
     }
@@ -1401,7 +1401,7 @@ HRESULT CCandidateWindow::_AdjustPageIndex(_Inout_ UINT & currentPage, _Inout_ U
     BOOL hasEmptyItems = FALSE;
     if (FAILED(_CurrentPageHasEmptyItems(&hasEmptyItems)))
     {
-        goto Exit; 
+        goto Exit;
     }
 
     if (FALSE == hasEmptyItems)

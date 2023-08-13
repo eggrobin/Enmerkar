@@ -166,3 +166,37 @@ the placement of `Ṣ` and `Ṭ` is more haphazard. The table below shows the la
 </td></tr></tbody></table>
 
 The layout may be customized by editing the file `%APPDATA%\mockingbirdnest\Enmerkar\layout.txt` according to the instructions in that file.
+
+### Backspacing
+
+Since version [𒀭𒄑𒉈𒂵𒈩](https://github.com/eggrobin/Enmerkar/releases/tag/𒀭𒄑𒉈𒂵𒈩),
+recently entered signs that are represented as sequences of Unicode code points are backspaced as they have been typed.
+Thus, typing `d` `i` `r` `i` `␣` `⌫` emits the text 𒋛𒀀 and then removes all of it,
+whereas typing `s` `i`  `␣` `a` `␣` `⌫` emits the same text, but backspaces only the 𒀀, leaving 𒋛.
+
+| Key sequences | Output | Notes|
+|---|---|---|
+| `lu2␣` `ra␣` `geme␣` `⌫` `gi␣` `me␣` | 𒇽𒊏𒄀𒈨 | GEME₂ 𒊩𒆳 is backspaced atomically. |
+| `dumu␣` `mi2␣` `mat␣` `⌫` `meš␣` | 𒌉𒊩𒎌 | Only the 𒆳 in 𒊩𒆳 is backspaced. |
+| `babilim2␣` `⌫` `babilim␣` | 𒆍𒀭 | 𒆍𒀭𒊏 is backspaced atomically. |
+| `ka2␣` `dingir␣` `ra␣` `⌫` | 𒆍𒀭 | Only the 𒊏 in 𒆍𒀭𒊏 is backspaced. |
+
+> Note: version 𒀭𒄑𒉈𒂵𒈩 is not yet released.
+
+### Entry by sign list number
+
+Since version [𒀭𒌉𒍣](https://github.com/eggrobin/Enmerkar/releases/tag/𒀭𒌉𒍣),
+signs can also be entered by their sign list number, prefixed by the key `x` and the abbreviation for the sign list,
+as illustrated in the following table for 𒂗.
+| Keys | Sign list |
+|---|---|
+|`x`&nbsp;`m`&nbsp;`e`&nbsp;`a`&nbsp;`9`&nbsp;`9`&nbsp;`␣` | René Labat, _Manuel d'épigraphie akkadienne_ |
+|`x`&nbsp;`l`&nbsp;`a`&nbsp;`k`&nbsp;`5`&nbsp;`3`&nbsp;`2`&nbsp;`␣` | Anton Deimel, _Liste der archaischen Keilschriftzeichen von Fara_ |
+|`x`&nbsp;`r`&nbsp;`s`&nbsp;`p`&nbsp;`2`&nbsp;`7`&nbsp;`1`&nbsp;`␣` | Yvonne Rosengarten, _Répertoire commenté des signes présargoniques sumériens de Lagash_ |
+|`x`&nbsp;`b`&nbsp;`a`&nbsp;`u`&nbsp;`2`&nbsp;`9`&nbsp;`6`&nbsp;`␣` | Eric Burrows, _Archaic Texts_ |
+|`x`&nbsp;`ḫ`&nbsp;`z`&nbsp;`l`&nbsp;`0`&nbsp;`4`&nbsp;`0`&nbsp;`␣` | Christel Rüster & Erich Neu, _Hethitisches Zeichenlexikon_ |
+|`x`&nbsp;`m`&nbsp;`z`&nbsp;`l`&nbsp;`1`&nbsp;`6`&nbsp;`4`&nbsp;`␣` | Rykle Borger, _Mesopotamisches Zeichenlexikon_ |
+|`x`&nbsp;`a`&nbsp;`b`&nbsp;`z`&nbsp;`l`&nbsp;`6`&nbsp;`2`&nbsp;`␣` | Catherine Mittermayer, _Altbabylonische Zeichenliste der sumerisch-literarische Texte_ |
+|`x`&nbsp;`k`&nbsp;`w`&nbsp;`u`&nbsp;`7`&nbsp;`5`&nbsp;`␣` | Nikolaus Schneider, _Die Keilschriftzeichen der Wirtschaftsurkunden von Ur III_ |
+
+This makes it possible to enter signs that have no known values, such as `x` `m` `z` `l` `4` `0` `␣` for 𒎄.

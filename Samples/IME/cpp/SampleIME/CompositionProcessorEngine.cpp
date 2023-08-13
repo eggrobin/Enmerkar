@@ -233,7 +233,7 @@ BOOL CCompositionProcessorEngine::SetupLanguageProfile(LANGID langid, REFGUID gu
     _guidProfile = guidLanguageProfile;
     _tfClientId = tfClientId;
 
-    //SetupPreserved(pThreadMgr, tfClientId);	
+    //SetupPreserved(pThreadMgr, tfClientId);
     SetupPunctuationPair();
     //SetupLanguageBar(pThreadMgr, tfClientId, isSecureMode);
     SetupKeystroke();
@@ -329,8 +329,8 @@ void CCompositionProcessorEngine::PurgeVirtualKey()
     }
 }
 
-WCHAR CCompositionProcessorEngine::GetVirtualKey(DWORD_PTR dwIndex) 
-{ 
+WCHAR CCompositionProcessorEngine::GetVirtualKey(DWORD_PTR dwIndex)
+{
     if (dwIndex < _keystrokeBuffer.GetLength())
     {
         return *(_keystrokeBuffer.Get() + dwIndex);
@@ -982,7 +982,7 @@ BOOL CCompositionProcessorEngine::InitLanguageBar(_In_ CLangBarItemButton *pLang
 //----------------------------------------------------------------------------
 
 BOOL CCompositionProcessorEngine::SetupDictionaryFile()
-{	
+{
     // Not yet registered
     // Register CFileMapping
     WCHAR wszFileName[MAX_PATH] = {'\0'};
@@ -1350,7 +1350,7 @@ CCompositionProcessorEngine::XPreservedKey::~XPreservedKey()
 }
 //+---------------------------------------------------------------------------
 //
-// CSampleIME::CreateInstance 
+// CSampleIME::CreateInstance
 //
 //----------------------------------------------------------------------------
 
@@ -1366,8 +1366,8 @@ HRESULT CSampleIME::CreateInstance(REFCLSID rclsid, REFIID riid, _Outptr_result_
 
     if (!isComLessMode)
     {
-        hr = ::CoCreateInstance(rclsid, 
-            NULL, 
+        hr = ::CoCreateInstance(rclsid,
+            NULL,
             CLSCTX_INPROC_SERVER,
             riid,
             ppv);
@@ -1463,9 +1463,9 @@ HRESULT CSampleIME::GetComModuleName(REFGUID rclsid, _Out_writes_(cchPath)WCHAR*
                 hr = (key.QueryStringValue(L"ThreadingModel", wszModel, &cch) == ERROR_SUCCESS) ? S_OK : E_FAIL;
                 if (SUCCEEDED(hr))
                 {
-                    if (CompareStringOrdinal(wszModel, 
-                        -1, 
-                        L"Apartment", 
+                    if (CompareStringOrdinal(wszModel,
+                        -1,
+                        L"Apartment",
                         -1,
                         TRUE) == CSTR_EQUAL)
                     {
@@ -1575,6 +1575,14 @@ BOOL CCompositionProcessorEngine::IsVirtualKeyNeed(UINT uCode, _In_reads_(1) WCH
         pKeyState->Function = FUNCTION_NONE;
     }
 
+    if (uCode == VK_BACK) {
+      if (pKeyState) {
+        pKeyState->Category = CATEGORY_COMPOSING;
+        pKeyState->Function = FUNCTION_BACKSPACE;
+      }
+      return true;
+    }
+
     if (candidateMode == CANDIDATE_ORIGINAL || candidateMode == CANDIDATE_PHRASE || candidateMode == CANDIDATE_WITH_NEXT_COMPOSITION)
     {
         fComposing = FALSE;
@@ -1627,11 +1635,11 @@ BOOL CCompositionProcessorEngine::IsVirtualKeyNeed(UINT uCode, _In_reads_(1) WCH
             }
             else
             {
-                if (pKeyState) { pKeyState->Category = CATEGORY_CANDIDATE; pKeyState->Function = FUNCTION_FINALIZE_CANDIDATELIST_AND_INPUT; } 
+                if (pKeyState) { pKeyState->Category = CATEGORY_CANDIDATE; pKeyState->Function = FUNCTION_FINALIZE_CANDIDATELIST_AND_INPUT; }
                 return TRUE;
             }
         }
-    } 
+    }
 
     // CANDIDATE_INCREMENTAL should process Keystroke.Candidate virtual keys.
     else if (candidateMode == CANDIDATE_INCREMENTAL)
@@ -1643,7 +1651,7 @@ BOOL CCompositionProcessorEngine::IsVirtualKeyNeed(UINT uCode, _In_reads_(1) WCH
         }
     }
 
-    if (!fComposing && candidateMode != CANDIDATE_ORIGINAL && candidateMode != CANDIDATE_PHRASE && candidateMode != CANDIDATE_WITH_NEXT_COMPOSITION) 
+    if (!fComposing && candidateMode != CANDIDATE_ORIGINAL && candidateMode != CANDIDATE_PHRASE && candidateMode != CANDIDATE_WITH_NEXT_COMPOSITION)
     {
         if (IsVirtualKeyKeystrokeComposition(uCode, pKeyState, FUNCTION_INPUT))
         {

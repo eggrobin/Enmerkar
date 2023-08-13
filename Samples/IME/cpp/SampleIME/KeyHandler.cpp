@@ -30,13 +30,13 @@ BOOL CSampleIME::_IsRangeCovered(TfEditCookie ec, _In_ ITfRange *pRangeTest, _In
 {
     LONG lResult = 0;;
 
-    if (FAILED(pRangeCover->CompareStart(ec, pRangeTest, TF_ANCHOR_START, &lResult)) 
+    if (FAILED(pRangeCover->CompareStart(ec, pRangeTest, TF_ANCHOR_START, &lResult))
         || (lResult > 0))
     {
         return FALSE;
     }
 
-    if (FAILED(pRangeCover->CompareEnd(ec, pRangeTest, TF_ANCHOR_END, &lResult)) 
+    if (FAILED(pRangeCover->CompareEnd(ec, pRangeTest, TF_ANCHOR_END, &lResult))
         || (lResult < 0))
     {
         return FALSE;
@@ -369,9 +369,9 @@ HRESULT CSampleIME::_HandleCompositionConvert(TfEditCookie ec, _In_ ITfContext *
             _isCandidateWithWildcard = FALSE;
         }
 
-        // 
+        //
         // create an instance of the candidate list class.
-        // 
+        //
         if (_pCandidateListUIPresenter == nullptr)
         {
             _pCandidateListUIPresenter = new (std::nothrow) CCandidateListUIPresenter(this, Global::AtomCandidateWindow,
@@ -423,16 +423,40 @@ HRESULT CSampleIME::_HandleCompositionBackspace(TfEditCookie ec, _In_ ITfContext
     ULONG fetched = 0;
     BOOL isCovered = TRUE;
 
-    // Start the new (std::nothrow) compositon if there is no composition.
-    if (!_IsComposing())
-    {
-        return S_OK;
-    }
-
     // first, test where a keystroke would go in the document if we did an insert
     if (FAILED(pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &fetched)) || fetched != 1)
     {
         return S_FALSE;
+    }
+
+    // Start the new (std::nothrow) compositon if there is no composition.
+    if (!_IsComposing())
+    {
+      for (auto it = emitted_ranges_.begin(); it != emitted_ranges_.end(); ++it) {
+        BOOL match;
+        it->range().IsEqualEnd(ec, tfSelection.range, TF_ANCHOR_END, &match);
+        std::vector<wchar_t> actual_text;
+        actual_text.resize(it->urtext().size() + 1);
+        ULONG actual_size;
+        if (match &&
+          SUCCEEDED(it->range().GetText(ec, 0, actual_text.data(), actual_text.size(), &actual_size)) &&
+          it->urtext() == std::wstring_view(actual_text.data(), actual_size)) {
+          it->range().SetText(ec, 0, L"", 0);
+          emitted_ranges_.erase(it++);
+          goto Exit;
+        }
+      }
+      INPUT input = {
+        .type = INPUT_KEYBOARD,
+        .ki = {
+            .wVk = VK_BACK,
+            .wScan = 0,
+            .dwFlags = 0} };
+      LetBackspaceThrough = true;
+      // TODO(egg): Figure out why this does not work.
+      SendInput(1, &input, sizeof(input));
+
+      goto Exit;
     }
 
     // is the insertion point covered by a composition?
