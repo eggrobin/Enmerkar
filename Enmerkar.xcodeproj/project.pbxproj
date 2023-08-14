@@ -319,11 +319,13 @@
 				CONFIGURATION_BUILD_DIR = "/Library/Input Methods";
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"mac/Preview Content\"";
+				DEVELOPMENT_TEAM = ZWWLMXTD64;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = mac/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "𒂗𒈨𒅕𒃸 Cuneiform IME";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "/Library/Input Methods";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -351,11 +353,13 @@
 				CONFIGURATION_BUILD_DIR = "/Library/Input Methods";
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"mac/Preview Content\"";
+				DEVELOPMENT_TEAM = ZWWLMXTD64;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = mac/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "𒂗𒈨𒅕𒃸 Cuneiform IME";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "/Library/Input Methods";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
