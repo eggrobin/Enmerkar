@@ -178,9 +178,9 @@ whereas typing `s` `i`  `␣` `a` `␣` `⌫` emits the same text, but backspace
 
 | Key sequences | Output | Notes|
 |---|---|---|
-| `ku3␣` `babbar␣` `enkum␣` `⌫` `enku␣` `da␣` | 𒆬𒌓𒍠𒄩𒁕 | ENKUM 𒂗𒉽𒅊𒉣𒈨𒂬 is backspaced atomically. |
+| `kug␣` `babbar␣` `enkum␣` `⌫` `enku␣` `da␣` | 𒆬𒌓𒍠𒄩𒁕 | ENKUM 𒂗𒉽𒅊𒉣𒈨𒂬 is backspaced atomically. |
 | `lu2␣` `ra␣` `geme␣` `⌫` `gi␣` `me␣` | 𒇽𒊏𒄀𒈨 | GEME₂ 𒊩𒆳 is backspaced atomically. |
-| `dumu␣` `mi2␣` `mat␣` `⌫` `meš␣` | 𒌉𒊩𒎌 | Only the 𒆳 in 𒊩𒆳 is backspaced. |
+| `šal␣` `mat␣` `⌫` `ma␣` `at␣` | 𒊩𒈠𒀜 | Only the 𒆳 in 𒊩𒆳 is backspaced. |
 | `babilim2␣` `⌫` `babilim␣` | 𒆍𒀭 | 𒆍𒀭𒊏 is backspaced atomically. |
 | `ka2␣` `dingir␣` `ra␣` `⌫` | 𒆍𒀭 | Only the 𒊏 in 𒆍𒀭𒊏 is backspaced. |
 
