@@ -165,21 +165,32 @@ class InputController: IMKInputController {
                             if let actualText = client.attributedSubstring(from: NSRange(s.range)) {
                                 if actualText.string == s.text {
                                     deletedRange = NSRange(s.range)
-                                    client.setMarkedText("", selectionRange: deletedRange!, replacementRange: deletedRange!)
+                                    client.setMarkedText("", selectionRange: NSRange(location: NSNotFound, length: NSNotFound), replacementRange: deletedRange!)
+                                    if client.selectedRange().location == s.range.endIndex {
+                                        // In web page text fields in Chrome, setMarkedText with an empty string seems to be ignored.
+                                        // Replacing the text to be deleted with a space seems to work; somehow the actual backspace
+                                        // also goes through, removing the space.
+                                        client.insertText(" ", replacementRange: deletedRange!)
+                                    }
                                     emittedSequences.remove(at: i)
+                                    break
                                 }
                             }
                         }
                     }
                     if deletedRange == nil && client.selectedRange().location > 0 {
+                        // If we are not backspacing a 𒋛𒀀, backspace by code point.
                         deletedRange = NSRange(location: client.selectedRange().location - 1,length: 1)
                         if let deletedText = client.attributedSubstring(from: deletedRange!) {
                             deletedRange = NSRange(location: client.selectedRange().location - deletedText.string.utf16.count, length: deletedText.string.utf16.count)
                         }
+                        // In web page text fields in Chrome the following does nothing; but backspacing there is by code point anyway,
+                        // so it all works out.
                         client.setMarkedText("", selectionRange: deletedRange!, replacementRange: deletedRange!)
                     }
                     if let deleted = deletedRange {
                         for s in emittedSequences {
+                            // TODO(egg): We could be smarter about the case where we deleted stuff within a 𒋛𒀀.
                             if s.range.startIndex >= deleted.location {
                                 s.range = (s.range.startIndex-deleted.length)..<(s.range.endIndex-deleted.length)
                             }
