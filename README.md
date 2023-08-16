@@ -9,7 +9,7 @@
 
 ## Usage
 
-Once the above installation steps are complete, 𒂗𒈨𒅕𒃸 is installed, the list of keyboard layouts in the [Windows Language bar](https://support.microsoft.com/en-us/topic/switch-between-languages-using-the-language-bar-1c2242c0-fe15-4bc3-99bc-535de6f4f258) or [macOS Input menu](https://support.apple.com/en-gb/guide/mac-help/aside/glos52ed78a0/13.0/mac/13.0) should have a new entry.
+Once the above installation steps are complete, the list of keyboard layouts in the [Windows Language bar](https://support.microsoft.com/en-us/topic/switch-between-languages-using-the-language-bar-1c2242c0-fe15-4bc3-99bc-535de6f4f258) or [macOS Input menu](https://support.apple.com/en-gb/guide/mac-help/aside/glos52ed78a0/13.0/mac/13.0) should have a new entry.
 
 **Windows:**
 > ![𒀝 Syriac 𒂗𒈨𒅕𒃸 Cuneiform IME](https://github.com/eggrobin/Enmerkar/assets/2284290/8b4f70a2-9a3f-4d9a-ae75-99389eb25950)
@@ -63,7 +63,6 @@ Examples below. Note that thanks to the word separation, if you double-click on 
 | [`e␣` `nu␣` `ma␣` `/␣` `e␣` `liš␣` `/␣` `la␣` `/␣` `na␣` `bu␣` `u2␣` `/␣` `ša2␣` `ma␣` `mu␣` `/␣` `šap␣` `liš␣` `/␣` `am␣` `ma␣` `tum␣` `/␣` `šu␣` `ma␣` `/␣` `la␣` `/␣` `zak␣` `rat␣`](https://cdli.ucla.edu/search/search_results.php?SearchMode=Text&ObjectID=P480701) | 𒂊𒉡𒈠​𒂊𒇺​𒆷​𒈾𒁍𒌑​𒃻𒈠𒈬​𒉺𒅁𒇺​𒄠𒈠𒌈​𒋗𒈠​𒆷​𒍠𒋥 |
 | [`a␣` `na␣` `/␣` `d␣` `en␣` `lil2␣` `ba␣` `ni␣` `/␣` `qi2␣` `bi2␣` `ma␣` `/v␣` `um␣` `ma␣` `/␣` `ta␣` `ri␣` `iš␣` `ma␣` `tum␣` `ma␣`](https://cdli.ucla.edu/search/search_results.php?SearchMode=Text&ObjectID=P360975) | 𒀀𒈾​𒀭𒂗𒆤𒁀𒉌​𒆠𒉈𒈠𒑰𒌝𒈠​𒋫𒊑𒅖𒈠𒌈𒈠 |
 | [`ud␣` `bi␣` `ta␣` `/␣` `inim␣` `/␣` `im␣` `ma␣` `/␣` `gub␣` `bu␣` `/␣` `nu␣` `ub␣` `ta␣` `ŋal2␣` `la␣` `/␣` `i3␣` `ne␣` `eš2␣` `/␣` `d␣` `utu␣` `/␣` `ud␣` `ne␣` `a␣` `/␣` `ur5␣` `/␣` `ḫe2␣` `en␣` `na␣` `nam␣` `ma␣` `am3␣`](https://etcsl.orinst.ox.ac.uk/cgi-bin/etcsl.cgi?text=c.1.8.2.3&display=Crit&charenc=gtilde&lineid=c1823.504#c1823.504) | 𒌓𒁉𒋫​𒅗​𒅎𒈠​𒁺𒁍​𒉡𒌒𒋫𒅅𒆷​𒉌𒉈𒂠​𒀭𒌓​𒌓​𒉈𒀀​𒄯​𒃶𒂗𒈾𒉆𒈠𒀀𒀭 |
-
 
 ---
 \* We are told this does not work on Firefox, though it works fine on Chrome, Edge, Safari, and even Internet Explorer.
@@ -173,14 +172,15 @@ switching to 𒂗𒈨𒅕𒃸 from a QWERTY keyboard means that 𒂗𒈨𒅕�
 ### Backspacing
 
 Since version [𒀭𒄑𒉈𒂵𒈩](https://github.com/eggrobin/Enmerkar/releases/tag/𒀭𒄑𒉈𒂵𒈩),
-recently* entered signs that are represented as sequences of Unicode code points are backspaced as they have been typed.
+recently<sup>1</sup> entered signs that are represented as sequences of Unicode code points are backspaced as they have been typed wherever possible<sup>2</sup>.
 Thus, typing `d` `i` `r` `i` `␣` `⌫` emits the text 𒋛𒀀 and then removes all of it,
 whereas typing `s` `i`  `␣` `a` `␣` `⌫` emits the same text, but backspaces only the 𒀀, leaving 𒋛.
 
 | Key sequences | Output | Notes|
 |---|---|---|
+| `kug␣` `babbar␣` `enkum␣` `⌫` `enku␣` `da␣` | 𒆬𒌓𒍠𒄩𒁕 | ENKUM 𒂗𒉽𒅊𒉣𒈨𒂬 is backspaced atomically. |
 | `lu2␣` `ra␣` `geme␣` `⌫` `gi␣` `me␣` | 𒇽𒊏𒄀𒈨 | GEME₂ 𒊩𒆳 is backspaced atomically. |
-| `dumu␣` `mi2␣` `mat␣` `⌫` `meš␣` | 𒌉𒊩𒎌 | Only the 𒆳 in 𒊩𒆳 is backspaced. |
+| `šal␣` `mat␣` `⌫` `ma␣` `at␣` | 𒊩𒈠𒀜 | Only the 𒆳 in 𒊩𒆳 is backspaced. |
 | `babilim2␣` `⌫` `babilim␣` | 𒆍𒀭 | 𒆍𒀭𒊏 is backspaced atomically. |
 | `ka2␣` `dingir␣` `ra␣` `⌫` | 𒆍𒀭 | Only the 𒊏 in 𒆍𒀭𒊏 is backspaced. |
 
@@ -193,13 +193,14 @@ are accordingly backspaced separately from their base.
 | `r` `e` `◌̄` `ʾ` `u` `◌̄` `⌫` `◌̂ ` `m` | rēʾûm |
 
 ---
-
-\* On Windows, the IME remembers sequences 128 sequences per document as long as the process is running; it does not recognize sequences if they are copy-pasted.
+<sup>1</sup> On Windows, the IME remembers sequences 128 sequences per document as long as the process is running; it does not recognize sequences if they are copy-pasted.
 The macOS implementation is more limited: sequences will be forgotten as soon as another input source is selected, or as soon as the focus moves to another text field, and many text editing operations even within the IME will disrupt the sequence backspacing behaviour.
 The reason for this discrepancy is that the Windows implementation can make use of [ITfRange objects](https://learn.microsoft.com/en-us/windows/win32/api/msctf/nn-msctf-itfrange),
 which track a range of text as the document is edited;
 to our knowledge there is no macOS equivalent, so the macOS IME needs keep track of the emitted ranges itself.
 Nevertheless, we expect that this should work well enough for the common use case of backspacing a recent typo.
+
+<sup>2</sup> Some applications interfere with the ability of input methods to keep track of context; this is notably the case of Google Docs.
 
 ### Entry by sign list number
 
