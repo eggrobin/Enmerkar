@@ -13,7 +13,7 @@ We are in the process of [upstreaming](https://github.com/oracc/ogsl/pulls?q=is%
 
 ## Installation
 
-Download the installer (`Enmerkar.msi`) for the latest release from https://github.com/eggrobin/Enmerkar/releases, and run the installer; select an appropriate keyboard layout (be that one in which you touch type, or the one matching your physical keyboard) in the installer.
+Download the installer (`Enmerkar.msi`) for the [latest release](https://github.com/eggrobin/Enmerkar/releases/latest), and run the installer; select an appropriate keyboard layout (be that one in which you touch type, or the one matching your physical keyboard) in the installer.
 
 ## Usage
 
