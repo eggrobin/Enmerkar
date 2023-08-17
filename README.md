@@ -3,9 +3,9 @@
 
 ## Installation
 
-**Windows:** Download `Enmerkar.msi` for the latest release from https://github.com/eggrobin/Enmerkar/releases, and run it. In the installer, select an appropriate keyboard layout (be that one in which you touch type, or the one matching your physical keyboard).
+**Windows:** Download `Enmerkar.msi` for the [latest release](https://github.com/eggrobin/Enmerkar/releases/latest), and run it. In the installer, select an appropriate keyboard layout (be that one in which you touch type, or the one matching your physical keyboard).
 
-**macOS:** Download `Enmerkar.pkg` for the latest release from https://github.com/eggrobin/Enmerkar/releases, and run it.  Log out, and log back in.  In the [Input Sources settings](https://support.apple.com/guide/mac-help/mchl84525d76/13.0/mac/13.0), press the `+` button to add an input source; choose Enmerkar from the list of input methods for the Akkadian language, and press `Add`.
+**macOS:** Download `Enmerkar.pkg` for the [latest release](https://github.com/eggrobin/Enmerkar/releases/latest), and run it.  Log out, and log back in.  In the [Input Sources settings](https://support.apple.com/guide/mac-help/mchl84525d76/13.0/mac/13.0), press the `+` button to add an input source; choose 𒂗𒈨𒅕𒃸 from the list of input methods for the Akkadian language, and press `Add`.
 
 ## Usage
 
