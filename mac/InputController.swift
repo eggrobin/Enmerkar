@@ -158,58 +158,77 @@ class InputController: IMKInputController {
         }
         if keyCode == kVK_Delete {
             if currentComposition.isEmpty {
-                var deletedRange: NSRange? = nil
-                var systemShouldAlsoBackspace = false
+                // Custom backspacing is somewhat circuitous on mac.  Calling |insertText|
+                // with an empty string seems to have no effect; |setMarkedText| with an
+                // empty string works in many places, but not in web page text fields in
+                // Chrome, nor in Safari & Firefox (either in web page text fields or in the
+                // browser’s own UI).
+                // Instead we replace the text to be deleted with a space, and return false
+                // from this function so that normal backspacing happens, removing the
+                // space.  We could do that as a fallback if the first attempt at
+                // backspacing failed, but that does not work because |setMarkedText| with
+                // an empty string garbles the location of the |selectedRange| on Firefox.
+                // Backspacing seems to be by legacy grapheme cluster on mac by default, but
+                // is overriden, e.g., in Chrome, to being by code point; but our space
+                // forms its own grapheme cluster, so this does not matter.
+                // Complicating matters further, in some situations (webpage text fields in
+                // Safari, message field on Discord even in Chrome), attempting to replace
+                // part of an extended grapheme cluster with a space keeps the EGC intact,
+                // but still inserts the space, so that backspacing gets stuck at a combining
+                // mark.  Thus, when trying to delete one code point from an EGC, we instead
+                // replace the whole EGC a string made up of that EGC with its last code
+                // point removed, followed by a space.
+                var deletion: (NSRange, String)? = nil
                 if client.selectedRange().length == 0 {
                     for (i, s) in emittedSequences.enumerated() {
                         if s.range.endIndex == client.selectedRange().location {
                             if let actualText = client.attributedSubstring(from: NSRange(s.range)) {
                                 if actualText.string == s.text {
-                                    deletedRange = NSRange(s.range)
+                                    // A 𒋛𒀀 should always consist of whole EGCs, so
+                                    // straightforward replacement with a space should work here.
+                                    deletion = (NSRange(s.range), " ")
                                     emittedSequences.remove(at: i)
                                     break
                                 }
                             }
                         }
                     }
-                    if deletedRange == nil && client.selectedRange().location > 0 {
+                    if deletion == nil && client.selectedRange().location > 0 {
                         // If we are not backspacing a 𒋛𒀀, backspace by code point.
                         let location = client.selectedRange().location
-                        deletedRange = NSRange(location: location - 1,length: 1)
-                        if let deletedText = client.attributedSubstring(from: deletedRange!) {
-                            deletedRange = NSRange(location: location - deletedText.string.utf16.count, length: deletedText.string.utf16.count)
+                        var candidateLength = 1
+                        while let deletedText = client.attributedSubstring(from: NSRange(location: location - candidateLength, length: candidateLength)) {
+                            if deletedText.string.count > 1 {
+                                // The first element of |deletion| probably covers a whole EGC.
+                                // This is not true, e.g., if we are at the end of an indic
+                                // consonant conjunct, as shown below.
+                                //    Consonant [Virama Consonant]
+                                //    The bracketed part here is two EGCs, but the whole string is
+                                //    a single EGC (post 15.1).
+                                // However, this is a somewhat unlikely situation for a cuneiform
+                                // IME, and I do not want to implement a GCB iterator here if I can
+                                // avoid it.
+                                break
+                            }
+                            deletion = (NSRange(location: location - deletedText.string.utf16.count,
+                                                length: deletedText.string.utf16.count),
+                                        String(deletedText.string.unicodeScalars.dropLast()) + " ")
+                            candidateLength = deletedText.string.utf16.count + 1
+                            if candidateLength > location {
+                                // The first element of |deletion| reaches the beginning of the
+                                // string, and thus covers a whole EGC.
+                                break
+                            }
                         }
-                        // TODO(egg): This fails to backspace combining marks in text fields in Safari, even though
-                        // it works fine in the address bar, and in the discord message field.
                     }
 
-                    if let deleted = deletedRange {
-                        // Custom backspacing is somewhat circuitous on mac.  Calling |insertText|
-                        // with an empty string seems to have no effect; |setMarkedText| with an
-                        // empty string works in many places, but not in web page text fields in
-                        // Chrome, nor in Safari & Firefox (either in web page text fields or in the
-                        // browser’s own UI).
-                        // Instead we replace the text to be deleted with a space, and return false
-                        // from this function so that normal backspacing happens, removing the
-                        // space.  We could do that as a fallback if the first attempt at
-                        // backspacing failed, but that does not work because |setMarkedText| with
-                        // an empty string garbles the location of the |selectedRange| on Firefox.
-                        // Backspacing seems to be by legacy grapheme cluster on mac by default, but
-                        // is overriden, e.g., in Chrome, to being by code point; but our space
-                        // forms its own grapheme cluster, so this does not matter.
-                        // Complicating matters further, in some situations (text fields in Safari,
-                        // message field on Discord even in Chrome), attempting to replace part of
-                        // an extended grapheme cluster with a space does not remove the combining
-                        // mark, but does insert the space, so that backspacing gets stuck at a
-                        // combining mark (or spacing mark, though those are rather less likely to
-                        // occur when using this IME).
-                        // TODO(egg): Figure out a way out of that one.
-                        client.insertText(" ", replacementRange: deleted)
+                    if let (deletedRange, replacement) = deletion {
+                        client.insertText(replacement, replacementRange: deletedRange)
 
                         for s in emittedSequences {
                             // TODO(egg): We could be smarter about the case where we deleted stuff within a 𒋛𒀀.
-                            if s.range.startIndex >= deleted.location {
-                                s.range = (s.range.startIndex-deleted.length)..<(s.range.endIndex-deleted.length)
+                            if s.range.startIndex >= deletedRange.location {
+                                s.range = (s.range.startIndex-deletedRange.length)..<(s.range.endIndex-deletedRange.length)
                             }
                         }
                     }
