@@ -166,16 +166,6 @@ class InputController: IMKInputController {
                             if let actualText = client.attributedSubstring(from: NSRange(s.range)) {
                                 if actualText.string == s.text {
                                     deletedRange = NSRange(s.range)
-                                    client.setMarkedText("", selectionRange: NSRange(location: NSNotFound, length: NSNotFound), replacementRange: deletedRange!)
-                                    if client.selectedRange().location == s.range.endIndex {
-                                        // In web page text fields in Chrome, and in both UI and web page text fields in Safari & Firefox,
-                                        // setMarkedText with an empty string seems to be ignored.
-                                        // Replacing the text to be deleted with a space seems to work.
-                                        // On Chrome the actual backspace also goes through regardless of what we return;
-                                        // but we need to return false for the backspacing to happen on Safari.
-                                        client.insertText(" ", replacementRange: deletedRange!)
-                                        systemShouldAlsoBackspace = true
-                                    }
                                     emittedSequences.remove(at: i)
                                     break
                                 }
@@ -190,28 +180,44 @@ class InputController: IMKInputController {
                             deletedRange = NSRange(location: location - deletedText.string.utf16.count, length: deletedText.string.utf16.count)
                         }
                         // TODO(egg): This fails to backspace combining marks in text fields in Safari, even though
-                        // it works fine in the address bar.
-                        // TODO(egg): Factor this out.
-                        client.setMarkedText("", selectionRange: deletedRange!, replacementRange: deletedRange!)
-                        if client.selectedRange().location == location {
-                            client.insertText(" ", replacementRange: deletedRange!)
-                            systemShouldAlsoBackspace = true
-                        }
+                        // it works fine in the address bar, and in the discord message field.
                     }
+
                     if let deleted = deletedRange {
+                        // Custom backspacing is somewhat circuitous on mac.  Calling |insertText|
+                        // with an empty string seems to have no effect; |setMarkedText| with an
+                        // empty string works in many places, but not in web page text fields in
+                        // Chrome, nor in Safari & Firefox (either in web page text fields or in the
+                        // browser’s own UI).
+                        // Instead we replace the text to be deleted with a space, and return false
+                        // from this function so that normal backspacing happens, removing the
+                        // space.  We could do that as a fallback if the first attempt at
+                        // backspacing failed, but that does not work because |setMarkedText| with
+                        // an empty string garbles the location of the |selectedRange| on Firefox.
+                        // Backspacing seems to be by legacy grapheme cluster on mac by default, but
+                        // is overriden, e.g., in Chrome, to being by code point; but our space
+                        // forms its own grapheme cluster, so this does not matter.
+                        // Complicating matters further, in some situations (text fields in Safari,
+                        // message field on Discord even in Chrome), attempting to replace part of
+                        // an extended grapheme cluster with a space does not remove the combining
+                        // mark, but does insert the space, so that backspacing gets stuck at a
+                        // combining mark (or spacing mark, though those are rather less likely to
+                        // occur when using this IME).
+                        // TODO(egg): Figure out a way out of that one.
+                        client.insertText(" ", replacementRange: deleted)
+
                         for s in emittedSequences {
                             // TODO(egg): We could be smarter about the case where we deleted stuff within a 𒋛𒀀.
                             if s.range.startIndex >= deleted.location {
                                 s.range = (s.range.startIndex-deleted.length)..<(s.range.endIndex-deleted.length)
                             }
                         }
-                        return !systemShouldAlsoBackspace
                     }
                 }
                 return false
             }
             currentComposition = String(currentComposition.prefix(currentComposition.count - 1))
-            client.setMarkedText(currentComposition, selectionRange: NSRange(location: NSNotFound, length: NSNotFound), replacementRange: client.markedRange())
+            client.setMarkedText(currentComposition, selectionRange: NSRange(location: 0, length: currentComposition.utf16.count), replacementRange: client.markedRange())
             updateCandidateWindow()
             return true
         }
@@ -227,10 +233,10 @@ class InputController: IMKInputController {
         }
         if currentComposition.isEmpty {
             currentComposition = string;
-            client.setMarkedText(currentComposition, selectionRange: NSRange(location: NSNotFound, length: NSNotFound), replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
+            client.setMarkedText(currentComposition, selectionRange: NSRange(location: 0, length: currentComposition.utf16.count), replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
         } else {
             currentComposition.append(string)
-            client.setMarkedText(currentComposition, selectionRange: NSRange(location: NSNotFound, length: NSNotFound), replacementRange: client.markedRange())
+            client.setMarkedText(currentComposition, selectionRange: NSRange(location: 0, length: currentComposition.utf16.count), replacementRange: client.markedRange())
         }
         updateCandidateWindow()
         return true
