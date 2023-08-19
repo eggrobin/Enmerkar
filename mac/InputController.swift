@@ -159,6 +159,7 @@ class InputController: IMKInputController {
         if keyCode == kVK_Delete {
             if currentComposition.isEmpty {
                 var deletedRange: NSRange? = nil
+                var systemShouldAlsoBackspace = false
                 if client.selectedRange().length == 0 {
                     for (i, s) in emittedSequences.enumerated() {
                         if s.range.endIndex == client.selectedRange().location {
@@ -167,10 +168,13 @@ class InputController: IMKInputController {
                                     deletedRange = NSRange(s.range)
                                     client.setMarkedText("", selectionRange: NSRange(location: NSNotFound, length: NSNotFound), replacementRange: deletedRange!)
                                     if client.selectedRange().location == s.range.endIndex {
-                                        // In web page text fields in Chrome, setMarkedText with an empty string seems to be ignored.
-                                        // Replacing the text to be deleted with a space seems to work; somehow the actual backspace
-                                        // also goes through, removing the space.
+                                        // In web page text fields in Chrome, and in both UI and web page text fields in Safari & Firefox,
+                                        // setMarkedText with an empty string seems to be ignored.
+                                        // Replacing the text to be deleted with a space seems to work.
+                                        // On Chrome the actual backspace also goes through regardless of what we return;
+                                        // but we need to return false for the backspacing to happen on Safari.
                                         client.insertText(" ", replacementRange: deletedRange!)
+                                        systemShouldAlsoBackspace = true
                                     }
                                     emittedSequences.remove(at: i)
                                     break
@@ -180,13 +184,19 @@ class InputController: IMKInputController {
                     }
                     if deletedRange == nil && client.selectedRange().location > 0 {
                         // If we are not backspacing a 𒋛𒀀, backspace by code point.
-                        deletedRange = NSRange(location: client.selectedRange().location - 1,length: 1)
+                        let location = client.selectedRange().location
+                        deletedRange = NSRange(location: location - 1,length: 1)
                         if let deletedText = client.attributedSubstring(from: deletedRange!) {
-                            deletedRange = NSRange(location: client.selectedRange().location - deletedText.string.utf16.count, length: deletedText.string.utf16.count)
+                            deletedRange = NSRange(location: location - deletedText.string.utf16.count, length: deletedText.string.utf16.count)
                         }
-                        // In web page text fields in Chrome the following does nothing; but backspacing there is by code point anyway,
-                        // so it all works out.
+                        // TODO(egg): This fails to backspace combining marks in text fields in Safari, even though
+                        // it works fine in the address bar.
+                        // TODO(egg): Factor this out.
                         client.setMarkedText("", selectionRange: deletedRange!, replacementRange: deletedRange!)
+                        if client.selectedRange().location == location {
+                            client.insertText(" ", replacementRange: deletedRange!)
+                            systemShouldAlsoBackspace = true
+                        }
                     }
                     if let deleted = deletedRange {
                         for s in emittedSequences {
@@ -195,7 +205,7 @@ class InputController: IMKInputController {
                                 s.range = (s.range.startIndex-deleted.length)..<(s.range.endIndex-deleted.length)
                             }
                         }
-                        return true
+                        return !systemShouldAlsoBackspace
                     }
                 }
                 return false
