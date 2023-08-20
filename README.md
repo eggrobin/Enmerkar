@@ -270,4 +270,4 @@ We are in the process of [upstreaming](https://github.com/oracc/ogsl/pulls?q=is%
 
 We thank [@Zaikarion](https://github.com/Zaikarion) for testing and providing feedback on many early prototypes of the Windows version. 
 
-We thank [@erica-scarpa](https://github.com/erica-scarpa) and Pavla Rosenstein for testing and providing feedback on early prototypes of the macOS version.
+We thank Pavla Rosenstein and [@erica-scarpa](https://github.com/erica-scarpa) for testing and providing feedback on early prototypes of the macOS version.
