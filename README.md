@@ -7,6 +7,12 @@
 
 **macOS:** Download `Enmerkar.pkg` for the [latest release](https://github.com/eggrobin/Enmerkar/releases/latest), and run it.  Log out, and log back in.  In the [Input Sources settings](https://support.apple.com/guide/mac-help/mchl84525d76/13.0/mac/13.0), press the `+` button to add an input source; choose 𒂗𒈨𒅕𒃸 from the list of input methods for the Akkadian language, and press `Add`.
 
+> **Note**: The flat package puts `Enmerkar.app` in `/Library/Input Methods`.
+> However, this is not an app that can be launched directly;
+> instead, it is registered among the input methods at the next login,
+> hence the logout-login step in the installation instructions.
+> Once registered, it behaves like any other keyboard layout or input method. 
+
 ## Usage
 
 Once the above installation steps are complete, the list of keyboard layouts in the [Windows Language bar](https://support.microsoft.com/en-us/topic/switch-between-languages-using-the-language-bar-1c2242c0-fe15-4bc3-99bc-535de6f4f258) or [macOS Input menu](https://support.apple.com/en-gb/guide/mac-help/aside/glos52ed78a0/13.0/mac/13.0) should have a new entry.
@@ -29,7 +35,20 @@ which only supports a relatively small set of languages, and in particular has n
 
 Select this IME to type Sumero-Akkadian cuneiform signs.
 
-When using the IME, typing a transliteration will bring up a menu with possible completions; pressing the spacebar `␣` or the enter key `⏎` will cause the selected sign to be entered, as shown in the table below.
+When using the IME, typing a transliteration will bring up a menu with possible completions, as shown below.
+Pressing the spacebar `␣` or the enter key `⏎` will cause the selected sign to be entered, as illustrated in the table below.
+<table>
+<tr>
+<th>
+Sample compositions
+</th>
+<th>
+The candidate window after typing `e`
+</th>
+</tr>
+<tr>
+<td>
+            
 | Keys | Output |
 |---|---|
 |`a` `␣` | 𒀀 |
@@ -39,6 +58,20 @@ When using the IME, typing a transliteration will bring up a menu with possible 
 |`e` `2` `␣`         | 𒂍 |
 |`d` `␣` `3` `0` `␣` | 𒀭𒌍 |
 |`d` `␣` `s` `i` `n` `␣` | 𒀭𒌍 |
+
+
+</td>
+<td>
+<img src=https://github.com/eggrobin/Enmerkar/assets/2284290/40c868f6-8a87-48c1-9949-21ee03279903 width=300>
+</td>
+</tr>
+</table>
+
+Besides typing the whole transliteration,
+signs other than the first candidate can be selected using the arrow keys (thus `e` `↓` `␣` also outputs 𒂍);
+they can also be entered by clicking on the candidate window.
+The page up and page down keys may be used to navigate to candidates beyond the first ten;
+for instance, as of this writing, `e` `⇟` will display 𒇯𒁽 e₁₂ through 𒂗𒋾 ebeḫ.
 
 ### Spelling
 
@@ -236,3 +269,5 @@ Adjustments were made to the sign list, in particular to take into account
 We are in the process of [upstreaming](https://github.com/oracc/ogsl/pulls?q=is%3Apr+author%3Aeggrobin) these adjustments.
 
 We thank [@Zaikarion](https://github.com/Zaikarion) for testing and providing feedback on many early prototypes of the Windows version. 
+
+We thank [@erica-scarpa](https://github.com/erica-scarpa) and Pavla Rosenstein for testing and providing feedback on early prototypes of the macOS version.
