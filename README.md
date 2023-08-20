@@ -43,7 +43,7 @@ Pressing the spacebar `␣` or the enter key `⏎` will cause the selected sign 
 Sample compositions
 </th>
 <th>
-The candidate window after typing `e`
+Candidate window after typing <code>e</code>
 </th>
 </tr>
 <tr>
