@@ -21,8 +21,12 @@ class InputController: IMKInputController {
     
     var emittedSequences: [EmittedSequence] = []
     
-    func insertCandidate(_: Candidate) {
-        
+    func insertCandidate(offset: Int) {
+        if let currentIndex = selectedIndex {
+            let pageStart = (currentIndex - currentCandidates.startIndex) / pageSize * pageSize + currentCandidates.startIndex;
+            selectedIndex = pageStart + offset
+            insertSelectedCandidate(client: client())
+        }
     }
 
     override func activateServer(_ sender: Any!) {
@@ -79,20 +83,39 @@ class InputController: IMKInputController {
         CandidateWindow.shared.close()
     }
     
-    override func candidateSelectionChanged(_ candidateString: NSAttributedString!) {
-        
-    }
-    
-    override func candidateSelected(_ candidateString: NSAttributedString!) {
-        
-    }
-    
     func getOriginPoint() -> NSPoint {
         let xd: CGFloat = 0
         let yd: CGFloat = 4
         var rect = NSRect()
         client()?.attributes(forCharacterIndex: 0, lineHeightRectangle: &rect)
         return NSPoint(x: rect.minX + xd, y: rect.minY - yd)
+    }
+    
+    private func insertSelectedCandidate(client: IMKTextInput) {
+        if !currentCandidates.isEmpty {
+            let text = currentCandidates[selectedIndex!].text
+            let marked = client.markedRange()
+            client.insertText(text, replacementRange: marked)
+            for s in emittedSequences {
+                if s.range.endIndex > marked.location {
+                    s.range = s.range.startIndex..<(s.range.endIndex+text.utf16.count)
+                }
+                if s.range.startIndex >= marked.location {
+                    s.range = (s.range.startIndex+text.utf16.count)..<s.range.endIndex
+                }
+            }
+            if text.unicodeScalars.count > 1 {
+                let emitted = NSRange.init(location: marked.location, length: text.utf16.count)
+                if emittedSequences.count >= 128 {
+                    emittedSequences.removeFirst()
+                }
+                emittedSequences.append(EmittedSequence(range:Range(emitted)!, text: text))
+            }
+            currentComposition = "";
+            currentCandidates = []
+            selectedIndex = nil
+            CandidateWindow.shared.close()
+        }
     }
     
     override func inputText(_ string: String!, key keyCode: Int, modifiers rawFlags: Int, client sender: Any!) -> Bool {
@@ -129,32 +152,10 @@ class InputController: IMKInputController {
             keyCode == kVK_ANSI_KeypadEnter {
             if currentComposition.isEmpty {
                 return false
+            } else {
+                insertSelectedCandidate(client: client)
+                return true
             }
-            if !currentCandidates.isEmpty {
-                let text = currentCandidates[selectedIndex!].text
-                let marked = client.markedRange()
-                client.insertText(text, replacementRange: marked)
-                for s in emittedSequences {
-                    if s.range.endIndex > marked.location {
-                        s.range = s.range.startIndex..<(s.range.endIndex+text.utf16.count)
-                    }
-                    if s.range.startIndex >= marked.location {
-                        s.range = (s.range.startIndex+text.utf16.count)..<s.range.endIndex
-                    }
-                }
-                if text.unicodeScalars.count > 1 {
-                    let emitted = NSRange.init(location: marked.location, length: text.utf16.count)
-                    if emittedSequences.count >= 128 {
-                        emittedSequences.removeFirst()
-                    }
-                    emittedSequences.append(EmittedSequence(range:Range(emitted)!, text: text))
-                }
-                currentComposition = "";
-                currentCandidates = []
-                selectedIndex = nil
-                CandidateWindow.shared.close()
-            }
-            return true;
         }
         if keyCode == kVK_Delete {
             if currentComposition.isEmpty {

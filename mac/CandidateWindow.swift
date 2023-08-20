@@ -31,8 +31,8 @@ class CandidateWindow: NSWindow, NSWindowDelegate {
     func bindEvents() {
         let events: [(name: Notification.Name, callback: (_ notification: Notification) -> Void)] = [
             (CandidatesView.candidateSelected, { notification in
-                if let candidate = notification.userInfo?["candidate"] as? Candidate {
-                    self.inputController?.insertCandidate(candidate)
+                if let index = notification.userInfo?["index"] as? Int {
+                    self.inputController?.insertCandidate(offset: index)
                 }
             }),
         ]
