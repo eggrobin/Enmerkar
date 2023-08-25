@@ -205,7 +205,7 @@ switching to 𒂗𒈨𒅕𒃸 from a QWERTY keyboard means that 𒂗𒈨𒅕�
 ### Backspacing
 
 Since version [𒀭𒄑𒉈𒂵𒈩](https://github.com/eggrobin/Enmerkar/releases/tag/𒀭𒄑𒉈𒂵𒈩),
-recently<sup>1</sup> entered signs that are represented as sequences of Unicode code points are backspaced as they have been typed wherever possible<sup>2</sup>.
+recently<sup><a href=#fn1 id=ref-fn1>1</a></sup> entered signs that are represented as sequences of Unicode code points are backspaced as they have been typed wherever possible<sup><a href=#fn2 id=ref-fn2>2</a></sup>.
 Thus, typing `d` `i` `r` `i` `␣` `⌫` emits the text 𒋛𒀀 and then removes all of it,
 whereas typing `s` `i`  `␣` `a` `␣` `⌫` emits the same text, but backspaces only the 𒀀, leaving 𒋛.
 
@@ -226,14 +226,14 @@ are accordingly backspaced separately from their base.
 | `r` `e` `◌̄` `ʾ` `u` `◌̄` `⌫` `◌̂ ` `m` | rēʾûm |
 
 ---
-<sup>1</sup> On Windows, the IME remembers sequences 128 sequences per document as long as the process is running; it does not recognize sequences if they are copy-pasted.
+<sup><a href=#ref-fn1 id=fn1>1</a></sup> On Windows, the IME remembers sequences 128 sequences per document as long as the process is running; it does not recognize sequences if they are copy-pasted.
 The macOS implementation is more limited: sequences will be forgotten as soon as another input source is selected, or as soon as the focus moves to another text field, and many text editing operations even within the IME will disrupt the sequence backspacing behaviour.
 The reason for this discrepancy is that the Windows implementation can make use of [ITfRange objects](https://learn.microsoft.com/en-us/windows/win32/api/msctf/nn-msctf-itfrange),
 which track a range of text as the document is edited;
-to our knowledge there is no macOS equivalent, so the macOS IME needs keep track of the emitted ranges itself.
+to our knowledge there is no macOS equivalent, so the macOS IME needs to keep track of the emitted ranges itself.
 Nevertheless, we expect that this should work well enough for the common use case of backspacing a recent typo.
 
-<sup>2</sup> Some applications interfere with the ability of input methods to keep track of context; this is notably the case of Google Docs.
+<sup><a href=#ref-fn2 id=fn2>2</a></sup> Some applications interfere with the ability of input methods to keep track of context; this is notably the case of Google Docs.
 
 ### Entry by sign list number
 
@@ -269,5 +269,7 @@ Adjustments were made to the sign list, in particular to take into account
 We are in the process of [upstreaming](https://github.com/oracc/ogsl/pulls?q=is%3Apr+author%3Aeggrobin) these adjustments.
 
 We thank [@Zaikarion](https://github.com/Zaikarion) for testing and providing feedback on many early prototypes of the Windows version. 
+
+We thank [@PeterConstable](https://github.com/PeterConstable) for pointing out that the Text Services Framework provides APIs that make it easy to backspace sequences as they are emitted.
 
 We thank Pavla Rosenstein and [@erica-scarpa](https://github.com/erica-scarpa) for testing and providing feedback on early prototypes of the macOS version.
