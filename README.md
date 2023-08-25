@@ -255,7 +255,7 @@ This makes it possible to enter signs that have no known values, such as `x` `m`
 
 ## Versioning
 
-Releases are named after kings of the Sumerian King List, starting [𒂗𒈨𒅕𒃸](https://etcsl.orinst.ox.ac.uk/cgi-bin/etcsl.cgi?text=c.2.1.1&display=Crit&charenc=gtilde&lineid=c211.102#c211.102).
+Releases are named after kings of the Sumerian King List, starting after [𒂗𒈨𒅕𒃸](https://etcsl.orinst.ox.ac.uk/cgi-bin/etcsl.cgi?text=c.2.1.1&display=Crit&charenc=gtilde&lineid=c211.102#c211.102).
 There is no regular release schedule at this time.
 
 ## Acknowledgements
