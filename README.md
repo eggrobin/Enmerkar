@@ -253,6 +253,11 @@ as illustrated in the following table for 𒂗.
 
 This makes it possible to enter signs that have no known values, such as `x` `m` `z` `l` `4` `0` `␣` for 𒎄.
 
+## Versioning
+
+Releases are named after kings of the Sumerian King List, starting [𒂗𒈨𒅕𒃸](https://etcsl.orinst.ox.ac.uk/cgi-bin/etcsl.cgi?text=c.2.1.1&display=Crit&charenc=gtilde&lineid=c211.102#c211.102).
+There is no regular release schedule at this time.
+
 ## Acknowledgements
 
 The Windows implementation is based on the [sample IME from *Windows classic samples* by
