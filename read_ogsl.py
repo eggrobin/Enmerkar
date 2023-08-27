@@ -144,7 +144,7 @@ try:
     i += 1
     if line.strip().startswith("#"):
       continue
-    tokens = line.split()
+    tokens = re.split(r'[\t\x20]', line)
     if not tokens:
       continue
     if tokens[0] == "@sign" or tokens[0] == "@form" or tokens[:2] == ["@end", "sign"]:
@@ -240,11 +240,11 @@ try:
       value = value.replace("'", "ʾ")
 
       values.append(value)
-    if tokens[0] == "@ucode":
+    if tokens[0] == "@utf8":
       ucode_line = i
       if len(tokens) != 2:
         raise ValueError(tokens)
-      codepoints = ''.join((x if x in ("X", "None") else chr(int("0" + x, 16)) for x in tokens[-1].split(".")))
+      codepoints = tokens[-1]
       for c in codepoints:
         if ord(c) >= 0xE000 and ord(c) <= 0xF8FF:
           codepoints = None
@@ -321,6 +321,7 @@ rename("|NI.UD|", "NA₄")
 rename("|IM.NI.UD|", "|IM.NA₄|")
 rename("|NI.UD.EN|", "|NA₄.EN|")
 rename("|NI.UD.KI|", "|NA₄.KI|")
+rename("|NI.UD.KISIM₅×(U₂.GIR₂)|", "|NA₄.KISIM₅×(U₂.GIR₂)|")
 
 disunify(["ERIN₂"],
          [Form("ERIN₂", None, None,
@@ -523,6 +524,9 @@ for name, forms in forms_by_name.items():
   if not encoding:
     continue
 
+  if 'X' in encoding:
+    continue
+
   if name == "ASAL₂~a":
     # Very weird entry and very weird Unicode name.  Merging with LAK 212,
     # see above.
@@ -544,16 +548,21 @@ for name, forms in forms_by_name.items():
 
   expected_unicode_name = compute_expected_unicode_name(name)
 
+  if expected_unicode_name == "PESH2~v":
+    expected_unicode_name = "PESH2 ASTERISK"
+
   # Misnaming in Unicode? U+12036 ARKAB 𒀶 is (looking at the reference
   # glyph) LAK296, to which OGSL gives the value arkab₂, arkab being
   # GAR.IB 𒃻𒅁.
   expected_unicode_name = expected_unicode_name.replace("ARKAB2", "ARKAB")
 
   # OGSL decomposes 𒍧 and 𒍦, Unicode does not (perhaps for length reasons?).
-  if expected_unicode_name == " OVER ".join(4 * ["ASH KABA TENU"]):
-    expected_unicode_name = "ZIB KABA TENU"
-  if expected_unicode_name == " OVER ".join(4 * ["ASH ZIDA TENU"]):
-    expected_unicode_name = "ZIB"
+  expected_unicode_name = expected_unicode_name.replace(
+      " OVER ".join(4 * ["ASH KABA TENU"]),
+      "ZIB KABA TENU")
+  expected_unicode_name = expected_unicode_name.replace(
+      " OVER ".join(4 * ["ASH ZIDA TENU"]),
+      "ZIB")
 
   if expected_unicode_name == "BURU5":
     # Quoth the OGSL: @note The NB source for Ea II (LKU 1) describes BURU₅ as NAM nutillû.
@@ -566,10 +575,10 @@ for name, forms in forms_by_name.items():
   # OGSL never decomposes LAL₂, so lets’ treat this as intentional.
   expected_unicode_name = expected_unicode_name.replace("LAL2", "LAL TIMES LAL")
 
-  if expected_unicode_name == "SHAR2 TIMES 1U":
+  if expected_unicode_name == "SHAR2 TIMES U":
     expected_unicode_name = "HI TIMES U"
 
-  if expected_unicode_name == "GISHGAL TIMES IGI":
+  if expected_unicode_name == "URU TIMES MIN TIMES IGI":
     expected_unicode_name = "LAK-648 TIMES IGI"
 
   if expected_unicode_name == "KU4~a":
@@ -585,6 +594,10 @@ for name, forms in forms_by_name.items():
     expected_unicode_name = "PA LAGAB TIMES GUD PLUS GUD"
   if expected_unicode_name == "SAL LAGAB TIMES GUD OVER GUD":
     expected_unicode_name = "SAL LAGAB TIMES GUD PLUS GUD"
+  if expected_unicode_name == "LAGAB TIMES GUD OVER GUD A":
+    expected_unicode_name = "LAGAB TIMES GUD PLUS GUD A"
+  if expected_unicode_name == "LAGAB TIMES GUD OVER GUD HUL2":
+    expected_unicode_name = "LAGAB TIMES GUD PLUS GUD HUL2"
 
   # OGSL has no MA×TAK₄, Unicode has no MA GUNU TIMES TAK4.
   # This is probably fine, though I don’t know where the gunû went.
@@ -623,10 +636,19 @@ for name, forms in forms_by_name.items():
   if expected_unicode_name == "LAK-212":
     expected_unicode_name = "ASAL2"
 
-  if expected_unicode_name == "SHE NUN OVER NUN":  # Not decomposed in Unicode.
-    expected_unicode_name = "TIR"
-  if "SHE PLUS NUN OVER NUN" in expected_unicode_name:
-    expected_unicode_name = expected_unicode_name.replace("SHE PLUS NUN OVER NUN", "TIR")
+  # Not decomposed in Unicode.
+  expected_unicode_name = expected_unicode_name.replace("SHE NUN OVER NUN", "TIR")
+  expected_unicode_name = expected_unicode_name.replace("SHE PLUS NUN OVER NUN", "TIR")
+
+
+
+  # Quirky Unicode 7.0 names.
+  # Unicode has KU3 but AMAR TIMES KUG.
+  if expected_unicode_name == "AMAR TIMES KU3":
+    expected_unicode_name = "AMAR TIMES KUG"
+  # Similarly DUN but KA TIMES SHUL.
+  if expected_unicode_name == "KA TIMES DUN":
+    expected_unicode_name = "KA TIMES SHUL"
 
   # Sometimes (but not always) decomposed in OGSL, not decomposed in Unicode.
   if expected_unicode_name == "SHU2 DUN3 GUNU GUNU SHESHIG":
