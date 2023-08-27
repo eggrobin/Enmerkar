@@ -925,5 +925,5 @@ for filename, encoding in (("sign_list.txt", "utf-16"),
                            ("sign_list.utf-8.txt", "utf-8")):
   with open(fr".\Samples\IME\cpp\SampleIME\Dictionary\{filename}",
             "w", encoding=encoding) as f:
-    for composition, encodings in compositions.items():
+    for composition, encodings in sorted(compositions.items()):
       print(f'"{composition}"="{encodings[0]}"', file=f)
