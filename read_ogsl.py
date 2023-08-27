@@ -193,7 +193,7 @@ try:
         if tokens[1] in ("%akk", "%elx", "#nib", "#old", "#struck"):  # What do the # annotations mean?
           value = tokens[2]
         elif tokens[1] == "%akk/n":
-          continue  # These values seem to be sumerograms in normalized Akkadian spelling, out of scope for now.
+          continue  # These values seem to be sumerograms in normalized Akkadian spelling, out of scope for now
         else:
           raise ValueError(tokens)
       elif '@' in tokens[1]:
@@ -221,9 +221,9 @@ try:
           continue
       if value in ("?", "x", "xₓ") or value.endswith("?"):
         continue
-      if "[...]" in value:
+      if "[...]" in value or "x" in value:
         continue
-      if value[0] in '1234567890' or value == "oo":
+      if value[0] in '1234567890' or value == "oo" or value == "::":
         continue  # We do numeric values by hand.
       if value in "dfm":
         # We do determinative shorthands by hand.
@@ -845,6 +845,8 @@ for value, forms_by_codepoints in sorted(encoded_forms_by_value.items()):
 
 
 for list_number, forms_by_codepoints in encoded_forms_by_list_number.items():
+  if re.match(r"U\+[0-9A-F]+", list_number):
+    continue
   composition = "x" + list_number.lower().replace("é", "e").replace("c", "š").replace("hzl", "ḫzl").replace("'", "ʾ")
   if not re.match(r"^[bdgptkʾṭqzšsṣḫmnrlwyaeiuŋśaeui0-9xf]+$", composition):
     print("Weird characters in list number %s" % list_number)
