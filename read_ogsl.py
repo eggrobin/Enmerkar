@@ -352,41 +352,6 @@ forms_by_name["EŠE₃"] = [main_forms_by_name["EŠE₃"]]
 
 # OGSL naming bugs handled here.
 
-# Unnormalized |GAD+TAK₄.DUH| (neither has values).
-del main_forms_by_name["|GAD+KID₂.DUH|"]
-del forms_by_name["|GAD+KID₂.DUH|"]
-# Unnormalized |A.GISAL.GAD.GAR.A.SI| (both with the value addirₓ).
-del main_forms_by_name["|A.GISAL.GADA.GAR.A.SI|"]
-del forms_by_name["|A.GISAL.GADA.GAR.A.SI|"]
-
-# Insufficiently decomposed/normalized in OGSL.
-for name in ("|DIM×EŠ|", "|KA×EŠ|",
-             "|LAK617×MIR|",
-             "|KAR.MUŠ|",
-             "|ŠE₃.TU.BU|",
-             "|ŠUL.GI|",
-#             "|UD.MUD.NUN.KI|",
-             "|IM.LAK648|",
-             "|E₃.E₃|",
-             "|KUD.KUD|"):
-  rename(name,
-         name.replace(
-             "EŠ", "(U.U.U)").replace(
-             "MIR", "DUN3@g@g").replace(
-             "KAR", "TE.A").replace(
-             "ŠE₃", "EŠ₂").replace(
-             "ŠUL", "DUN").replace(
-             "MUD", "HU.HI").replace(
-             # Not sure what to make of the following @note in |URU×MIN|; but it is called |URU×MIN|, so shrug.
-             # LAK648 is GIŠGAL, but is not properly described as URU×MIN. Many of the URU× signs are LAK648× in ED.
-             "LAK648", "URU×MIN").replace(
-             # The entry has the @inote this is a deliberate exception to what should be |UD.DU.UD.DU|.
-             # Not sure why this exception.  There are no values for this one anyway.
-             "E₃", "UD.DU").replace(
-             "KUD", "TAR"))
-
-rename("|ŠU₂.NESAG|", "|ŠU₂.NISAG|")
-
 # LAK207 looks to me like ŠE.HUB₂, not (ŠE&ŠE).HUB₂.
 # Conventiently Unicode has the former and not the latter.
 rename("|(ŠE&ŠE).HUB₂|", "|ŠE.HUB₂|")
