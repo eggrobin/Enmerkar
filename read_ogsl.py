@@ -175,10 +175,10 @@ try:
       form_id = None
       sign_or_form_line = i
     if tokens[0] == "@form":
-      if len(tokens) != 3 and not tokens[3][0] in ("x", "["):
+      if len(tokens) != 2 and not tokens[2][0] in ("x", "["):
         raise ValueError(tokens)
       name = tokens[-1]
-      form_id = tokens[1]
+      form_id = name
       sign_or_form_line = i
     if tokens[0] == "@list" and '"' not in tokens[1] and tokens[1] != "KWU":
       [list_name, number] = re.split(r"(?=\d)", tokens[1], 1)
