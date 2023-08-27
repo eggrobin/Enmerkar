@@ -649,6 +649,9 @@ for name, forms in forms_by_name.items():
   # Similarly DUN but KA TIMES SHUL.
   if expected_unicode_name == "KA TIMES DUN":
     expected_unicode_name = "KA TIMES SHUL"
+  # And SIX DISH but KA TIMES ASH3.
+  if expected_unicode_name == "KA TIMES 6DISH":
+    expected_unicode_name = "KA TIMES ASH3"
 
   # Sometimes (but not always) decomposed in OGSL, not decomposed in Unicode.
   if expected_unicode_name == "SHU2 DUN3 GUNU GUNU SHESHIG":
