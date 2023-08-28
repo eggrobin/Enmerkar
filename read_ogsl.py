@@ -625,6 +625,8 @@ for name, forms in forms_by_name.items():
   # get the alias...
   if expected_unicode_name == "NU11 TENU":
     expected_unicode_name = "SHIR TENU"
+  if expected_unicode_name == "NU11 TENU SILA3":
+    expected_unicode_name = "SHIR TENU SILA3"
   elif expected_unicode_name == "NU11 OVER NU11 BUR OVER BUR":
     expected_unicode_name = "SHIR OVER SHIR BUR OVER BUR"
 
