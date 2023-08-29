@@ -183,6 +183,8 @@ try:
     if tokens[0] == "@list" and '"' not in tokens[1] and tokens[1] != "KWU":
       [list_name, number] = re.split(r"(?=\d)", tokens[1], 1)
       number = number.lstrip("0");
+      if list_name == "U+":
+        continue
       if list_name == "SLLHA":
         for l in ("ŠL", "MÉA"):
           lists.append(l + number)
@@ -741,7 +743,8 @@ for value, forms_by_codepoints in encoded_forms_by_value.items():
       break
 
 encoded_signs = set(form.codepoints for forms in forms_by_name.values() for form in forms)
-encoded_signs_with_values = set(form.codepoints for forms in forms_by_name.values() for form in forms if form.values)
+encoded_signs_with_list_numbers = {form.codepoints: form.lists for forms in forms_by_name.values() for form in forms if form.lists}
+encoded_signs_with_values = {form.codepoints: form.values for forms in forms_by_name.values() for form in forms if form.values}
 
 NON_SIGNS = set((
   # @nosign |A×GAN₂@t|
@@ -781,8 +784,6 @@ NON_SIGNS = set((
   "𒁿", "𒍶",
   # No idea where that comes from.  Maybe look for it HethZL?
   "𒍾",
-  # MZL067, Hittite, no values, not in the OGSL.
-  "𒍿",
   # No idea for that one either.
   "𒎁",
   "𒎅",
@@ -812,6 +813,14 @@ for u in range(0x12000, 0x12550):  # Cuneiform, Cuneiform numbers and punctuatio
   if unicodedata.name(chr(u)).startswith("CUNEIFORM PUNCTUATION SIGN"):
     continue
   if chr(u) in NON_SIGNS:
+    if chr(u) in encoded_signs_with_values:
+      raise KeyError(f"""Non-sign U+{u:X} {
+        unicodedata.name(chr(u))} {chr(u)} has values {
+        encoded_signs_with_values[chr(u)]}""")
+    if chr(u) in encoded_signs_with_list_numbers:
+      raise KeyError(f"""Non-sign U+{u:X} {
+        unicodedata.name(chr(u))} {chr(u)} has list numbers {
+        encoded_signs_with_list_numbers[chr(u)]}""")
     continue
   if chr(u) not in encoded_signs:
     raise KeyError(f"No form U+{u:X} {unicodedata.name(chr(u))} {chr(u)}")
@@ -850,8 +859,6 @@ for value, forms_by_codepoints in sorted(encoded_forms_by_value.items()):
 
 
 for list_number, forms_by_codepoints in encoded_forms_by_list_number.items():
-  if re.match(r"U\+[0-9A-F]+", list_number):
-    continue
   composition = "x" + list_number.lower().replace("é", "e").replace("c", "š").replace("hzl", "ḫzl").replace("'", "ʾ")
   if not re.match(r"^[bdgptkʾṭqzšsṣḫmnrlwyaeiuŋśaeui0-9xf]+$", composition):
     print("Weird characters in list number %s" % list_number)
