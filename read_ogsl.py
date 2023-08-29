@@ -742,7 +742,7 @@ for value, forms_by_codepoints in encoded_forms_by_value.items():
       raise ValueError(f"Unexpected character {c} in value {value} for {'; '.join(forms_by_codepoints.keys())}")
       break
 
-encoded_signs = set(form.codepoints for forms in forms_by_name.values() for form in forms)
+encoded_signs = {form.codepoints: form for forms in forms_by_name.values() for form in forms}
 encoded_signs_with_list_numbers = {form.codepoints: form.lists for forms in forms_by_name.values() for form in forms if form.lists}
 encoded_signs_with_values = {form.codepoints: form.values for forms in forms_by_name.values() for form in forms if form.values}
 
@@ -803,6 +803,46 @@ NON_SIGNS = set((
   "𒀼", "𒅓", "𒇹",
   "𒊪", # Turned into a @nosign with: @inote unicode revision needed/deleted; sign is |ZUM×TUG₂| = LAK524.
   "𒍴", # Baffling disunification.
+  # EZEN×ḪA@g: https://oracc.iaas.upenn.edu/dcclt/signlists/P365252?P365252.57
+  # MSL 14, 497 A1.
+  # MZL 291 (EZEN×ḪA) cites MSL 14 497 101 (? Lw. z.T. abgebrochen).
+  # https://www.britishmuseum.org/collection/object/W_1880-1112-11, no photo.
+  "𒂪",
+  "𒃀", # GA₂×(BAR.RA) eburra? gaburraₓ?  ???
+  "𒃬", # GA₂×(UD.DU) [...]e  ???
+  # GABA%GABA: http://oracc.iaas.upenn.edu/dcclt/P368988?P368988.22,P368988.23#P368988.17
+  # MSL 14 484.
+  # MZL does cite it for other signs, but does not mention this.
+  "𒃯",
+  "𒄺", # HUB₂×HAL. ???
+  "𒄼", # HUB₂×LIŠ. ???
+  "𒅟", # KA×BI. ???
+  # KA×GI. DCCLT ED Metals; even in MEE 03, 026:
+  # http://oracc.iaas.upenn.edu/dcclt/P240968/ o vi 8 sqq.
+  # But ELLes has 26 r. VI 8 at ELLes 182 = LAK 318, normal 𒅗.
+  "𒅧",
+  "𒅳",  # KA×LU pu-udu.  ???
+  "𒅹",  # KA×(MI.NUNUZ). ???
+  # KA₂×KA₂: http://oracc.museum.upenn.edu/dcclt/signlists/P391514?P391514.7#P391514.2
+  # MSL 14, 353 A
+  "𒆎",
+  "𒆖", # KAK×IGI@g. ???
+  # LAGAB×ME: http://oracc.museum.upenn.edu/dcclt/signlists/P365261?P365261.140,
+  # variant form of LAGAB×A.
+  # MSL 14, 207 A.  Note the transliteration LAGAB×A is inconsistent with the copy.
+  # Also LAGAB×ME in LAGAB×ME.EN http://oracc.iaas.upenn.edu/dcclt/signlists/Q000145?Q000145.173
+  # But not in the score; could it be LAGAB×(ME.EN)?
+  "𒇘",
+  # [...]tallu. https://oracc.museum.upenn.edu/dcclt/P258842?P258842.46
+  # MSL 14, pp. 461—65.
+  "𒈍",
+  "𒊛", # SAG×KUR http://oracc.museum.upenn.edu/dcclt/signlists/P230117.5.3
+  "𒌭", # UR₂×(A.NA). ???
+  "𒌳", # UR₂×(U₂.BI) ar[...]. https://oracc.museum.upenn.edu/dcclt/P258842?P258842.140
+  "𒍅", # URU×KI https://oracc.museum.upenn.edu/dcclt/P345354?P345354.399
+  "𒍆", # URU×LUM ???
+  "𒎆", # KA×TU, variant form of šeg₅ e.g. in http://oracc.iaas.upenn.edu/dcclt/Q003221/
+  "𒎍", # MUŠ₃×ZA, variant form of something.
 ))
 
 for u in range(0x12000, 0x12550):  # Cuneiform, Cuneiform numbers and punctuation, Early Dynastic cuneiform.
@@ -824,6 +864,14 @@ for u in range(0x12000, 0x12550):  # Cuneiform, Cuneiform numbers and punctuatio
     continue
   if chr(u) not in encoded_signs:
     raise KeyError(f"No form U+{u:X} {unicodedata.name(chr(u))} {chr(u)}")
+  if (chr(u) not in encoded_signs_with_values and
+      chr(u) not in encoded_signs_with_list_numbers):
+    message = f"""Neither form nor list number for U+{u:X} {
+        unicodedata.name(chr(u))} {chr(u)} {encoded_signs[chr(u)]}"""
+    if u >= 0x12480:
+      print("ED: " + message)
+    else:
+      raise KeyError(message)
 
 compositions = {}
 
