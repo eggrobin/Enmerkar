@@ -202,6 +202,7 @@ try:
           raise ValueError(tokens)
       elif '@' in tokens[1]:
         print(f"@ in value: {tokens}")
+        continue
       else:
         if len(tokens) > 2 and not tokens[2].startswith("["):
           raise ValueError(tokens)
@@ -525,6 +526,8 @@ for name, forms in forms_by_name.items():
       else:
         break
     else:
+      if encoding:
+        print(f"WARNING: {name} has no ucun but it can be derived as {encoding} from {components}")
       for form in forms:
         form.codepoints = encoding
       print(f"Encoding {forms[0] if len(forms) == 1 else forms} from {components}")
@@ -738,11 +741,13 @@ for value, forms_by_codepoints in encoded_forms_by_value.items():
                 for form in forms if not form.form_id]
   if "ₓ" not in value and len(forms_by_codepoints) > 1:
     if len(main_forms) > 1:
-      print(f"Multiple main forms with non-ₓ value {value}: {main_forms}")
+      raise ValueError(f"Multiple main forms with non-ₓ value {value}: {main_forms}")
     elif not main_forms:
-      print(f"Multiple variant forms and no main form with non-ₓ value {value}: {forms_by_codepoints.values()}")
+      #print(f"Multiple variant forms and no main form with non-ₓ value {value}: {forms_by_codepoints.values()}")
+      pass
     else:
-      print(f"Multiple forms (one main) with non-ₓ value {value}: {forms_by_codepoints.values()}")
+      #print(f"Multiple forms (one main) with non-ₓ value {value}: {forms_by_codepoints.values()}")
+      pass
 
 for value, forms_by_codepoints in encoded_forms_by_value.items():
   for c in value:
