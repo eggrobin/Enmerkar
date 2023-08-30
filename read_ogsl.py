@@ -775,19 +775,13 @@ NON_SIGNS = set((
   # It probably isn’t KWU089 contrary to Koslova, but the variant of 𒁔, consistent with both the name and the reference glyph,
   # exists—whether it deserved its own codepoint is another question…
   "𒍘",
-  # MZL680, Hittite, no values, not in the OGSL.
-  "𒍱",
-  # MZL697, HZL276, Hittite, no values, not in the OGSL.
-  "𒍲",
-  # MZL454, no values, not in the OGSL.
-  "𒍳",
   # MZL811, with explanations given at MZL748 𒁹:
   # 60šu, šuššu^šu resp. 60+šu, šuššu^+šu, the number 60.
   # Borgers writes this can be transcribed 60(KU) in assyrian, but differs from
   # KU in babylonian.  This is probably why we have a separate codepoint.
   # See CAD, entry šūši.
   # Numeric, so let’s handle that separately.
-  "𒍵",
+  #"𒍵",
   # A misreading of MZL for gaz₃, and gaz₃ itself.
   # See https://github.com/oracc/ogsl/pull/7#issuecomment-1304608990.
   "𒁿", "𒍶",
@@ -796,18 +790,14 @@ NON_SIGNS = set((
   # No idea for that one either.
   "𒎁",
   "𒎅",
-  # MZL763, no values, not in the OGSL.
-  "𒎈",
   # MZL741, variant of MZL882.  Not clear how it differs, does it have the same
   # values?  Does it only have a specific logographic value like TA*?  Punt for
   # now.
-  "𒎔",
-  # MZL194, no values, not in the OGSL.
-  "𒎖",
+  # "𒎔",
   # MZL488, a variant of 𒌝𒈨.
   # TODO(egg): should it take its place (and should the UM.ME rendition be a
   # matter for the font?)
-  "𒎘",
+  #"𒎘",
   # Unified in favour of the numeric versions.
   "𒀼", "𒅓", "𒇹",
   "𒊪", # Turned into a @nosign with: @inote unicode revision needed/deleted; sign is |ZUM×TUG₂| = LAK524.
