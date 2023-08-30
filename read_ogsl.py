@@ -119,7 +119,7 @@ main_forms_by_name = {}
 forms_by_name = {}
 
 class Form:
-  def __init__(self, name, form_id, sign, values, codepoints, sign_or_form_line=None, ucode_line=None):
+  def __init__(self, name, form_id, sign, values, codepoints, sign_or_form_line=None, ucode_line=None, umap=None):
     self.name = name
     self.original_name = self.name
     self.form_id = form_id
@@ -129,6 +129,7 @@ class Form:
     self.original_codepoints = self.codepoints
     self.sign_or_form_line = sign_or_form_line
     self.ucode_line = ucode_line
+    self.umap = umap
     self.lists = []
 
   def __str__(self):
@@ -150,9 +151,9 @@ try:
     if tokens[0] == "@sign" or tokens[0] == "@form" or tokens[:2] == ["@end", "sign"]:
       if name:
         if form_id:
-          form = Form(name, form_id, main_forms_by_name[sign_name], values, codepoints, sign_or_form_line, ucode_line)
+          form = Form(name, form_id, main_forms_by_name[sign_name], values, codepoints, sign_or_form_line, ucode_line, umap)
         else:
-          form = Form(name, form_id, None, values, codepoints, sign_or_form_line, ucode_line)
+          form = Form(name, form_id, None, values, codepoints, sign_or_form_line, ucode_line, umap)
           if name in main_forms_by_name and name not in ("LAK499", "LAK712"):  # TODO(egg): Deduplicate.
             raise ValueError(f"Duplicate signs {name}: {main_forms_by_name[name]} and {form}")
           main_forms_by_name[name] = form
@@ -167,6 +168,7 @@ try:
       values = []
       sign_or_form_line = None
       ucode_line = None
+      umap = None
     if tokens[0] == "@sign":
       if len(tokens) != 2:
         raise ValueError(tokens)
@@ -242,7 +244,7 @@ try:
       value = value.replace("'", "ʾ")
 
       values.append(value)
-    if tokens[0] == "@utf8":
+    if tokens[0] == "@ucun":
       ucode_line = i
       if len(tokens) != 2:
         raise ValueError(tokens)
@@ -251,11 +253,27 @@ try:
         if ord(c) >= 0xE000 and ord(c) <= 0xF8FF:
           codepoints = None
           break
+    if tokens[0] == "@umap":
+      if len(tokens) != 2:
+        raise ValueError(tokens)
+      umap = tokens[1]
 except Exception as e:
   print(f"line {i}:")
   print(line)
   print(e)
   raise
+
+# Process umap.
+for name, forms in forms_by_name.items():
+  for form in forms:
+    if form.umap:
+      if form.codepoints:
+        raise ValueError(f"{form} has umap and ucun")
+      if form.umap not in forms_by_name:
+        raise ValueError(f"{form} has umap to unknown {form.umap}")
+      if not forms_by_name[form.umap][0].codepoints:
+        raise ValueError(f"{form} has umap unencoded {forms_by_name[form.umap][0]}")
+      form.codepoints = forms_by_name[form.umap][0].codepoints
 
 for name, forms in forms_by_name.items():
   encodings = sorted(set(form.codepoints for form in forms if form.codepoints))
@@ -489,15 +507,6 @@ for name, forms in forms_by_name.items():
     if name == "|DIŠ.DIŠ.DIŠ.U.U.U|":
       form.codepoints = "𒐈𒌍"
 
-
-    # See https://github.com/oracc/ogsl/commit/11f04981b49131894bc5cba543f09b255985b1a2.
-    # There may be a problem, but not having a codepoint for de₂ is not a
-    # solution.  We let UMUM×KASKAL = de₂, and consider that making it
-    # look like an UMUM šeššig is a problem for the font.
-    if name == "DE₂":
-      form.codepoints = "𒌤"
-
-
     # Unicode 7.0 fanciness, except disunifications.
     if "NI.UD" in name:
       raise ValueError(f"NI.UD in {form}")
@@ -545,7 +554,7 @@ for name, forms in forms_by_name.items():
     # Both are given the reading gigir₃.  Shrug.
     continue
 
-  if name== "OO":
+  if name== "OO" or name=="O":
     continue
 
   expected_unicode_name = compute_expected_unicode_name(name)
