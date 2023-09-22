@@ -77,7 +77,7 @@ with open("La paleografia dei testi dell’amministrazione e della cancelleria d
     else:
       if catagnoti_number in egg_concordance:
         forms = read_ogsl.forms_by_name[egg_concordance[catagnoti_number]]
-        print("PACE%s %s has no LAK, but is %s" % (catagnoti_number, catagnoti_name, forms))
+        #print("PACE%s %s has no LAK, but is %s" % (catagnoti_number, catagnoti_name, forms))
       elif catagnoti_name == "AŠGAB" and laks == "346":
         # LAK346? in OGSL.
         forms = read_ogsl.forms_by_name["AŠGAB"]
@@ -123,7 +123,9 @@ with open("La paleografia dei testi dell’amministrazione e della cancelleria d
           ogsl_by_catagnoti[catagnoti_number] = []
       ogsl_by_catagnoti[catagnoti_number] = forms
       if not any(form.codepoints or form.sign and form.sign.codepoints for form in forms):
-        print("PACE%s %s = LAK%s not has no encoding: %s" % (catagnoti_number, catagnoti_name, laks, forms))
+        print("PACE%s %s = LAK%s has no encoding: %s" % (catagnoti_number, catagnoti_name, laks, forms))
+      elif not any(form.codepoints or form.sign and len(form.sign.codepoints) == 1 for form in forms):
+        print("PACE%s %s = LAK%s is a variant of a diri: %s" % (catagnoti_number, catagnoti_name, laks, forms))
 
       if any(form.name == catagnoti_name for form in forms):
         continue
