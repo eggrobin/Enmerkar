@@ -26,9 +26,26 @@ ellesify("EREN", 327)
 ellesify("|GA₂×(NE.E₂)|", 374)
 ellesify("|A×HA|", 394)
 
+read_ogsl.forms_by_name["LAK776"][0].codepoints = "𒇻𒄾"
+# See comment in read_ogsl.
+read_ogsl.forms_by_name["LAK20"][0].codepoints = "𒆱"
+
+# Catagnoti name to OGSL name.
+NAME_BASED_IDENTIFICATIONS = {
+  "DAR": "DAR",
+  "ZÍ": "ZE₂",
+  "PIRIG": "PIRIG",
+  "ITI": "|UD×(U.U.U)|",
+  "IL": "IL",
+  "DIB": "DIB"
+}
+
 ogsl_by_lak = {}
 ogsl_by_elles = {}
 ogsl_by_catagnoti = {}
+
+unencoded_catagnoti = []
+diri_variant_catagnoti = []
 
 for form in forms:
   for number in form.lists:
@@ -67,6 +84,8 @@ egg_concordance = {
 with open("La paleografia dei testi dell’amministrazione e della cancelleria di Ebla - Source.csv", encoding="utf-8") as f:
   lines = list(csv.reader(f))
   for catagnoti_number, catagnoti_name, laks in lines[1:]:
+    if catagnoti_number == "331":
+      break
     if not laks and catagnoti_number not in egg_concordance:
       print("No LAK number for PACE%s %s" % (catagnoti_number, catagnoti_name))
       continue
@@ -118,14 +137,17 @@ with open("La paleografia dei testi dell’amministrazione e della cancelleria d
       else:
         print("PACE%s %s = LAK%s not in OGSL" % (catagnoti_number, catagnoti_name, laks))
 
+    if catagnoti_name in NAME_BASED_IDENTIFICATIONS:
+      for form in forms:
+        form.sign = read_ogsl.main_forms_by_name[NAME_BASED_IDENTIFICATIONS[catagnoti_name]]
     if forms:
       if catagnoti_number not in ogsl_by_catagnoti:
           ogsl_by_catagnoti[catagnoti_number] = []
       ogsl_by_catagnoti[catagnoti_number] = forms
       if not any(form.codepoints or form.sign and form.sign.codepoints for form in forms):
-        print("PACE%s %s = LAK%s has no encoding: %s" % (catagnoti_number, catagnoti_name, laks, forms))
+        print("PACE%s %s = LAK%s has no encoding: %s, %s" % (catagnoti_number, catagnoti_name, laks, forms, [number for form in forms for number in form.lists]))
       elif not any(form.codepoints or form.sign and len(form.sign.codepoints) == 1 for form in forms):
-        print("PACE%s %s = LAK%s is a variant of a diri: %s" % (catagnoti_number, catagnoti_name, laks, forms))
+        print("PACE%s %s = LAK%s is a variant of a diri: %s, %s" % (catagnoti_number, catagnoti_name, laks, forms, [number for form in forms for number in form.lists]))
 
       if any(form.name == catagnoti_name for form in forms):
         continue
