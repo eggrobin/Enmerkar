@@ -65,7 +65,7 @@ class TextTag:
     self.text = text
 
   def __str__(self):
-    return "@%s\t%s" % (self.tag, "\t\n".join(self.text.splitlines()))
+    return "@%s\t%s" % (self.tag, "\n\t".join(self.text.splitlines()))
   
   @classmethod
   def parse(cls, parser: Parser, *args) -> "TextTag":
@@ -141,7 +141,7 @@ class Source:
     entry = parser.entry()
     entry.validate(cls, parser)
     abbreviation, numbers = entry.text.split(maxsplit=1)
-    result = cls(abbreviation, set())    
+    result = cls(abbreviation, numbers)    
     while entry := parser.peek():
       for entry_type in (Note, *Note.__subclasses__()):
         if entry.tag == entry_type.tag:
@@ -150,6 +150,12 @@ class Source:
       else:
         break
     return result
+
+  def __str__(self):
+    return "@%s %s\n%s" % (
+      self.tag,
+      "\n\t".join(self.numbers.splitlines()),
+      "\n".join(str(note) for note in self.notes))
   
 class Value:
   tag = "v"
@@ -164,6 +170,9 @@ class Value:
     self.text = text
     self.notes = []
 
+  def __str__(self):
+    return f"@v{'-' if self.deprecated else ''}\t{'%'+self.language + ' ' if self.language else ''}{self.text}"
+
   @classmethod
   def parse(cls, parser: Parser):
     entry = parser.entry()
@@ -176,7 +185,7 @@ class Value:
     for entry_type in (Note, *Note.__subclasses__()):
       if entry.tag == entry_type.tag:
         result.notes.append(entry.parse(parser))
-    
+    return result
 
 class SourceReference:
   tag = "list"
@@ -186,6 +195,9 @@ class SourceReference:
   def __init__(self, source: Source, number: SourceNumber):
     self.source = source
     self.number = number
+
+  def __str__(self):
+    return f"@list\t{self.source.abbreviation}{self.number}"
 
   @classmethod
   def parse(cls, parser: Parser, sources: dict[str, Source]):
@@ -202,7 +214,12 @@ class System:
   def __init__(self, name: str):
     self.name = name
     self.notes = []
-  
+
+  def __str__(self):
+    return "\n".join((
+      f"@{self.tag} {self.name}",
+      *(str(note) for note in self.notes)))
+    
   @classmethod
   def parse(cls, parser: Parser) -> "System":
     entry = parser.entry()
@@ -234,6 +251,11 @@ class CompoundOnly(SignLike):
   def __init__(self, text: str):
     self.text = text
     self.notes = []
+
+  def __str__(self):
+    return "\n".join((
+      f"@{self.tag} {self.text}",
+      *(str(note) for note in self.notes)))
   
   @classmethod
   def parse(cls, parser: Parser, sources: dict[str, Source]) -> "Form":
@@ -249,6 +271,7 @@ class CompoundOnly(SignLike):
           break
       else:
         break
+    return result
 
 # Omitting @sref which is not actually used.
 
@@ -279,6 +302,12 @@ class Form:
     self.values = []
     self.systems = []
     self.notes = []
+    self.unicode_name = None
+    self.unicode_sequence = None
+    self.unicode_cuneiform = None
+    self.unicode_age = None
+    self.unicode_note = None
+    self.unicode_map = None
 
   @classmethod
   def check_end(cls, parser: Parser, entry: RawEntry):
@@ -291,6 +320,27 @@ class Form:
 
   def parse_extension(self, parser: Parser, sources: dict[str, Source]) -> bool:
     return False
+
+  def form_components_str(self):
+    return "\n".join(lines for lines in (
+        "\n".join("@aka %s" % name for name in self.names[1:]),
+        "\n".join(str(source) for source in self.sources),
+        "\n".join(str(note) for note in self.notes),
+        str(self.unicode_name) if self.unicode_name else None,
+        str(self.unicode_sequence) if self.unicode_sequence else None,
+        str(self.unicode_cuneiform) if self.unicode_cuneiform else None,
+        str(self.unicode_map) if self.unicode_map else None,
+        str(self.unicode_age) if self.unicode_age else None,
+        str(self.unicode_note) if self.unicode_note else None,
+        "\n".join(str(value) for value in self.values),
+        "\n".join(str(system) for system in self.systems)) if lines)
+
+  def __str__(self):
+    return "\n".join(lines for lines in (
+        f"@{self.tag} {self.names[0]}",
+        self.form_components_str(),
+        "@@") if lines)
+
 
   @classmethod
   def parse(cls, parser: Parser, sources: dict[str, Source]) -> "Form":
@@ -337,10 +387,18 @@ class Form:
             parser.raise_error(f"Unexpected tag @{entry.tag} {entry.text}")
     else:
       parser.raise_error(f"Reached end of file within {cls.__name__} block")
+    return result
 
 class Sign(Form, SignLike):
   tag = "sign"
   forms: list[Form]
+
+  def __str__(self):
+    return "\n".join(lines for lines in (
+        f"@{self.tag} {self.names[0]}",
+        self.form_components_str(),
+        "\n".join(str(form) for form in self.forms),
+        "@end sign") if lines)
 
   def __init__(self, name):
     super().__init__(name)
@@ -381,10 +439,18 @@ class SignList:
     self.sources[source.abbreviation] = source
     
   def add_system(self, system: System):
-    self.sources[system.name] = system
+    self.systems[system.name] = system
 
   def add_sign(self, sign: Sign):
     self.signs.append(sign)
+
+  def __str__(self):
+    return "\n\n".join((
+      f"@{self.tag} {self.name}",
+      "\n\n".join(str(note) for note in self.notes),
+      "\n\n".join(str(source) for source in self.sources.values()),
+      "\n\n".join(str(system) for system in self.systems.values()),
+      "\n\n".join(str(sign) for sign in self.signs)))
 
   @classmethod
   def parse(cls, parser: Parser) -> "SignList":
@@ -402,10 +468,11 @@ class SignList:
       else:
         for entry_type in SignLike.__subclasses__():
           if entry.tag == entry_type.tag:
-            entry_type.parse(parser, result.sources)
+            result.signs.append(entry_type.parse(parser, result.sources))
             break
         else:
           parser.raise_error(f"Expected one of {SignLike.__subclasses__()}, got {entry.tag}")
+    return result
 
 with open(r"..\ogsl\00lib\ogsl.asl", encoding="utf-8") as f:
-  SignList.parse(Parser(f.readlines(), "ogsl.asl"))
+  print(SignList.parse(Parser(f.readlines(), "ogsl.asl")))
