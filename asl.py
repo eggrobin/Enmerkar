@@ -152,8 +152,9 @@ class Source:
     return result
 
   def __str__(self):
-    return "@%s %s\n%s" % (
+    return "@%s %s %s\n%s" % (
       self.tag,
+      self.abbreviation,
       "\n\t".join(self.numbers.splitlines()),
       "\n".join(str(note) for note in self.notes))
   
@@ -171,7 +172,9 @@ class Value:
     self.notes = []
 
   def __str__(self):
-    return f"@v{'-' if self.deprecated else ''}\t{'%'+self.language + ' ' if self.language else ''}{self.text}"
+    return "\n".join((
+      f"@v{'-' if self.deprecated else ''}\t{'%'+self.language + ' ' if self.language else ''}{self.text}",
+      *(str(note) for note in self.notes)))
 
   @classmethod
   def parse(cls, parser: Parser):
@@ -182,9 +185,13 @@ class Value:
       language, args = args.split(maxsplit=1)
       language = language[1:]
     result = Value(args, language, entry.deprecated)
-    for entry_type in (Note, *Note.__subclasses__()):
-      if entry.tag == entry_type.tag:
-        result.notes.append(entry.parse(parser))
+    while entry := parser.peek():
+      for entry_type in (Note, *Note.__subclasses__()):
+        if entry.tag == entry_type.tag:
+          result.notes.append(entry_type.parse(parser))
+          break
+      else:
+        break
     return result
 
 class SourceReference:
@@ -254,7 +261,7 @@ class CompoundOnly(SignLike):
 
   def __str__(self):
     return "\n".join((
-      f"@{self.tag} {self.text}",
+      f"@{self.tag}\t{self.text}",
       *(str(note) for note in self.notes)))
   
   @classmethod
@@ -308,6 +315,7 @@ class Form:
     self.unicode_age = None
     self.unicode_note = None
     self.unicode_map = None
+    self.fake = None
 
   @classmethod
   def check_end(cls, parser: Parser, entry: RawEntry):
@@ -323,10 +331,13 @@ class Form:
 
   def form_components_str(self):
     return "\n".join(lines for lines in (
-        "\n".join("@aka %s" % name for name in self.names[1:]),
-        "\n".join(str(source) for source in self.sources),
+        str(self.pname) if self.pname else None,
+        "\n".join("@aka\t%s" % name for name in self.names[1:]),
+        str(self.fake) if self.fake else None,
+        "\n".join(str(source) for source in self.sources if source.source.abbreviation != "U+"),
         "\n".join(str(note) for note in self.notes),
         str(self.unicode_name) if self.unicode_name else None,
+        "\n".join(str(source) for source in self.sources if source.source.abbreviation == "U+"),
         str(self.unicode_sequence) if self.unicode_sequence else None,
         str(self.unicode_cuneiform) if self.unicode_cuneiform else None,
         str(self.unicode_map) if self.unicode_map else None,
@@ -337,7 +348,7 @@ class Form:
 
   def __str__(self):
     return "\n".join(lines for lines in (
-        f"@{self.tag} {self.names[0]}",
+        f"@{self.tag}{'-' if self.deprecated else ''} {self.names[0]}",
         self.form_components_str(),
         "@@") if lines)
 
@@ -370,7 +381,7 @@ class Form:
       elif entry.tag == UnicodeNote.tag:
         result.unicode_note = UnicodeNote.parse(parser)
       elif entry.tag == UnicodeMap.tag:
-        result.unicode_note = UnicodeMap.parse(parser)
+        result.unicode_map = UnicodeMap.parse(parser)
       elif entry.tag == Value.tag:
         result.values.append(Value.parse(parser))
       elif entry.tag == SystemBinding.tag:
@@ -395,7 +406,7 @@ class Sign(Form, SignLike):
 
   def __str__(self):
     return "\n".join(lines for lines in (
-        f"@{self.tag} {self.names[0]}",
+        f"@{self.tag}{'-' if self.deprecated else ''} {self.names[0]}",
         self.form_components_str(),
         "\n".join(str(form) for form in self.forms),
         "@end sign") if lines)
@@ -475,4 +486,7 @@ class SignList:
     return result
 
 with open(r"..\ogsl\00lib\ogsl.asl", encoding="utf-8") as f:
-  print(SignList.parse(Parser(f.readlines(), "ogsl.asl")))
+  ogsl = SignList.parse(Parser(f.readlines(), "ogsl.asl"))
+
+with open(r"..\ogsl\00lib\ogsl.asl", 'w', encoding="utf-8") as f:
+  f.write(str(ogsl))
