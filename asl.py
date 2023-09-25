@@ -1,11 +1,12 @@
 # Based on https://build-oracc.museum.upenn.edu/ogsl/aslogslfileformat/index.html as built from
 # https://github.com/oracc/ogsl/blob/53952bfcbe2a575f92522562fdff3b8fcfd757ab/00web/asl.xml.
 
-import re
+from collections import defaultdict
 import difflib
+import re
 import sys
 import textwrap
-from typing import Optional, Literal
+from typing import Optional, Literal, Tuple
 
 class RawEntry:
   def __init__(self, line: str, parser: "Parser"):
@@ -141,8 +142,18 @@ class SourceRange:
       self.first = int(number, self.base)
       self.last = self.first
 
+  def __eq__(self, other):
+    return (isinstance(other, SourceRange) and
+            self.first == other.first and
+            self.last == other.last and
+            self.suffix == other.suffix)
+
+  def __hash__(self):
+    return hash((self.first, self.last, self.suffix))
+
   def __iter__(self):
-    yield from (SourceRange(self.format_number(n) + self.suffix, self.base) for n in range(self.first, self.last + 1))
+    yield from (SourceRange(self.format_number(n) + self.suffix, self.base)
+                for n in range(self.first, self.last + 1))
 
   def __len__(self):
     return self.last - self.first + 1
@@ -526,7 +537,8 @@ class SignList:
   systems: dict[str, System]
   signs: list[SignLike]
   signs_by_name: dict[str, SignLike]
-  forms_by_name: dict[str, list[SignLike]]
+  forms_by_name: defaultdict[str, list[SignLike]]
+  forms_by_source: defaultdict[Tuple[Source, SourceRange], list[SignLike]]
 
   def __init__(self, name: str):
     self.name = name
@@ -535,6 +547,8 @@ class SignList:
     self.systems = {}
     self.signs = []
     self.signs_by_name = {}
+    self.forms_by_name = defaultdict(list)
+    self.forms_by_source = defaultdict(list)
 
   def add_source(self, source: Source):
     self.sources[source.abbreviation] = source
@@ -544,6 +558,16 @@ class SignList:
 
   def add_sign(self, sign: SignLike, parser: Parser):
     self.signs.append(sign)
+    if isinstance(sign, Sign):
+      for name in sign.names:
+        self.forms_by_name[name].append(sign)
+      for s in sign.sources:
+        self.forms_by_source[(s.source, s.number)].append(sign)
+      for form in sign.forms:
+        for name in form.names:
+          self.forms_by_name[name].append(form)
+        for s in form.sources:
+          self.forms_by_source[(s.source, s.number)].append(form)
     if isinstance(sign, Form):
       names = sign.names
     else:
@@ -601,3 +625,18 @@ print("\n".join(difflib.unified_diff(
     fromfile="ogsl.asl", tofile="formatted")))
 if str(SignList.parse(Parser(str(ogsl).splitlines(), "str(ogsl)"))) != str(ogsl):
   raise ValueError("Not idempotent")
+
+for l in ogsl.sources.values():
+  missing = []
+  for r in l.ranges():
+    for n in r:
+      if (l, n) not in ogsl.forms_by_source:
+        if not n.suffix and any(m.suffix and m.first == n.first for r in l.ranges() for m in r):
+          continue
+        missing.append(n)
+  if missing:
+    print(f"*** {len(missing)} missing numbers from {l.abbreviation}", file=sys.stderr)
+  else:
+    print(f"--- {len(missing)} missing numbers from {l.abbreviation}", file=sys.stderr)
+  if len(missing) < 20:
+    print(f"***   {' '.join(str(n) for n in missing)}", file=sys.stderr)
