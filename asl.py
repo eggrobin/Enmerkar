@@ -3,6 +3,7 @@
 
 import re
 from typing import Optional, Sequence, Tuple
+import difflib
 
 class RawEntry:
   def __init__(self, line: str, parser: "Parser"):
@@ -23,19 +24,19 @@ class Parser:
   lines: list[str]
   line_number: int
   context: str
-  
+
   def __init__(self, lines: list[str], context: str):
     self.lines = lines
-    self.line_number = 0 
-    self.context = context    
+    self.line_number = 0
+    self.context = context
 
   def peek(self) -> Optional[RawEntry]:
     old_line_number = self.line_number
-    entry = self.entry()
+    entry = self.next()
     self.line_number = old_line_number
     return entry
 
-  def entry(self) -> Optional[RawEntry]:
+  def next(self) -> Optional[RawEntry]:
     while self.line_number < len(self.lines):
       line = self.lines[self.line_number]
       self.line_number += 1
@@ -50,11 +51,11 @@ class Parser:
         result.text += "\n" + line.strip()
         self.line_number += 1
       else:
-        break      
+        break
     return result
 
   def raise_error(self, message: str):
-    raise SyntaxError(f"{self.context}:{self.line_number}: {message}")    
+    raise SyntaxError(f"{self.context}:{self.line_number}: {message}")
 
 
 class TextTag:
@@ -66,10 +67,10 @@ class TextTag:
 
   def __str__(self):
     return "@%s\t%s" % (self.tag, "\n\t".join(self.text.splitlines()))
-  
+
   @classmethod
   def parse(cls, parser: Parser, *args) -> "TextTag":
-    entry = parser.entry()
+    entry = parser.next()
     entry.validate(cls, parser)
     return cls(entry.text)
 
@@ -97,13 +98,13 @@ class Reference(Note):
 
 class UnicodeName(TextTag):
   tag = "uname"
-  
+
 class UnicodeSequence(TextTag):
   tag = "useq"
-  
+
 class UnicodeCuneiform(TextTag):
   tag = "ucun"
-  
+
 class UnicodeAge(TextTag):
   tag = "uage"
 
@@ -126,11 +127,11 @@ class Source:
   both the SignList type, representing the OGSL, and with Python lists.
   """
   tag = "listdef"
-  
+
   abbreviation: str
   numbers: set[SourceNumber]  # TODO(egg): Represent ranges etc. and keep the line structure.
   notes: list[Note]
-  
+
   def __init__(self, abbreviation: str, numbers: set[SourceNumber]):
     self.abbreviation = abbreviation
     self.numbers = numbers
@@ -138,10 +139,10 @@ class Source:
 
   @classmethod
   def parse(cls, parser: Parser) -> "Source":
-    entry = parser.entry()
+    entry = parser.next()
     entry.validate(cls, parser)
     abbreviation, numbers = entry.text.split(maxsplit=1)
-    result = cls(abbreviation, numbers)    
+    result = cls(abbreviation, numbers)
     while entry := parser.peek():
       for entry_type in (Note, *Note.__subclasses__()):
         if entry.tag == entry_type.tag:
@@ -157,7 +158,7 @@ class Source:
       self.abbreviation,
       "\n\t".join(self.numbers.splitlines()),
       "\n".join(str(note) for note in self.notes))
-  
+
 class Value:
   tag = "v"
   deprecated: bool
@@ -178,7 +179,7 @@ class Value:
 
   @classmethod
   def parse(cls, parser: Parser):
-    entry = parser.entry()
+    entry = parser.next()
     language = None
     args = entry.text
     if args.startswith('%'):
@@ -208,15 +209,15 @@ class SourceReference:
 
   @classmethod
   def parse(cls, parser: Parser, sources: dict[str, Source]):
-    entry = parser.entry()
+    entry = parser.next()
     entry.validate(cls, parser)
     abbreviation, number = re.split(r"(?=\d)", entry.text, maxsplit=1)
     return cls(sources[abbreviation], number)
-    
+
 class System:
   tag = "sysdef"
   name: str
-  notes: list[Note]  
+  notes: list[Note]
 
   def __init__(self, name: str):
     self.name = name
@@ -226,10 +227,10 @@ class System:
     return "\n".join((
       f"@{self.tag} {self.name}",
       *(str(note) for note in self.notes)))
-    
+
   @classmethod
   def parse(cls, parser: Parser) -> "System":
-    entry = parser.entry()
+    entry = parser.next()
     entry.validate(cls, parser)
     result = cls(entry.text)
     while entry := parser.peek():
@@ -263,10 +264,10 @@ class CompoundOnly(SignLike):
     return "\n".join((
       f"@{self.tag}\t{self.text}",
       *(str(note) for note in self.notes)))
-  
+
   @classmethod
   def parse(cls, parser: Parser, sources: dict[str, Source]) -> "Form":
-    entry = parser.entry()
+    entry = parser.next()
     entry.validate(cls, parser)
     result = cls(entry.text)
     result.deprecated = entry.deprecated
@@ -297,7 +298,7 @@ class Form:
   unicode_age: Optional[UnicodeAge]
   unicode_note: Optional[UnicodeNote]
   unicode_map: Optional[UnicodeNote]
-  
+
   values: list[Value]
   # system* is missing from formblock in the documentation, but really is used.
   systems: list[SystemBinding]
@@ -322,7 +323,7 @@ class Form:
     if entry.tag == "@":
       if entry.text:
         parser.raise_error(f"Unexpected args {entry.text} on endform")
-      parser.entry()
+      parser.next()
       return True
     return False
 
@@ -355,7 +356,7 @@ class Form:
 
   @classmethod
   def parse(cls, parser: Parser, sources: dict[str, Source]) -> "Form":
-    entry = parser.entry()
+    entry = parser.next()
     entry.validate(cls, parser)
     result = cls(entry.text)
     result.deprecated = entry.deprecated
@@ -365,7 +366,7 @@ class Form:
         break
       if entry.tag == "aka":
         result.names.append(entry.text)
-        parser.entry()
+        parser.next()
       elif entry.tag == PlusName.tag:
         result.pname = PlusName.parse(parser)
       elif entry.tag == SourceReference.tag:
@@ -394,7 +395,7 @@ class Form:
             result.notes.append(entry_type.parse(parser))
             break
         else:
-          if not result.parse_extension(parser, sources):            
+          if not result.parse_extension(parser, sources):
             parser.raise_error(f"Unexpected tag @{entry.tag} {entry.text}")
     else:
       parser.raise_error(f"Reached end of file within {cls.__name__} block")
@@ -418,22 +419,22 @@ class Sign(Form, SignLike):
   def parse_extension(self, parser: Parser, sources: dict[str, Source]):
     entry = parser.peek()
     if entry.tag == Form.tag:
-      self.forms.append(Form.parse(parser, sources))     
+      self.forms.append(Form.parse(parser, sources))
       return True
     return False
 
   @classmethod
   def check_end(cls, parser: Parser, entry: RawEntry):
     if entry.tag == "end" and entry.text == "sign":
-      parser.entry()
+      parser.next()
       return True
     return False
 
 class SignList:
-  tag = "signlist"  
+  tag = "signlist"
   name: str
   # Not documented, nor really used, except that one of the listdefs is
-  # @inoted out. 
+  # @inoted out.
   notes: list[Note]
   sources: dict[str, Source]
   systems: dict[str, System]
@@ -448,7 +449,7 @@ class SignList:
 
   def add_source(self, source: Source):
     self.sources[source.abbreviation] = source
-    
+
   def add_system(self, system: System):
     self.systems[system.name] = system
 
@@ -465,8 +466,8 @@ class SignList:
 
   @classmethod
   def parse(cls, parser: Parser) -> "SignList":
-    entry = parser.entry()
-    entry.validate(cls, parser) 
+    entry = parser.next()
+    entry.validate(cls, parser)
     result = cls(entry.text)
 
     while entry := parser.peek():
@@ -486,7 +487,7 @@ class SignList:
     return result
 
 with open(r"..\ogsl\00lib\ogsl.asl", encoding="utf-8") as f:
-  ogsl = SignList.parse(Parser(f.readlines(), "ogsl.asl"))
+  original_lines = f.read().splitlines()
+  ogsl = SignList.parse(Parser(original_lines, "ogsl.asl"))
 
-with open(r"..\ogsl\00lib\ogsl.asl", 'w', encoding="utf-8") as f:
-  f.write(str(ogsl))
+print("\n".join(difflib.unified_diff(original_lines, str(ogsl).splitlines())))
