@@ -4,6 +4,7 @@
 import re
 from typing import Optional, Sequence, Tuple
 import difflib
+import textwrap
 
 class RawEntry:
   def __init__(self, line: str, parser: "Parser"):
@@ -248,21 +249,48 @@ class SystemBinding(TextTag):
 class SignLike:
   pass
 
-class SourceOnly(SignLike, TextTag):
+class SourceOnly(SignLike):
   tag = "lref"
-
-class CompoundOnly(SignLike):
-  tag = "compoundonly"
-  text = str
+  name = str
   notes: list[Note]
 
-  def __init__(self, text: str):
-    self.text = text
+  def __init__(self, name: str):
+    self.name = name
     self.notes = []
 
   def __str__(self):
     return "\n".join((
-      f"@{self.tag}\t{self.text}",
+      f"@{self.tag}\t{self.name}",
+      *(str(note) for note in self.notes)))
+
+  @classmethod
+  def parse(cls, parser: Parser, sources: dict[str, Source]) -> "Form":
+    entry = parser.next()
+    entry.validate(cls, parser)
+    result = cls(entry.text)
+    result.deprecated = entry.deprecated
+
+    while entry := parser.peek():
+      for entry_type in (Note, *Note.__subclasses__()):
+        if entry.tag == entry_type.tag:
+          result.notes.append(entry_type.parse(parser))
+          break
+      else:
+        break
+    return result
+
+class CompoundOnly(SignLike):
+  tag = "compoundonly"
+  name = str
+  notes: list[Note]
+
+  def __init__(self, name: str):
+    self.name = name
+    self.notes = []
+
+  def __str__(self):
+    return "\n".join((
+      f"@{self.tag}\t{self.name}",
       *(str(note) for note in self.notes)))
 
   @classmethod
@@ -439,6 +467,8 @@ class SignList:
   sources: dict[str, Source]
   systems: dict[str, System]
   signs: list[SignLike]
+  signs_by_name: dict[str, SignLike]
+  forms_by_name: dict[str, list[SignLike]]
 
   def __init__(self, name: str):
     self.name = name
@@ -446,6 +476,7 @@ class SignList:
     self.sources = {}
     self.systems = {}
     self.signs = []
+    self.signs_by_name = {}
 
   def add_source(self, source: Source):
     self.sources[source.abbreviation] = source
@@ -453,8 +484,25 @@ class SignList:
   def add_system(self, system: System):
     self.systems[system.name] = system
 
-  def add_sign(self, sign: Sign):
+  def add_sign(self, sign: SignLike, parser: Parser):
     self.signs.append(sign)
+    if isinstance(sign, Form):
+      names = sign.names
+    else:
+      names = [sign.name]
+    for name in names:
+      if name in self.signs_by_name:
+        if self.signs_by_name[name].deprecated and not sign.deprecated:
+          del self.signs_by_name[name]
+        elif not self.signs_by_name[name] and sign.deprecated:
+          return
+        else:
+          parser.raise_error(
+              "Duplicate sign %s. Existing:\n%s\nNew:\n%s" % (
+                  name,
+                  textwrap.indent(str(self.signs_by_name[name]), '  '),
+                  textwrap.indent(str(sign), '  ')))
+      self.signs_by_name[name] = sign
 
   def __str__(self):
     return "\n\n".join((
@@ -480,7 +528,7 @@ class SignList:
       else:
         for entry_type in SignLike.__subclasses__():
           if entry.tag == entry_type.tag:
-            result.signs.append(entry_type.parse(parser, result.sources))
+            result.add_sign(entry_type.parse(parser, result.sources), parser)
             break
         else:
           parser.raise_error(f"Expected one of {SignLike.__subclasses__()}, got {entry.tag}")
