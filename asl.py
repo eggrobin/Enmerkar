@@ -490,4 +490,8 @@ with open(r"..\ogsl\00lib\ogsl.asl", encoding="utf-8") as f:
   original_lines = f.read().splitlines()
   ogsl = SignList.parse(Parser(original_lines, "ogsl.asl"))
 
-print("\n".join(difflib.unified_diff(original_lines, str(ogsl).splitlines())))
+print("\n".join(difflib.unified_diff(
+    original_lines, str(ogsl).splitlines(),
+    fromfile="ogsl.asl", tofile="formatted")))
+if str(SignList.parse(Parser(str(ogsl).splitlines(), "str(ogsl)"))) != str(ogsl):
+  raise ValueError("Not idempotent")
