@@ -2,9 +2,10 @@
 # https://github.com/oracc/ogsl/blob/53952bfcbe2a575f92522562fdff3b8fcfd757ab/00web/asl.xml.
 
 import re
-from typing import Optional, Sequence, Tuple
 import difflib
+import sys
 import textwrap
+from typing import Optional, Literal
 
 class RawEntry:
   def __init__(self, line: str, parser: "Parser"):
@@ -118,8 +119,51 @@ class UnicodeMap(TextTag):
 class UnicodeSequence(TextTag):
   tag = "useq"
 
-class SourceNumber:
-  pass
+class SourceRange:
+  def __init__(self, text: str, base: Optional[Literal[10, 16]] = None):
+    self.hex_prefix = text.startswith("0x")
+    self.base = base or (16 if self.hex_prefix else 10)
+    if '-' in text:
+      first, last = text.split('-')
+      self.first = int(first, self.base)
+      self.last = int(last, self.base)
+      self.suffix = ""
+      self.width = 0
+    else:
+      if self.hex_prefix:
+        text = text[2:]
+      if self.base == 10:
+        number, self.suffix = re.split(r"(?!\d)", text, maxsplit=1)
+      else:
+        number = text
+        self.suffix = ""
+      self.width = len(number)
+      self.first = int(number, self.base)
+      self.last = self.first
+
+  def __iter__(self):
+    yield from (SourceRange(self.format_number(n) + self.suffix, self.base) for n in range(self.first, self.last + 1))
+
+  def __len__(self):
+    return self.last - self.first + 1
+
+  def __contains__(self, n: "SourceRange"):
+    return n.suffix == self.suffix and n.first >= self.first and n.last <= self.last
+
+  def format_number(self, n: int):
+    if self.base == 16:
+      if self.hex_prefix:
+        return f"0x%0{self.width}X" % n
+      else:
+        return f"%0{self.width}X" % n
+    else:
+      return f"%0{self.width}d" % n
+
+  def __str__(self):
+    if self.first == self.last:
+      return self.format_number(self.first) + self.suffix
+    else:
+      return self.format_number(self.first) + "-" + self.format_number(self.last)
 
 class Source:
   """A classical sign list, e.g., RÉC, MZL, etc.
@@ -130,20 +174,27 @@ class Source:
   tag = "listdef"
 
   abbreviation: str
-  numbers: set[SourceNumber]  # TODO(egg): Represent ranges etc. and keep the line structure.
+  numbers: list[list[SourceRange]]
   notes: list[Note]
+  base: Literal[10, 16]
 
-  def __init__(self, abbreviation: str, numbers: set[SourceNumber]):
+  def ranges(self):
+    yield from (r for line in self.numbers for r in line)
+
+  def __init__(self, abbreviation: str, numbers: list[list[SourceRange]]):
     self.abbreviation = abbreviation
     self.numbers = numbers
     self.notes = []
+    self.base = numbers[0][0].base
+    if not all(r.base == self.base for line in numbers for r in line):
+      raise ValueError(f"All list numbers do not have the same base in {self.abbreviation}")
 
   @classmethod
   def parse(cls, parser: Parser) -> "Source":
     entry = parser.next()
     entry.validate(cls, parser)
     abbreviation, numbers = entry.text.split(maxsplit=1)
-    result = cls(abbreviation, numbers)
+    result = cls(abbreviation, [[SourceRange(r) for r in line.split()] for line in numbers.splitlines()])
     while entry := parser.peek():
       for entry_type in (Note, *Note.__subclasses__()):
         if entry.tag == entry_type.tag:
@@ -157,7 +208,7 @@ class Source:
     return "@%s %s %s\n%s" % (
       self.tag,
       self.abbreviation,
-      "\n\t".join(self.numbers.splitlines()),
+      "\n\t".join(' '.join(str(number) for number in line) for line in self.numbers),
       "\n".join(str(note) for note in self.notes))
 
 class Value:
@@ -199,11 +250,17 @@ class Value:
 class SourceReference:
   tag = "list"
   source: Source
-  number: SourceNumber
+  number: SourceRange
+  questionable: bool
 
-  def __init__(self, source: Source, number: SourceNumber):
+  def __init__(self, source: Source, number: SourceRange, questionable: bool = False):
     self.source = source
     self.number = number
+    self.questionable = questionable
+    if len(number) != 1:
+      raise ValueError(f"SourceReference must have a single {source.abbreviation} number, got {number}")
+    if not any(number in r for r in source.ranges()):
+      print(f"*** Undeclared number {source.abbreviation}{number}", file=sys.stderr)
 
   def __str__(self):
     return f"@list\t{self.source.abbreviation}{self.number}"
@@ -213,7 +270,8 @@ class SourceReference:
     entry = parser.next()
     entry.validate(cls, parser)
     abbreviation, number = re.split(r"(?=\d)", entry.text, maxsplit=1)
-    return cls(sources[abbreviation], number)
+    source = sources[abbreviation]
+    return cls(source, SourceRange(number.rstrip("?"), source.base), number.endswith("?"))
 
 class System:
   tag = "sysdef"
