@@ -185,20 +185,27 @@ class Source:
   tag = "listdef"
 
   abbreviation: str
-  numbers: list[list[SourceRange]]
+  range_lines: list[list[SourceRange]]
   notes: list[Note]
   base: Literal[10, 16]
 
-  def ranges(self):
-    yield from (r for line in self.numbers for r in line)
-
-  def __init__(self, abbreviation: str, numbers: list[list[SourceRange]]):
+  def __init__(self, abbreviation: str, range_lines: list[list[SourceRange]]):
     self.abbreviation = abbreviation
-    self.numbers = numbers
+    self.range_lines = range_lines
     self.notes = []
-    self.base = numbers[0][0].base
-    if not all(r.base == self.base for line in numbers for r in line):
+    self.base = next(self.ranges()).base
+    if not all(r.base == self.base for line in range_lines for r in line):
       raise ValueError(f"All list numbers do not have the same base in {self.abbreviation}")
+
+  def ranges(self):
+    yield from (r for line in self.range_lines for r in line)
+
+  def __iter__(self):
+    for r in self.ranges():
+      yield from r
+
+  def __contains__(self, n: "SourceRange"):
+    return any(n in r for r in self.ranges())
 
   @classmethod
   def parse(cls, parser: Parser) -> "Source":
@@ -219,7 +226,7 @@ class Source:
     return "@%s %s %s\n%s" % (
       self.tag,
       self.abbreviation,
-      "\n\t".join(' '.join(str(number) for number in line) for line in self.numbers),
+      "\n\t".join(' '.join(str(number) for number in line) for line in self.range_lines),
       "\n".join(str(note) for note in self.notes))
 
 class Value:
@@ -270,7 +277,7 @@ class SourceReference:
     self.questionable = questionable
     if len(number) != 1:
       raise ValueError(f"SourceReference must have a single {source.abbreviation} number, got {number}")
-    if not any(number in r for r in source.ranges()):
+    if number not in source:
       print(f"*** Undeclared number {source.abbreviation}{number}", file=sys.stderr)
 
   def __str__(self):
@@ -538,7 +545,7 @@ class SignList:
   signs: list[SignLike]
   signs_by_name: dict[str, SignLike]
   forms_by_name: defaultdict[str, list[SignLike]]
-  forms_by_source: defaultdict[Tuple[Source, SourceRange], list[SignLike]]
+  forms_by_source: defaultdict[Source, defaultdict[SourceRange, list[SignLike]]]
 
   def __init__(self, name: str):
     self.name = name
@@ -548,7 +555,7 @@ class SignList:
     self.signs = []
     self.signs_by_name = {}
     self.forms_by_name = defaultdict(list)
-    self.forms_by_source = defaultdict(list)
+    self.forms_by_source = defaultdict(lambda: defaultdict(list))
 
   def add_source(self, source: Source):
     self.sources[source.abbreviation] = source
@@ -562,12 +569,12 @@ class SignList:
       for name in sign.names:
         self.forms_by_name[name].append(sign)
       for s in sign.sources:
-        self.forms_by_source[(s.source, s.number)].append(sign)
+        self.forms_by_source[s.source][s.number].append(sign)
       for form in sign.forms:
         for name in form.names:
           self.forms_by_name[name].append(form)
         for s in form.sources:
-          self.forms_by_source[(s.source, s.number)].append(form)
+          self.forms_by_source[s.source][s.number].append(form)
     if isinstance(sign, Form):
       names = sign.names
     else:
@@ -626,17 +633,16 @@ print("\n".join(difflib.unified_diff(
 if str(SignList.parse(Parser(str(ogsl).splitlines(), "str(ogsl)"))) != str(ogsl):
   raise ValueError("Not idempotent")
 
-for l in ogsl.sources.values():
+for source in ogsl.sources.values():
   missing = []
-  for r in l.ranges():
-    for n in r:
-      if (l, n) not in ogsl.forms_by_source:
-        if not n.suffix and any(m.suffix and m.first == n.first for r in l.ranges() for m in r):
-          continue
-        missing.append(n)
+  for n in source:
+    if n not in ogsl.forms_by_source[source]:
+      if not n.suffix and any(m.suffix and m.first == n.first for m in source):
+        continue
+      missing.append(n)
   if missing:
-    print(f"*** {len(missing)} missing numbers from {l.abbreviation}", file=sys.stderr)
+    print(f"*** {len(missing)} missing numbers from {source.abbreviation}", file=sys.stderr)
   else:
-    print(f"--- {len(missing)} missing numbers from {l.abbreviation}", file=sys.stderr)
+    print(f"--- {len(missing)} missing numbers from {source.abbreviation}", file=sys.stderr)
   if len(missing) < 20:
     print(f"***   {' '.join(str(n) for n in missing)}", file=sys.stderr)
