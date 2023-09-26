@@ -403,6 +403,8 @@ class Form:
   unicode_note: Optional[UnicodeNote]
   unicode_map: Optional[UnicodeNote]
 
+  sign: Optional["Sign"]
+
   values: list[Value]
   # system* is missing from formblock in the documentation, but really is used.
   systems: list[SystemBinding]
@@ -421,6 +423,7 @@ class Form:
     self.unicode_note = None
     self.unicode_map = None
     self.fake = None
+    self.sign = None
 
   @classmethod
   def check_end(cls, parser: Parser, entry: RawEntry):
@@ -524,7 +527,9 @@ class Sign(Form, SignLike):
   def parse_extension(self, parser: Parser, sources: dict[str, Source]):
     entry = parser.peek()
     if entry.tag == Form.tag:
-      self.forms.append(Form.parse(parser, sources))
+      form = Form.parse(parser, sources)
+      form.sign = self
+      self.forms.append(form)
       return True
     return False
 
@@ -545,8 +550,8 @@ class SignList:
   systems: dict[str, System]
   signs: list[SignLike]
   signs_by_name: dict[str, SignLike]
-  forms_by_name: defaultdict[str, list[SignLike]]
-  forms_by_source: defaultdict[Source, defaultdict[SourceRange, list[SignLike]]]
+  forms_by_name: defaultdict[str, list[Form]]
+  forms_by_source: defaultdict[Source, defaultdict[SourceRange, list[Form]]]
 
   def __init__(self, name: str):
     self.name = name
@@ -554,6 +559,7 @@ class SignList:
     self.sources = {}
     self.systems = {}
     self.signs = []
+
     self.signs_by_name = {}
     self.forms_by_name = defaultdict(list)
     self.forms_by_source = defaultdict(lambda: defaultdict(list))
@@ -593,6 +599,16 @@ class SignList:
                   textwrap.indent(str(self.signs_by_name[name]), '  '),
                   textwrap.indent(str(sign), '  ')))
       self.signs_by_name[name] = sign
+
+  def add_source_mapping(self, name: str, source: Source, n: SourceRange):
+    if len(n) != 1:
+      raise ValueError(f"{n} should be a singleton")
+    if name not in self.forms_by_name:
+      raise KeyError(f"{name} not found")
+    for form in self.forms_by_name[name]:
+      form.sources.append(SourceReference(source, n))
+      form.sources = sorted(form.sources, key=lambda s: s.source.abbreviation)
+      self.forms_by_source[source][n].append(form)
 
   def __str__(self):
     return "\n\n".join((
