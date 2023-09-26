@@ -281,7 +281,7 @@ class SourceReference:
       print(f"*** Undeclared number {source.abbreviation}{number}", file=sys.stderr)
 
   def __str__(self):
-    return f"@list\t{self.source.abbreviation}{self.number}"
+    return f"@list\t{self.source.abbreviation}{self.number}{'?' if self.questionable else ''}"
 
   @classmethod
   def parse(cls, parser: Parser, sources: dict[str, Source]):
@@ -503,6 +503,7 @@ class Form:
             parser.raise_error(f"Unexpected tag @{entry.tag} {entry.text}")
     else:
       parser.raise_error(f"Reached end of file within {cls.__name__} block")
+    result.sources = sorted(result.sources, key=lambda s: s.source.abbreviation)
     return result
 
 class Sign(Form, SignLike):
