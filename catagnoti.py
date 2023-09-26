@@ -3,15 +3,17 @@ import unicodedata
 
 import asl
 from asl import ogsl, SourceRange
+import difflib
 
 forms = [form for forms in ogsl.forms_by_name.values() for form in forms]
+
+old_formatted_ogsl = str(ogsl)
 
 elles = ogsl.sources["ELLES"]
 lak = ogsl.sources["LAK"]
 
 def ellesify(ogsl_name, elles_number):
-  for form in ogsl.forms_by_name[ogsl_name]:
-    ogsl.add_source_mapping(ogsl_name, elles, SourceRange("%03d" % elles_number))
+  ogsl.add_source_mapping(ogsl_name, elles, SourceRange("%03d" % elles_number))
 
 ellesify("|DIM×MAŠ|", 32)
 ellesify("|UMUM×HA|", 86)
@@ -20,7 +22,7 @@ ellesify("ANŠE", 140)  # Note that the ELLes reference to MEE 45 is off-by-one 
 ellesify("PIRIG", 144)
 ellesify("LAK247", 145)
 ellesify("LAK247", 146)
-ellesify("ERIN₂", 159)  # Lost because of the ad hoc disunification in 𒂗𒈨𒅕𒃸.
+#ellesify("ERIN₂", 159)  # Lost because of the ad hoc disunification in 𒂗𒈨𒅕𒃸.
 ellesify("GIDIM", 191)
 ellesify("|ŠA₃×SAL|", 231)
 ellesify("|LAK449×(AN.EŠ₂)|", 235)
@@ -29,6 +31,10 @@ ellesify("ELLES302", 302)  # Not a terribly difficult identification…
 ellesify("EREN", 327)
 ellesify("|GA₂×(NE.E₂)|", 374)
 ellesify("|A×HA|", 394)
+
+with open("ellesify.diff", "w", encoding="utf-8", newline='\n') as f:
+  print("\n".join(difflib.unified_diff(old_formatted_ogsl.splitlines(), str(ogsl).splitlines(),fromfile="a/00lib/ogsl.asl",tofile="b/00lib/ogsl.asl", lineterm="")), file=f)
+
 
 ogsl.forms_by_name["LAK776"][0].unicode_cuneiform = asl.UnicodeCuneiform("𒇻𒄾")
 # See comment in read_ogsl.
