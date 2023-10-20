@@ -16,12 +16,13 @@ def ellesify(ogsl_name, elles_number):
   ogsl.add_source_mapping(ogsl_name, elles, SourceRange("%03d" % elles_number))
 
 ellesify("|DIM×MAŠ|", 32)
+ellesify("ARAD", 35)
 ellesify("|UMUM×HA|", 86)
 ellesify("|MUŠ×KUR|", 134)
-ellesify("ANŠE", 140)  # Note that the ELLes reference to MEE 45 is off-by-one in column numbers.
+ellesify("ANŠE", 140)
 ellesify("PIRIG", 144)
 ellesify("LAK247", 145)
-ellesify("LAK247", 146)
+ellesify("PEŠ₂", 146)
 #ellesify("ERIN₂", 159)  # Lost because of the ad hoc disunification in 𒂗𒈨𒅕𒃸.
 ellesify("GIDIM", 191)
 ellesify("|ŠA₃×SAL|", 231)
