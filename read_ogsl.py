@@ -119,7 +119,7 @@ main_forms_by_name = {}
 forms_by_name = {}
 
 class Form:
-  def __init__(self, name, form_id, sign, values, codepoints, sign_or_form_line=None, ucode_line=None):
+  def __init__(self, name, form_id, sign, values, codepoints, sign_or_form_line=None, ucode_line=None, umap=None):
     self.name = name
     self.original_name = self.name
     self.form_id = form_id
@@ -129,6 +129,7 @@ class Form:
     self.original_codepoints = self.codepoints
     self.sign_or_form_line = sign_or_form_line
     self.ucode_line = ucode_line
+    self.umap = umap
     self.lists = []
 
   def __str__(self):
@@ -144,15 +145,15 @@ try:
     i += 1
     if line.strip().startswith("#"):
       continue
-    tokens = line.split()
+    tokens = re.split(r'[\t\x20]', line)
     if not tokens:
       continue
     if tokens[0] == "@sign" or tokens[0] == "@form" or tokens[:2] == ["@end", "sign"]:
       if name:
         if form_id:
-          form = Form(name, form_id, main_forms_by_name[sign_name], values, codepoints, sign_or_form_line, ucode_line)
+          form = Form(name, form_id, main_forms_by_name[sign_name], values, codepoints, sign_or_form_line, ucode_line, umap)
         else:
-          form = Form(name, form_id, None, values, codepoints, sign_or_form_line, ucode_line)
+          form = Form(name, form_id, None, values, codepoints, sign_or_form_line, ucode_line, umap)
           if name in main_forms_by_name and name not in ("LAK499", "LAK712"):  # TODO(egg): Deduplicate.
             raise ValueError(f"Duplicate signs {name}: {main_forms_by_name[name]} and {form}")
           main_forms_by_name[name] = form
@@ -167,6 +168,7 @@ try:
       values = []
       sign_or_form_line = None
       ucode_line = None
+      umap = None
     if tokens[0] == "@sign":
       if len(tokens) != 2:
         raise ValueError(tokens)
@@ -175,14 +177,16 @@ try:
       form_id = None
       sign_or_form_line = i
     if tokens[0] == "@form":
-      if len(tokens) != 3 and not tokens[3][0] in ("x", "["):
+      if len(tokens) != 2 and not tokens[2][0] in ("x", "["):
         raise ValueError(tokens)
       name = tokens[-1]
-      form_id = tokens[1]
+      form_id = name
       sign_or_form_line = i
     if tokens[0] == "@list" and '"' not in tokens[1] and tokens[1] != "KWU":
       [list_name, number] = re.split(r"(?=\d)", tokens[1], 1)
       number = number.lstrip("0");
+      if list_name == "U+":
+        continue
       if list_name == "SLLHA":
         for l in ("ŠL", "MÉA"):
           lists.append(l + number)
@@ -193,11 +197,12 @@ try:
         if tokens[1] in ("%akk", "%elx", "#nib", "#old", "#struck"):  # What do the # annotations mean?
           value = tokens[2]
         elif tokens[1] == "%akk/n":
-          continue  # These values seem to be sumerograms in normalized Akkadian spelling, out of scope for now.
+          continue  # These values seem to be sumerograms in normalized Akkadian spelling, out of scope for now
         else:
           raise ValueError(tokens)
       elif '@' in tokens[1]:
         print(f"@ in value: {tokens}")
+        continue
       else:
         if len(tokens) > 2 and not tokens[2].startswith("["):
           raise ValueError(tokens)
@@ -221,9 +226,9 @@ try:
           continue
       if value in ("?", "x", "xₓ") or value.endswith("?"):
         continue
-      if "[...]" in value:
+      if "[...]" in value or "x" in value:
         continue
-      if value[0] in '1234567890' or value == "oo":
+      if value[0] in '1234567890' or value == "oo" or value == "::":
         continue  # We do numeric values by hand.
       if value in "dfm":
         # We do determinative shorthands by hand.
@@ -240,20 +245,36 @@ try:
       value = value.replace("'", "ʾ")
 
       values.append(value)
-    if tokens[0] == "@ucode":
+    if tokens[0] == "@ucun":
       ucode_line = i
       if len(tokens) != 2:
         raise ValueError(tokens)
-      codepoints = ''.join((x if x in ("X", "None") else chr(int("0" + x, 16)) for x in tokens[-1].split(".")))
+      codepoints = tokens[-1]
       for c in codepoints:
         if ord(c) >= 0xE000 and ord(c) <= 0xF8FF:
           codepoints = None
           break
+    if tokens[0] == "@umap":
+      if len(tokens) != 2:
+        raise ValueError(tokens)
+      umap = tokens[1]
 except Exception as e:
   print(f"line {i}:")
   print(line)
   print(e)
   raise
+
+# Process umap.
+for name, forms in forms_by_name.items():
+  for form in forms:
+    if form.umap:
+      if form.codepoints:
+        raise ValueError(f"{form} has umap and ucun")
+      if form.umap not in forms_by_name:
+        raise ValueError(f"{form} has umap to unknown {form.umap}")
+      if not forms_by_name[form.umap][0].codepoints:
+        raise ValueError(f"{form} has umap unencoded {forms_by_name[form.umap][0]}")
+      form.codepoints = forms_by_name[form.umap][0].codepoints
 
 for name, forms in forms_by_name.items():
   encodings = sorted(set(form.codepoints for form in forms if form.codepoints))
@@ -321,6 +342,7 @@ rename("|NI.UD|", "NA₄")
 rename("|IM.NI.UD|", "|IM.NA₄|")
 rename("|NI.UD.EN|", "|NA₄.EN|")
 rename("|NI.UD.KI|", "|NA₄.KI|")
+rename("|NI.UD.KISIM₅×(U₂.GIR₂)|", "|NA₄.KISIM₅×(U₂.GIR₂)|")
 
 disunify(["ERIN₂"],
          [Form("ERIN₂", None, None,
@@ -351,41 +373,6 @@ main_forms_by_name["EŠE₃"] = Form("EŠE₃", None, None, ["eše₃"], "𒑘")
 forms_by_name["EŠE₃"] = [main_forms_by_name["EŠE₃"]]
 
 # OGSL naming bugs handled here.
-
-# Unnormalized |GAD+TAK₄.DUH| (neither has values).
-del main_forms_by_name["|GAD+KID₂.DUH|"]
-del forms_by_name["|GAD+KID₂.DUH|"]
-# Unnormalized |A.GISAL.GAD.GAR.A.SI| (both with the value addirₓ).
-del main_forms_by_name["|A.GISAL.GADA.GAR.A.SI|"]
-del forms_by_name["|A.GISAL.GADA.GAR.A.SI|"]
-
-# Insufficiently decomposed/normalized in OGSL.
-for name in ("|DIM×EŠ|", "|KA×EŠ|",
-             "|LAK617×MIR|",
-             "|KAR.MUŠ|",
-             "|ŠE₃.TU.BU|",
-             "|ŠUL.GI|",
-#             "|UD.MUD.NUN.KI|",
-             "|IM.LAK648|",
-             "|E₃.E₃|",
-             "|KUD.KUD|"):
-  rename(name,
-         name.replace(
-             "EŠ", "(U.U.U)").replace(
-             "MIR", "DUN3@g@g").replace(
-             "KAR", "TE.A").replace(
-             "ŠE₃", "EŠ₂").replace(
-             "ŠUL", "DUN").replace(
-             "MUD", "HU.HI").replace(
-             # Not sure what to make of the following @note in |URU×MIN|; but it is called |URU×MIN|, so shrug.
-             # LAK648 is GIŠGAL, but is not properly described as URU×MIN. Many of the URU× signs are LAK648× in ED.
-             "LAK648", "URU×MIN").replace(
-             # The entry has the @inote this is a deliberate exception to what should be |UD.DU.UD.DU|.
-             # Not sure why this exception.  There are no values for this one anyway.
-             "E₃", "UD.DU").replace(
-             "KUD", "TAR"))
-
-rename("|ŠU₂.NESAG|", "|ŠU₂.NISAG|")
 
 # LAK207 looks to me like ŠE.HUB₂, not (ŠE&ŠE).HUB₂.
 # Conventiently Unicode has the former and not the latter.
@@ -521,15 +508,6 @@ for name, forms in forms_by_name.items():
     if name == "|DIŠ.DIŠ.DIŠ.U.U.U|":
       form.codepoints = "𒐈𒌍"
 
-
-    # See https://github.com/oracc/ogsl/commit/11f04981b49131894bc5cba543f09b255985b1a2.
-    # There may be a problem, but not having a codepoint for de₂ is not a
-    # solution.  We let UMUM×KASKAL = de₂, and consider that making it
-    # look like an UMUM šeššig is a problem for the font.
-    if name == "DE₂":
-      form.codepoints = "𒌤"
-
-
     # Unicode 7.0 fanciness, except disunifications.
     if "NI.UD" in name:
       raise ValueError(f"NI.UD in {form}")
@@ -548,6 +526,8 @@ for name, forms in forms_by_name.items():
       else:
         break
     else:
+      if encoding:
+        print(f"WARNING: {name} has no ucun but it can be derived as {encoding} from {components}")
       for form in forms:
         form.codepoints = encoding
       print(f"Encoding {forms[0] if len(forms) == 1 else forms} from {components}")
@@ -556,6 +536,9 @@ for name, forms in forms_by_name.items():
 for name, forms in forms_by_name.items():
   encoding = forms[0].codepoints
   if not encoding:
+    continue
+
+  if 'X' in encoding:
     continue
 
   if name == "ASAL₂~a":
@@ -574,10 +557,13 @@ for name, forms in forms_by_name.items():
     # Both are given the reading gigir₃.  Shrug.
     continue
 
-  if name== "OO":
+  if name== "OO" or name=="O":
     continue
 
   expected_unicode_name = compute_expected_unicode_name(name)
+
+  if expected_unicode_name == "PESH2~v":
+    expected_unicode_name = "PESH2 ASTERISK"
 
   # Misnaming in Unicode? U+12036 ARKAB 𒀶 is (looking at the reference
   # glyph) LAK296, to which OGSL gives the value arkab₂, arkab being
@@ -585,10 +571,12 @@ for name, forms in forms_by_name.items():
   expected_unicode_name = expected_unicode_name.replace("ARKAB2", "ARKAB")
 
   # OGSL decomposes 𒍧 and 𒍦, Unicode does not (perhaps for length reasons?).
-  if expected_unicode_name == " OVER ".join(4 * ["ASH KABA TENU"]):
-    expected_unicode_name = "ZIB KABA TENU"
-  if expected_unicode_name == " OVER ".join(4 * ["ASH ZIDA TENU"]):
-    expected_unicode_name = "ZIB"
+  expected_unicode_name = expected_unicode_name.replace(
+      " OVER ".join(4 * ["ASH KABA TENU"]),
+      "ZIB KABA TENU")
+  expected_unicode_name = expected_unicode_name.replace(
+      " OVER ".join(4 * ["ASH ZIDA TENU"]),
+      "ZIB")
 
   if expected_unicode_name == "BURU5":
     # Quoth the OGSL: @note The NB source for Ea II (LKU 1) describes BURU₅ as NAM nutillû.
@@ -601,10 +589,10 @@ for name, forms in forms_by_name.items():
   # OGSL never decomposes LAL₂, so lets’ treat this as intentional.
   expected_unicode_name = expected_unicode_name.replace("LAL2", "LAL TIMES LAL")
 
-  if expected_unicode_name == "SHAR2 TIMES 1U":
+  if expected_unicode_name == "SHAR2 TIMES U":
     expected_unicode_name = "HI TIMES U"
 
-  if expected_unicode_name == "GISHGAL TIMES IGI":
+  if expected_unicode_name == "URU TIMES MIN TIMES IGI":
     expected_unicode_name = "LAK-648 TIMES IGI"
 
   if expected_unicode_name == "KU4~a":
@@ -620,6 +608,10 @@ for name, forms in forms_by_name.items():
     expected_unicode_name = "PA LAGAB TIMES GUD PLUS GUD"
   if expected_unicode_name == "SAL LAGAB TIMES GUD OVER GUD":
     expected_unicode_name = "SAL LAGAB TIMES GUD PLUS GUD"
+  if expected_unicode_name == "LAGAB TIMES GUD OVER GUD A":
+    expected_unicode_name = "LAGAB TIMES GUD PLUS GUD A"
+  if expected_unicode_name == "LAGAB TIMES GUD OVER GUD HUL2":
+    expected_unicode_name = "LAGAB TIMES GUD PLUS GUD HUL2"
 
   # OGSL has no MA×TAK₄, Unicode has no MA GUNU TIMES TAK4.
   # This is probably fine, though I don’t know where the gunû went.
@@ -647,6 +639,8 @@ for name, forms in forms_by_name.items():
   # get the alias...
   if expected_unicode_name == "NU11 TENU":
     expected_unicode_name = "SHIR TENU"
+  if expected_unicode_name == "NU11 TENU SILA3":
+    expected_unicode_name = "SHIR TENU SILA3"
   elif expected_unicode_name == "NU11 OVER NU11 BUR OVER BUR":
     expected_unicode_name = "SHIR OVER SHIR BUR OVER BUR"
 
@@ -658,10 +652,22 @@ for name, forms in forms_by_name.items():
   if expected_unicode_name == "LAK-212":
     expected_unicode_name = "ASAL2"
 
-  if expected_unicode_name == "SHE NUN OVER NUN":  # Not decomposed in Unicode.
-    expected_unicode_name = "TIR"
-  if "SHE PLUS NUN OVER NUN" in expected_unicode_name:
-    expected_unicode_name = expected_unicode_name.replace("SHE PLUS NUN OVER NUN", "TIR")
+  # Not decomposed in Unicode.
+  expected_unicode_name = expected_unicode_name.replace("SHE NUN OVER NUN", "TIR")
+  expected_unicode_name = expected_unicode_name.replace("SHE PLUS NUN OVER NUN", "TIR")
+
+
+
+  # Quirky Unicode 7.0 names.
+  # Unicode has KU3 but AMAR TIMES KUG.
+  if expected_unicode_name == "AMAR TIMES KU3":
+    expected_unicode_name = "AMAR TIMES KUG"
+  # Similarly DUN but KA TIMES SHUL.
+  if expected_unicode_name == "KA TIMES DUN":
+    expected_unicode_name = "KA TIMES SHUL"
+  # And SIX DISH but KA TIMES ASH3.
+  if expected_unicode_name == "KA TIMES 6DISH":
+    expected_unicode_name = "KA TIMES ASH3"
 
   # Sometimes (but not always) decomposed in OGSL, not decomposed in Unicode.
   if expected_unicode_name == "SHU2 DUN3 GUNU GUNU SHESHIG":
@@ -735,11 +741,13 @@ for value, forms_by_codepoints in encoded_forms_by_value.items():
                 for form in forms if not form.form_id]
   if "ₓ" not in value and len(forms_by_codepoints) > 1:
     if len(main_forms) > 1:
-      print(f"Multiple main forms with non-ₓ value {value}: {main_forms}")
+      raise ValueError(f"Multiple main forms with non-ₓ value {value}: {main_forms}")
     elif not main_forms:
-      print(f"Multiple variant forms and no main form with non-ₓ value {value}: {forms_by_codepoints.values()}")
+      #print(f"Multiple variant forms and no main form with non-ₓ value {value}: {forms_by_codepoints.values()}")
+      pass
     else:
-      print(f"Multiple forms (one main) with non-ₓ value {value}: {forms_by_codepoints.values()}")
+      #print(f"Multiple forms (one main) with non-ₓ value {value}: {forms_by_codepoints.values()}")
+      pass
 
 for value, forms_by_codepoints in encoded_forms_by_value.items():
   for c in value:
@@ -748,8 +756,9 @@ for value, forms_by_codepoints in encoded_forms_by_value.items():
       raise ValueError(f"Unexpected character {c} in value {value} for {'; '.join(forms_by_codepoints.keys())}")
       break
 
-encoded_signs = set(form.codepoints for forms in forms_by_name.values() for form in forms)
-encoded_signs_with_values = set(form.codepoints for forms in forms_by_name.values() for form in forms if form.values)
+encoded_signs = {form.codepoints: form for forms in forms_by_name.values() for form in forms}
+encoded_signs_with_list_numbers = {form.codepoints: form.lists for forms in forms_by_name.values() for form in forms if form.lists}
+encoded_signs_with_values = {form.codepoints: form.values for forms in forms_by_name.values() for form in forms if form.values}
 
 NON_SIGNS = set((
   # @nosign |A×GAN₂@t|
@@ -789,8 +798,6 @@ NON_SIGNS = set((
   "𒁿", "𒍶",
   # No idea where that comes from.  Maybe look for it HethZL?
   "𒍾",
-  # MZL067, Hittite, no values, not in the OGSL.
-  "𒍿",
   # No idea for that one either.
   "𒎁",
   "𒎅",
@@ -810,6 +817,46 @@ NON_SIGNS = set((
   "𒀼", "𒅓", "𒇹",
   "𒊪", # Turned into a @nosign with: @inote unicode revision needed/deleted; sign is |ZUM×TUG₂| = LAK524.
   "𒍴", # Baffling disunification.
+  # EZEN×ḪA@g: https://oracc.iaas.upenn.edu/dcclt/signlists/P365252?P365252.57
+  # MSL 14, 497 A1.
+  # MZL 291 (EZEN×ḪA) cites MSL 14 497 101 (? Lw. z.T. abgebrochen).
+  # https://www.britishmuseum.org/collection/object/W_1880-1112-11, no photo.
+  "𒂪",
+  "𒃀", # GA₂×(BAR.RA) eburra? gaburraₓ?  ???
+  "𒃬", # GA₂×(UD.DU) [...]e  ???
+  # GABA%GABA: http://oracc.iaas.upenn.edu/dcclt/P368988?P368988.22,P368988.23#P368988.17
+  # MSL 14 484.
+  # MZL does cite it for other signs, but does not mention this.
+  "𒃯",
+  "𒄺", # HUB₂×HAL. ???
+  "𒄼", # HUB₂×LIŠ. ???
+  "𒅟", # KA×BI. ???
+  # KA×GI. DCCLT ED Metals; even in MEE 03, 026:
+  # http://oracc.iaas.upenn.edu/dcclt/P240968/ o vi 8 sqq.
+  # But ELLes has 26 r. VI 8 at ELLes 182 = LAK 318, normal 𒅗.
+  "𒅧",
+  "𒅳",  # KA×LU pu-udu.  ???
+  "𒅹",  # KA×(MI.NUNUZ). ???
+  # KA₂×KA₂: http://oracc.museum.upenn.edu/dcclt/signlists/P391514?P391514.7#P391514.2
+  # MSL 14, 353 A
+  "𒆎",
+  "𒆖", # KAK×IGI@g. ???
+  # LAGAB×ME: http://oracc.museum.upenn.edu/dcclt/signlists/P365261?P365261.140,
+  # variant form of LAGAB×A.
+  # MSL 14, 207 A.  Note the transliteration LAGAB×A is inconsistent with the copy.
+  # Also LAGAB×ME in LAGAB×ME.EN http://oracc.iaas.upenn.edu/dcclt/signlists/Q000145?Q000145.173
+  # But not in the score; could it be LAGAB×(ME.EN)?
+  "𒇘",
+  # [...]tallu. https://oracc.museum.upenn.edu/dcclt/P258842?P258842.46
+  # MSL 14, pp. 461—65.
+  "𒈍",
+  "𒊛", # SAG×KUR http://oracc.museum.upenn.edu/dcclt/signlists/P230117.5.3
+  "𒌭", # UR₂×(A.NA). ???
+  "𒌳", # UR₂×(U₂.BI) ar[...]. https://oracc.museum.upenn.edu/dcclt/P258842?P258842.140
+  "𒍅", # URU×KI https://oracc.museum.upenn.edu/dcclt/P345354?P345354.399
+  "𒍆", # URU×LUM ???
+  "𒎆", # KA×TU, variant form of šeg₅ e.g. in http://oracc.iaas.upenn.edu/dcclt/Q003221/
+  "𒎍", # MUŠ₃×ZA, variant form of something.
 ))
 
 for u in range(0x12000, 0x12550):  # Cuneiform, Cuneiform numbers and punctuation, Early Dynastic cuneiform.
@@ -820,9 +867,25 @@ for u in range(0x12000, 0x12550):  # Cuneiform, Cuneiform numbers and punctuatio
   if unicodedata.name(chr(u)).startswith("CUNEIFORM PUNCTUATION SIGN"):
     continue
   if chr(u) in NON_SIGNS:
+    if chr(u) in encoded_signs_with_values:
+      raise KeyError(f"""Non-sign U+{u:X} {
+        unicodedata.name(chr(u))} {chr(u)} has values {
+        encoded_signs_with_values[chr(u)]}""")
+    if chr(u) in encoded_signs_with_list_numbers:
+      raise KeyError(f"""Non-sign U+{u:X} {
+        unicodedata.name(chr(u))} {chr(u)} has list numbers {
+        encoded_signs_with_list_numbers[chr(u)]}""")
     continue
   if chr(u) not in encoded_signs:
     raise KeyError(f"No form U+{u:X} {unicodedata.name(chr(u))} {chr(u)}")
+  if (chr(u) not in encoded_signs_with_values and
+      chr(u) not in encoded_signs_with_list_numbers):
+    message = f"""Neither form nor list number for U+{u:X} {
+        unicodedata.name(chr(u))} {chr(u)} {encoded_signs[chr(u)]}"""
+    if u >= 0x12480:
+      print("ED: " + message)
+    else:
+      raise KeyError(message)
 
 compositions = {}
 
@@ -925,5 +988,5 @@ for filename, encoding in (("sign_list.txt", "utf-16"),
                            ("sign_list.utf-8.txt", "utf-8")):
   with open(fr".\Samples\IME\cpp\SampleIME\Dictionary\{filename}",
             "w", encoding=encoding) as f:
-    for composition, encodings in compositions.items():
+    for composition, encodings in sorted(compositions.items()):
       print(f'"{composition}"="{encodings[0]}"', file=f)
