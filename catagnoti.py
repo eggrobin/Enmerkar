@@ -15,23 +15,24 @@ lak = ogsl.sources["LAK"]
 def ellesify(ogsl_name, elles_number):
   ogsl.add_source_mapping(ogsl_name, elles, SourceRange("%03d" % elles_number))
 
-ellesify("|DIM×MAŠ|", 32)
-ellesify("ARAD", 35)
-ellesify("|UMUM×HA|", 86)
-ellesify("|MUŠ×KUR|", 134)
-ellesify("ANŠE", 140)
-ellesify("PIRIG", 144)
-ellesify("LAK247", 145)
-ellesify("PEŠ₂", 146)
-#ellesify("ERIN₂", 159)  # Lost because of the ad hoc disunification in 𒂗𒈨𒅕𒃸.
-ellesify("GIDIM", 191)
-ellesify("|ŠA₃×SAL|", 231)
-ellesify("|LAK449×(AN.EŠ₂)|", 235)
-ellesify("|LAK449×SI|", 236)
-ellesify("ELLES302", 302)  # Not a terribly difficult identification…
-ellesify("EREN", 327)
-ellesify("|GA₂×(NE.E₂)|", 374)
-ellesify("|A×HA|", 394)
+if False:
+  ellesify("|DIM×MAŠ|", 32)
+  ellesify("ARAD", 35)
+  ellesify("|UMUM×HA|", 86)
+  ellesify("|MUŠ×KUR|", 134)
+  ellesify("ANŠE", 140)
+  ellesify("PIRIG", 144)
+  ellesify("LAK247", 145)
+  ellesify("PEŠ₂", 146)
+  #ellesify("ERIN₂", 159)  # Lost because of the ad hoc disunification in 𒂗𒈨𒅕𒃸.
+  ellesify("GIDIM", 191)
+  ellesify("|ŠA₃×SAL|", 231)
+  ellesify("|LAK449×(AN.EŠ₂)|", 235)
+  ellesify("|LAK449×SI|", 236)
+  ellesify("ELLES302", 302)  # Not a terribly difficult identification…
+  ellesify("EREN", 327)
+  ellesify("|GA₂×(NE.E₂)|", 374)
+  ellesify("|A×HA|", 394)
 
 with open("ellesify.diff", "w", encoding="utf-8", newline='\n') as f:
   print("\n".join(difflib.unified_diff(old_formatted_ogsl.splitlines(), str(ogsl).splitlines(),fromfile="a/00lib/ogsl.asl",tofile="b/00lib/ogsl.asl", lineterm="")), file=f)
@@ -145,16 +146,18 @@ with open("La paleografia dei testi dell’amministrazione e della cancelleria d
           ogsl_by_catagnoti[catagnoti_number] = []
       ogsl_by_catagnoti[catagnoti_number] = forms
       if not any(form.unicode_cuneiform or form.sign and form.sign.unicode_cuneiform for form in forms):
-        print("PACE%s %s = LAK%s has no encoding: %s, %s" % (catagnoti_number, catagnoti_name, laks, [f.names[0] for f in forms], [s.source.abbreviation + str(s.number) for form in forms for s in form.sources]))
+        print("--- PACE%s %s = LAK%s has no encoding: %s, %s" % (catagnoti_number, catagnoti_name, laks, [f.names[0] for f in forms], [s.source.abbreviation + str(s.number) for form in forms for s in form.sources]))
       elif not any(form.unicode_cuneiform or form.sign and len(form.sign.unicode_cuneiform.text) == 1 for form in forms):
-        print("PACE%s %s = LAK%s is a variant of a diri: %s, %s" % (catagnoti_number, catagnoti_name, laks, [f.names[0] for f in forms], [s.source.abbreviation + str(s.number) for form in forms for s in form.sources]))
+        print("+++ PACE%s %s = LAK%s is a variant of a diri: %s, %s" % (catagnoti_number, catagnoti_name, laks, [f.names[0] for f in forms], [s.source.abbreviation + str(s.number) for form in forms for s in form.sources]))
 
       if any(form.names[0] == catagnoti_name for form in forms):
         continue
-      if any(to_numeric(catagnoti_name).replace('Ḫ', 'H').lower() in form.values for form in forms):
+      values = [value.text for form in forms for value in form.values] + [
+                value.text for form in forms if form.sign for value in form.sign.values]
+      if to_numeric(catagnoti_name).replace('Ḫ', 'H').lower() in values:
         continue
       else:
-        #print("PACE%s %s %s" % (catagnoti_number, catagnoti_name, forms))
+        print("!!! PACE%s %s %s" % (catagnoti_number, catagnoti_name, values))
         continue
 
 print(f"{len(ogsl_by_catagnoti)} Catagnoti signs in OGSL")
