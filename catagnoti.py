@@ -1,11 +1,20 @@
 import csv
+from typing import Dict
 import unicodedata
 
 import asl
 from asl import ogsl, SourceRange
 import difflib
 
+import re
+
 forms = [form for forms in ogsl.forms_by_name.values() for form in forms]
+signs_by_value: dict[str, asl.Sign] = {}
+
+for sign in ogsl.signs:
+  if isinstance(sign, asl.Sign):
+    for value in sign.values:
+      signs_by_value[value.text] = sign
 
 old_formatted_ogsl = str(ogsl)
 
@@ -15,32 +24,13 @@ lak = ogsl.sources["LAK"]
 def ellesify(ogsl_name, elles_number):
   ogsl.add_source_mapping(ogsl_name, elles, SourceRange("%03d" % elles_number))
 
-if False:
-  ellesify("|DIM×MAŠ|", 32)
-  ellesify("ARAD", 35)
-  ellesify("|UMUM×HA|", 86)
-  ellesify("|MUŠ×KUR|", 134)
-  ellesify("ANŠE", 140)
-  ellesify("PIRIG", 144)
-  ellesify("LAK247", 145)
-  ellesify("PEŠ₂", 146)
-  #ellesify("ERIN₂", 159)  # Lost because of the ad hoc disunification in 𒂗𒈨𒅕𒃸.
-  ellesify("GIDIM", 191)
-  ellesify("|ŠA₃×SAL|", 231)
-  ellesify("|LAK449×(AN.EŠ₂)|", 235)
-  ellesify("|LAK449×SI|", 236)
-  ellesify("ELLES302", 302)  # Not a terribly difficult identification…
-  ellesify("EREN", 327)
-  ellesify("|GA₂×(NE.E₂)|", 374)
-  ellesify("|A×HA|", 394)
-
 with open("ellesify.diff", "w", encoding="utf-8", newline='\n') as f:
   print("\n".join(difflib.unified_diff(old_formatted_ogsl.splitlines(), str(ogsl).splitlines(),fromfile="a/00lib/ogsl.asl",tofile="b/00lib/ogsl.asl", lineterm="")), file=f)
 
 
 ogsl.forms_by_name["LAK776"][0].unicode_cuneiform = asl.UnicodeCuneiform("𒇻𒄾")
 # See comment in read_ogsl.
-ogsl.forms_by_name["LAK20"][0].unicode_cuneiform = asl.UnicodeCuneiform("𒆱")
+#ogsl.forms_by_name["LAK20"][0].unicode_cuneiform = asl.UnicodeCuneiform("𒆱")
 
 # Catagnoti name to OGSL name.
 NAME_BASED_IDENTIFICATIONS = {
@@ -65,6 +55,20 @@ def to_numeric(value):
     value = value + "₃"
   value = value.replace('\u0301', '').replace('\u0300', '')
   return unicodedata.normalize("NFC", value)
+
+def oraccify_name(name):
+  parts = re.split("([×-])", name.replace('Ḫ', 'H'))
+  result = ""
+  for i, part in enumerate(parts):
+    if i % 2 == 1:
+      result += part.replace('-', '.')
+    else:
+      value = to_numeric(part.lower())
+      if value in signs_by_value:
+        result += signs_by_value[value].names[0]
+      else:
+        result += part
+  return result
 
 egg_concordance = {
   "11": "|BAD.AŠ|",
@@ -98,12 +102,6 @@ with open("La paleografia dei testi dell’amministrazione e della cancelleria d
       if catagnoti_number in egg_concordance:
         forms = ogsl.forms_by_name[egg_concordance[catagnoti_number]]
         #print("PACE%s %s has no LAK, but is %s" % (catagnoti_number, catagnoti_name, forms))
-      elif catagnoti_name == "AŠGAB" and laks == "346":
-        # LAK346? in OGSL.
-        forms = ogsl.forms_by_name["AŠGAB"]
-      elif catagnoti_name == "UM" and laks == "127":
-        # OGSL has LAK127? on MES instead.
-        forms = ogsl.forms_by_name["UM"]
       elif catagnoti_name == "GIŠGAL" and laks == "648":
         # Doubly encoded, LAK648 as an @form.
         forms = ogsl.forms_by_name["|URU×MIN|"]
@@ -130,32 +128,46 @@ with open("La paleografia dei testi dell’amministrazione e della cancelleria d
         # LAK672b in OGSL.
         forms = ogsl.forms_by_name["MUNSUB"]
       elif catagnoti_name == "GURUŠ" and laks == "709":
-        # LAK672a in OGSL.
+        # LAK709a in OGSL.
         forms = ogsl.forms_by_name["GURUŠ"]
       elif catagnoti_name == "KAL" and laks == "709":
-        # LAK672b in OGSL.
+        # LAK709b in OGSL.
         forms = ogsl.forms_by_name["KAL"]
       else:
         print("PACE%s %s = LAK%s not in OGSL" % (catagnoti_number, catagnoti_name, laks))
 
-    if catagnoti_name in NAME_BASED_IDENTIFICATIONS:
-      for form in forms:
-        form.sign = ogsl.signs_by_name[NAME_BASED_IDENTIFICATIONS[catagnoti_name]]
+    #if catagnoti_name in NAME_BASED_IDENTIFICATIONS:
+    #  for form in forms:
+    #    form.sign = ogsl.signs_by_name[NAME_BASED_IDENTIFICATIONS[catagnoti_name]]
+    oracc_name = None
+    if oraccify_name(catagnoti_name) in set(form.names[0] for form in forms):
+      oracc_name = oraccify_name(catagnoti_name)
+    if oracc_name and forms and laks:
+      if oracc_name == forms[0].names[0]:
+        print("--- Name and LAK%s agree on %s for PACE%s %s" % (laks, oracc_name, catagnoti_number, catagnoti_name))
+      else:
+        print("*** Name (%s) and LAK%s (%s) disagree on for PACE%s %s" % (oracc_name, laks, forms[0].names[0], catagnoti_number, catagnoti_name))
+    continue
     if forms:
       if catagnoti_number not in ogsl_by_catagnoti:
           ogsl_by_catagnoti[catagnoti_number] = []
       ogsl_by_catagnoti[catagnoti_number] = forms
-      if not any(form.unicode_cuneiform or form.sign and form.sign.unicode_cuneiform for form in forms):
-        print("--- PACE%s %s = LAK%s has no encoding: %s, %s" % (catagnoti_number, catagnoti_name, laks, [f.names[0] for f in forms], [s.source.abbreviation + str(s.number) for form in forms for s in form.sources]))
-      elif not any(form.unicode_cuneiform or form.sign and len(form.sign.unicode_cuneiform.text) == 1 for form in forms):
-        print("+++ PACE%s %s = LAK%s is a variant of a diri: %s, %s" % (catagnoti_number, catagnoti_name, laks, [f.names[0] for f in forms], [s.source.abbreviation + str(s.number) for form in forms for s in form.sources]))
+      log_unicode_status = False
+      if log_unicode_status:
+        if not any(form.unicode_cuneiform or form.sign and form.sign.unicode_cuneiform for form in forms):
+          print("--- PACE%s %s = LAK%s has no encoding: %s, %s" % (catagnoti_number, catagnoti_name, laks, [f.names[0] for f in forms], [s.source.abbreviation + str(s.number) for form in forms for s in form.sources]))
+        elif not any(form.unicode_cuneiform or form.sign and len(form.sign.unicode_cuneiform.text) == 1 for form in forms):
+          print("+++ PACE%s %s = LAK%s is a variant of a diri: %s, %s" % (catagnoti_number, catagnoti_name, laks, [f.names[0] for f in forms], [s.source.abbreviation + str(s.number) for form in forms for s in form.sources]))
 
-      if any(form.names[0] == catagnoti_name for form in forms):
-        continue
       values = [value.text for form in forms for value in form.values] + [
                 value.text for form in forms if form.sign for value in form.sign.values]
-      if to_numeric(catagnoti_name).replace('Ḫ', 'H').lower() in values:
+      if oraccify_name(catagnoti_name) in set(form.names[0] for form in forms):
         continue
+      elif oraccify_name(catagnoti_name) in ogsl.forms_by_name:
+        print("*** PACE%s %s name suggests %s instead identified with %s" %
+                (catagnoti_number, catagnoti_name,
+                 oraccify_name(catagnoti_name),
+                 [form.names[0] for form in forms]))
       else:
         print("!!! PACE%s %s %s" % (catagnoti_number, catagnoti_name, values))
         continue

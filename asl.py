@@ -650,6 +650,10 @@ print("\n".join(difflib.unified_diff(
 if str(SignList.parse(Parser(str(ogsl).splitlines(), "str(ogsl)"))) != str(ogsl):
   raise ValueError("Not idempotent")
 
+print(len([sign for sign in ogsl.signs if isinstance(sign, Sign) and (sign.sources or sign.values or sign.unicode_cuneiform) and sign.unicode_cuneiform and not sign.deprecated]), "typeable encoded signs")
+print(len([sign for sign in ogsl.signs if isinstance(sign, Sign) and (sign.sources or sign.values or sign.unicode_cuneiform) and not sign.deprecated]), "potential typeable signs")
+print(sum([len(sign.values) for forms in ogsl.forms_by_name.values() for sign in forms if (sign.sources or sign.values or sign.unicode_cuneiform) and sign.unicode_cuneiform and not sign.deprecated]), "typeable encoded values")
+
 for source in ogsl.sources.values():
   missing = []
   for n in source:
