@@ -92,28 +92,22 @@ with open("La paleografia dei testi dell’amministrazione e della cancelleria d
     if catagnoti_number == "331":
       break
     if not laks and catagnoti_number not in egg_concordance:
-      print("No LAK number for PACE%s %s" % (catagnoti_number, catagnoti_name))
+      print("No LAK number for PTACE%s %s" % (catagnoti_number, catagnoti_name))
       continue
     forms = [form for n in laks.split(", ") for form in ogsl.forms_by_source[lak][SourceRange(n)]] if laks else []
     if forms:
       if catagnoti_number in egg_concordance:
-        raise ValueError("PACE%s %s is %s, no need for exceptional concordance" % (catagnoti_number, catagnoti_name, forms))
+        raise ValueError("PTACE%s %s is %s, no need for exceptional concordance" % (catagnoti_number, catagnoti_name, forms))
     else:
       if catagnoti_number in egg_concordance:
         forms = ogsl.forms_by_name[egg_concordance[catagnoti_number]]
-        #print("PACE%s %s has no LAK, but is %s" % (catagnoti_number, catagnoti_name, forms))
+        #print("PTACE%s %s has no LAK, but is %s" % (catagnoti_number, catagnoti_name, forms))
       elif catagnoti_name == "GIŠGAL" and laks == "648":
         # Doubly encoded, LAK648 as an @form.
         forms = ogsl.forms_by_name["|URU×MIN|"]
       elif catagnoti_name == "ÁŠ" and laks == "162":
         # LAK162 split between AŠ₂ and ZIZ₂.
         forms = ogsl.forms_by_name["AŠ₂"]
-      elif catagnoti_name == "KAD₄" and laks == "171":
-        # LAK171? in OGSL.
-        forms = ogsl.forms_by_name["KAD₄"]
-      elif catagnoti_name == "ÍL" and laks == "172":
-        # LAK172? in OGSL.
-        forms = ogsl.forms_by_name["IL₂"]
       elif catagnoti_name == "ERIM" and laks == "280":
         # LAK280 in OGSL, but affected by a not-yet-upstreamed disunification
         # and I forgot to carry over the list numbers.
@@ -134,7 +128,7 @@ with open("La paleografia dei testi dell’amministrazione e della cancelleria d
         # LAK709b in OGSL.
         forms = ogsl.forms_by_name["KAL"]
       else:
-        print("PACE%s %s = LAK%s not in OGSL" % (catagnoti_number, catagnoti_name, laks))
+        print("PTACE%s %s = LAK%s not in OGSL" % (catagnoti_number, catagnoti_name, laks))
 
     #if catagnoti_name in NAME_BASED_IDENTIFICATIONS:
     #  for form in forms:
@@ -143,10 +137,11 @@ with open("La paleografia dei testi dell’amministrazione e della cancelleria d
     if oraccify_name(catagnoti_name) in set(form.names[0] for form in forms):
       oracc_name = oraccify_name(catagnoti_name)
     if oracc_name and forms and laks:
-      if oracc_name == forms[0].names[0]:
-        print("--- Name and LAK%s agree on %s for PACE%s %s" % (laks, oracc_name, catagnoti_number, catagnoti_name))
-      else:
-        print("*** Name (%s) and LAK%s (%s) disagree on for PACE%s %s" % (oracc_name, laks, forms[0].names[0], catagnoti_number, catagnoti_name))
+      for form in forms:
+        if oracc_name == form.names[0]:
+          print("--- Name and LAK%s agree on %s for PTACE%s %s" % (laks, oracc_name, catagnoti_number, catagnoti_name))
+        else:
+          print("*** Name (%s) and LAK%s (%s) disagree on for PTACE%s %s" % (oracc_name, laks, forms[0].names[0], catagnoti_number, catagnoti_name))
     continue
     if forms:
       if catagnoti_number not in ogsl_by_catagnoti:
@@ -155,21 +150,21 @@ with open("La paleografia dei testi dell’amministrazione e della cancelleria d
       log_unicode_status = False
       if log_unicode_status:
         if not any(form.unicode_cuneiform or form.sign and form.sign.unicode_cuneiform for form in forms):
-          print("--- PACE%s %s = LAK%s has no encoding: %s, %s" % (catagnoti_number, catagnoti_name, laks, [f.names[0] for f in forms], [s.source.abbreviation + str(s.number) for form in forms for s in form.sources]))
+          print("--- PTACE%s %s = LAK%s has no encoding: %s, %s" % (catagnoti_number, catagnoti_name, laks, [f.names[0] for f in forms], [s.source.abbreviation + str(s.number) for form in forms for s in form.sources]))
         elif not any(form.unicode_cuneiform or form.sign and len(form.sign.unicode_cuneiform.text) == 1 for form in forms):
-          print("+++ PACE%s %s = LAK%s is a variant of a diri: %s, %s" % (catagnoti_number, catagnoti_name, laks, [f.names[0] for f in forms], [s.source.abbreviation + str(s.number) for form in forms for s in form.sources]))
+          print("+++ PTACE%s %s = LAK%s is a variant of a diri: %s, %s" % (catagnoti_number, catagnoti_name, laks, [f.names[0] for f in forms], [s.source.abbreviation + str(s.number) for form in forms for s in form.sources]))
 
       values = [value.text for form in forms for value in form.values] + [
                 value.text for form in forms if form.sign for value in form.sign.values]
       if oraccify_name(catagnoti_name) in set(form.names[0] for form in forms):
         continue
       elif oraccify_name(catagnoti_name) in ogsl.forms_by_name:
-        print("*** PACE%s %s name suggests %s instead identified with %s" %
+        print("*** PTACE%s %s name suggests %s instead identified with %s" %
                 (catagnoti_number, catagnoti_name,
                  oraccify_name(catagnoti_name),
                  [form.names[0] for form in forms]))
       else:
-        print("!!! PACE%s %s %s" % (catagnoti_number, catagnoti_name, values))
+        print("!!! PTACE%s %s %s" % (catagnoti_number, catagnoti_name, values))
         continue
 
 print(f"{len(ogsl_by_catagnoti)} Catagnoti signs in OGSL")
