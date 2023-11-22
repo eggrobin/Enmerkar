@@ -92,6 +92,8 @@ egg_concordance = {
 
 catagnoti_easy = {}
 catagnoti_not_so_easy = set()
+refinements = []
+mismatches = []
 
 with open("La paleografia dei testi dell’amministrazione e della cancelleria di Ebla - Source.csv", encoding="utf-8") as f:
   lines = list(csv.reader(f))
@@ -149,8 +151,15 @@ with open("La paleografia dei testi dell’amministrazione e della cancelleria d
         if oracc_name == form.names[0]:
           print("--- Name and LAK%s agree on %s for PTACE%s %s" % (laks, oracc_name, catagnoti_number, catagnoti_name))
           catagnoti_easy[catagnoti_number] = oracc_name
+        elif form in ogsl.signs_by_name[oracc_name].forms:
+          refinement = ">>> LAK%s (%s) refines name (%s) for PTACE%s %s" % (laks, form.names[0], oracc_name, catagnoti_number, catagnoti_name)
+          refinements.append(refinement)
+          print(refinement)
+          catagnoti_not_so_easy.add(catagnoti_number)
         else:
-          print("*** Name (%s) and LAK%s (%s) disagree for PTACE%s %s" % (oracc_name, laks, form.names[0], catagnoti_number, catagnoti_name))
+          mismatch = "*** Name (%s) and LAK%s (%s) disagree for PTACE%s %s" % (oracc_name, laks, form.names[0], catagnoti_number, catagnoti_name)
+          mismatches.append(mismatch)
+          print(mismatch)
           catagnoti_not_so_easy.add(catagnoti_number)
     else:
       if not laks:
@@ -189,6 +198,10 @@ with open("La paleografia dei testi dell’amministrazione e della cancelleria d
 
 print(len(catagnoti_easy.keys() - catagnoti_not_so_easy), "really easy")
 print(len(catagnoti_easy), "partially easy")
+print(len(mismatches), "mismatches")
+print(len(refinements), "refinements")
+print('\n'.join(mismatches))
+
 for catagnoti_number, name in catagnoti_easy.items():
   if catagnoti_number in catagnoti_not_so_easy:
     continue
