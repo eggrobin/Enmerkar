@@ -198,7 +198,8 @@ with open("La paleografia dei testi dell’amministrazione e della cancelleria d
 print(len(catagnoti_easy.keys() - catagnoti_not_so_easy), "really easy")
 print(len(catagnoti_easy), "partially easy")
 print(len(mismatches), "mismatches")
-print(len(refinements), "refinements")
+print(len(refinements.keys() - catagnoti_not_so_easy), "easy refinements")
+print(len(refinements), "total refinements")
 print('\n'.join(mismatches))
 
 for catagnoti_number, name in refinements.items():
