@@ -35,6 +35,7 @@ HRESULT CSampleIME::_HandleCandidateFinalize(TfEditCookie ec, _In_ ITfContext *p
     DWORD_PTR candidateLen = 0;
     const WCHAR* pCandidateString = nullptr;
     CStringRange candidateString;
+    bool zwsp = false;
 
     if (nullptr == _pCandidateListUIPresenter)
     {
@@ -47,7 +48,8 @@ HRESULT CSampleIME::_HandleCandidateFinalize(TfEditCookie ec, _In_ ITfContext *p
       candidateString.Set(pCandidateString, candidateLen);
       std::wstring_view const candidate(pCandidateString, candidateLen);
       std::wstring with_a = std::wstring(candidate) + L"𒀀";
-      if (candidate == L"\u200B") {
+      zwsp = candidate == L"\u200B";
+      if (zwsp) {
         candidateString.Set(with_a.data(), with_a.size());
       }
 
@@ -73,6 +75,13 @@ HRESULT CSampleIME::_HandleCandidateFinalize(TfEditCookie ec, _In_ ITfContext *p
 NoPresenter:
 
     _HandleComplete(ec, pContext);
+
+    if (zwsp) {
+      LONG shifted;
+      emitted_ranges_.back().range().ShiftStart(ec, 1, &shifted, nullptr);
+      emitted_ranges_.back().range().SetText(ec, 0, L"", 0);
+      emitted_ranges_.pop_back();
+    }
 
     return hr;
 }
