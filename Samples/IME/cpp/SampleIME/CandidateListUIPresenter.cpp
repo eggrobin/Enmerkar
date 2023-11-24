@@ -43,24 +43,31 @@ HRESULT CSampleIME::_HandleCandidateFinalize(TfEditCookie ec, _In_ ITfContext *p
 
     candidateLen = _pCandidateListUIPresenter->_GetSelectedCandidateString(&pCandidateString);
 
-    candidateString.Set(pCandidateString, candidateLen);
-
-    if (candidateLen)
     {
-        ITfRange* clone;
-        hr = _AddComposingAndChar(ec, pContext, &candidateString, &clone);
-        if (clone != nullptr) {
-          clone->SetGravity(ec, TF_GRAVITY_FORWARD, TF_GRAVITY_BACKWARD);
-          if (emitted_ranges_.size() >= 128) {
-            emitted_ranges_.pop_front();
-          }
-          emitted_ranges_.emplace_back(clone, std::wstring_view(pCandidateString, candidateLen));
-        }
+      candidateString.Set(pCandidateString, candidateLen);
+      std::wstring_view const candidate(pCandidateString, candidateLen);
+      std::wstring with_a = std::wstring(candidate) + L"𒀀";
+      if (candidate == L"\u200B") {
+        candidateString.Set(with_a.data(), with_a.size());
+      }
 
-        if (FAILED(hr))
-        {
-            return hr;
-        }
+      if (candidateLen)
+      {
+          ITfRange* clone;
+          hr = _AddComposingAndChar(ec, pContext, &candidateString, &clone);
+          if (clone != nullptr) {
+            clone->SetGravity(ec, TF_GRAVITY_FORWARD, TF_GRAVITY_BACKWARD);
+            if (emitted_ranges_.size() >= 128) {
+              emitted_ranges_.pop_front();
+            }
+            emitted_ranges_.emplace_back(clone, std::wstring_view(pCandidateString, candidateLen));
+          }
+
+          if (FAILED(hr))
+          {
+              return hr;
+          }
+      }
     }
 
 NoPresenter:
