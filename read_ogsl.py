@@ -104,7 +104,7 @@ def compute_expected_unicode_name(string, inner_plus=True):
   return name.replace(".", " ") if inner_plus else name.replace(".", " PLUS ")
 
 
-with open(r"..\ogsl\00lib\ogsl.asl", encoding="utf-8") as f:
+with open(r"..\osl\00lib\osl.asl", encoding="utf-8") as f:
   lines = f.read().split("\n")
 
 sign_name = None
@@ -538,7 +538,7 @@ for name, forms in forms_by_name.items():
   if not encoding:
     continue
 
-  if 'X' in encoding:
+  if 'X' in encoding or 'O' in encoding:
     continue
 
   if name == "ASAL₂~a":
@@ -586,6 +586,10 @@ for name, forms in forms_by_name.items():
     # The unicode name is a value here rather than the catalogue number.
     expected_unicode_name = "ZAMX"
 
+  if expected_unicode_name == "LAK-776":
+    # The unicode name is a value here rather than the catalogue number.
+    expected_unicode_name = "LU HUL2"
+
   # OGSL never decomposes LAL₂, so lets’ treat this as intentional.
   expected_unicode_name = expected_unicode_name.replace("LAL2", "LAL TIMES LAL")
 
@@ -595,7 +599,7 @@ for name, forms in forms_by_name.items():
   if expected_unicode_name == "URU TIMES MIN TIMES IGI":
     expected_unicode_name = "LAK-648 TIMES IGI"
 
-  if expected_unicode_name == "KU4~a":
+  if expected_unicode_name == "REC145":
     expected_unicode_name = "KU4 VARIANT FORM"
 
   if expected_unicode_name == "LAGAB TIMES SHITA TENU PLUS GISH":
