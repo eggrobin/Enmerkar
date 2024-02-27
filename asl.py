@@ -1,5 +1,4 @@
-# Based on https://build-oracc.museum.upenn.edu/ogsl/aslogslfileformat/index.html as built from
-# https://github.com/oracc/ogsl/blob/53952bfcbe2a575f92522562fdff3b8fcfd757ab/00web/asl.xml.
+# Based on http://oracc.org/osl/asloslfileformat/index.html.
 
 from collections import defaultdict
 import difflib
@@ -183,7 +182,7 @@ class Source:
   """A classical sign list, e.g., RÉC, MZL, etc.
 
   We use the Unicode term source so as to avoid conflicts and confusion with
-  both the SignList type, representing the OGSL, and with Python lists.
+  both the SignList type, representing the OSL, and with Python lists.
   """
   tag = "listdef"
 
@@ -647,24 +646,24 @@ class SignList:
           parser.raise_error(f"Expected one of {SignLike.__subclasses__()}, got {entry.tag}")
     return result
 
-with open(r"..\ogsl\00lib\ogsl.asl", encoding="utf-8") as f:
+with open(r"..\osl\00lib\osl.asl", encoding="utf-8") as f:
   original_lines = f.read().splitlines()
-  ogsl = SignList.parse(Parser(original_lines, "ogsl.asl"))
+  osl = SignList.parse(Parser(original_lines, "osl.asl"))
 
 print("\n".join(difflib.unified_diff(
-    original_lines, str(ogsl).splitlines(),
-    fromfile="ogsl.asl", tofile="formatted")))
-if str(SignList.parse(Parser(str(ogsl).splitlines(), "str(ogsl)"))) != str(ogsl):
+    original_lines, str(osl).splitlines(),
+    fromfile="osl.asl", tofile="formatted")))
+if str(SignList.parse(Parser(str(osl).splitlines(), "str(osl)"))) != str(osl):
   raise ValueError("Not idempotent")
 
-print(len([sign for sign in ogsl.signs if isinstance(sign, Sign) and (sign.sources or sign.values or sign.unicode_cuneiform) and sign.unicode_cuneiform and not sign.deprecated]), "typeable encoded signs")
-print(len([sign for sign in ogsl.signs if isinstance(sign, Sign) and (sign.sources or sign.values or sign.unicode_cuneiform) and not sign.deprecated]), "potential typeable signs")
-print(sum([len(sign.values) for forms in ogsl.forms_by_name.values() for sign in forms if (sign.sources or sign.values or sign.unicode_cuneiform) and sign.unicode_cuneiform and not sign.deprecated]), "typeable encoded values")
+print(len([sign for sign in osl.signs if isinstance(sign, Sign) and (sign.sources or sign.values or sign.unicode_cuneiform) and sign.unicode_cuneiform and not sign.deprecated]), "typeable encoded signs")
+print(len([sign for sign in osl.signs if isinstance(sign, Sign) and (sign.sources or sign.values or sign.unicode_cuneiform) and not sign.deprecated]), "potential typeable signs")
+print(sum([len(sign.values) for forms in osl.forms_by_name.values() for sign in forms if (sign.sources or sign.values or sign.unicode_cuneiform) and sign.unicode_cuneiform and not sign.deprecated]), "typeable encoded values")
 
-for source in ogsl.sources.values():
+for source in osl.sources.values():
   missing = []
   for n in source:
-    if n not in ogsl.forms_by_source[source]:
+    if n not in osl.forms_by_source[source]:
       if not n.suffix and any(m.suffix and m.first == n.first for m in source):
         continue
       missing.append(n)
