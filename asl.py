@@ -80,6 +80,9 @@ class TextTag:
 class Fake(TextTag):
   tag = "fake"
 
+class OID(TextTag):
+  tag = "oid"
+
 class PlusName(TextTag):
   tag = "pname"
 
@@ -391,6 +394,7 @@ class CompoundOnly(SignLike):
 
 class Form:
   tag = "form"
+  oid: OID
   deprecated: bool
   names: list[str]
   pname: Optional[str]
@@ -441,6 +445,7 @@ class Form:
 
   def form_components_str(self):
     return "\n".join(lines for lines in (
+        str(self.oid),
         str(self.pname) if self.pname else None,
         "\n".join("@aka\t%s" % name for name in self.names[1:]),
         str(self.fake) if self.fake else None,
@@ -476,6 +481,8 @@ class Form:
       if entry.tag == "aka":
         result.names.append(entry.text)
         parser.next()
+      elif entry.tag == OID.tag:
+        result.oid = OID.parse(parser)
       elif entry.tag == PlusName.tag:
         result.pname = PlusName.parse(parser)
       elif entry.tag == SourceReference.tag:
