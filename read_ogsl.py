@@ -233,7 +233,7 @@ try:
       if value in "dfm":
         # We do determinative shorthands by hand.
         continue
-      if value in ("𒑱", ':"', ":.", ":"):
+      if value in ("𒑱", ':"', ":.", ":") or re.match("^p[₁₂₃₄₅]$", value):
         # We do punctuation by hand.
         continue
       if value[0] == "{":
