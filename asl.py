@@ -407,7 +407,7 @@ class Form:
   unicode_cuneiform: Optional[UnicodeCuneiform]
   unicode_age: Optional[UnicodeAge]
   unicode_note: Optional[UnicodeNote]
-  unicode_map: Optional[UnicodeNote]
+  unicode_map: Optional[UnicodeMap]
 
   sign: Optional["Sign"]
 
