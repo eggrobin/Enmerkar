@@ -4,6 +4,26 @@ import asl
 from asl import osl
 import numbers
 
+for forms in osl.forms_by_name.values():
+  for form in forms:
+    if form.unicode_cuneiform:
+      old = form.unicode_cuneiform.text
+      new = old.replace(
+          "𒁹𒁹𒁹", "𒐈").replace(
+          "𒇹", "𒐂").replace(
+          "𒋰𒋰𒋰𒋰𒀸", "𒐇").replace(
+          "𒋰𒋰𒋰𒋰", "𒐆").replace(
+          "𒋰𒋰𒋰𒀸", "𒐅").replace(
+          "𒋰𒋰𒋰", "𒐄").replace(
+          "𒋰𒋰𒀸", "𒐃").replace(
+          "𒀼𒀼𒀸", "𒑁").replace(
+          "𒀼𒀼", "𒑀").replace(
+          "𒀼", "𒐺").replace(
+          "𒅓", "𒐌")
+      if new != old:
+        print(f"*** Changing encoding of {form.names[0]} from {old} to {new}")
+        form.unicode_cuneiform.text = new
+
 for forms in (osl.forms_by_name["BAD"], osl.forms_by_name["IDIM"]):
   for form in forms:
     for v in form.values:
@@ -21,7 +41,7 @@ for name, forms in osl.forms_by_name.items():
     encoding = list(encodings)[0]
     for form in forms:
       if not form.unicode_cuneiform:
-        print(f"*** Missing {encoding} on {form}")
+        print(f"*** Missing {encoding} on {form.names[0]}")
         form.unicode_cuneiform = asl.UnicodeCuneiform(encoding)
 
 for name, forms in osl.forms_by_name.items():
@@ -65,7 +85,7 @@ for name, forms in osl.forms_by_name.items():
           encoded_forms_by_value[value.text][xsux] = []
         encoded_forms_by_value[value.text][xsux].append(form)
       for source in form.sources:
-        if source.source.abbreviation == "U+":
+        if source.source.abbreviation == "U+" or source.questionable:
           continue
         abbreviations = ("ŠL", "MÉA") if source.source.abbreviation == "SLLHA" else (source.source.abbreviation,);
         for abbreviation in abbreviations:
