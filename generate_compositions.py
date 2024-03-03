@@ -4,6 +4,25 @@ import asl
 from asl import osl
 import numbers
 
+ERIN2 = osl.forms_by_name["ERIN₂"][0]
+
+ERIN2_values = ["erin₂", "erim", "erem", "eren₂", "nura", "nuri", "nuru",
+                "rin₂", "rina₂", "sap₂", "ṣab", "ṣap", "ṣapa","zab", "zalag₂",
+                "zap", "erena₂", "erina₂",
+                # NABU 1990/12.
+                "surₓ",
+                # Note 𒋝 SIG; putting that there rather than with the UD-like
+                # ones.
+                "sigₓ",]
+PIR2_values = [# MZL values; all homophones of 𒌓 UD.
+               "pir₂", "bir₃", "hiš₃", "lah₂", "lih₂", "par₅", "per₂",
+                # Other OGSL values; shoving them there, since they are
+                # homophones of UD (or similar to them) and the ERIN₂ ones in
+                # MZL are not.
+                "udaₓ", "tam₅"]
+
+ERIN2.values = [value for value in ERIN2.values if value.text in ERIN2_values]
+
 for forms in osl.forms_by_name.values():
   for form in forms:
     if form.unicode_cuneiform:
