@@ -5,6 +5,7 @@ from asl import osl
 import numbers
 
 ERIN2 = osl.forms_by_name["ERIN₂"][0]
+PIR2 = osl.forms_by_name["PIR₂"][0]
 
 ERIN2_values = ["erin₂", "erim", "erem", "eren₂", "nura", "nuri", "nuru",
                 "rin₂", "rina₂", "sap₂", "ṣab", "ṣap", "ṣapa","zab", "zalag₂",
@@ -21,7 +22,9 @@ PIR2_values = [# MZL values; all homophones of 𒌓 UD.
                 # MZL are not.
                 "udaₓ", "tam₅"]
 
+PIR2.values = [value for value in ERIN2.values if value.text in PIR2_values]
 ERIN2.values = [value for value in ERIN2.values if value.text in ERIN2_values]
+osl.add_source_mapping("PIR₂", osl.sources["MZL"], asl.SourceRange("613"))
 
 for forms in osl.forms_by_name.values():
   for form in forms:
