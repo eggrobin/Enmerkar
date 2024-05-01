@@ -324,8 +324,57 @@ class System:
         break
     return result
 
+class LinkType:
+  tag = "linkdef"
+  name: str
+  notes: list[Note]
+
+  def __init__(self, name: str):
+    self.name = name
+    self.notes = []
+
+  def __str__(self):
+    return "\n".join((
+      f"@{self.tag} {self.name}",
+      *(str(note) for note in self.notes)))
+
+  @classmethod
+  def parse(cls, parser: Parser) -> "LinkType":
+    entry = parser.next()
+    entry.validate(cls, parser)
+    result = cls(entry.text)
+    while entry := parser.peek():
+      for entry_type in (Note, *Note.__subclasses__()):
+        if entry.tag == entry_type.tag:
+          result.notes.append(entry_type.parse(parser))
+          break
+      else:
+        break
+    return result
+
 class SystemBinding(TextTag):
   tag = "sys"
+
+class Link:
+  tag = "link"
+  system: str
+  identifier: str
+  url: str
+
+  def __init__(self, system: str, identifier: str, url: str):
+    self.system = system
+    self.identifier = identifier
+    self.url = url
+
+  def __str__(self):
+    return f"@{self.tag} {self.system} {self.identifier} {self.url}"
+
+  @classmethod
+  def parse(cls, parser: Parser, *args) -> "Link":
+    entry = parser.next()
+    entry.validate(cls, parser)
+    system, identifier, url = entry.text.split(maxsplit=2)
+    return cls(system, identifier, url)
 
 class SignLike:
   pass
@@ -414,6 +463,7 @@ class Form:
   values: list[Value]
   # system* is missing from formblock in the documentation, but really is used.
   systems: list[SystemBinding]
+  links: list[Link]
 
   def __init__(self, name: str):
     self.names = [name]
@@ -421,6 +471,7 @@ class Form:
     self.sources = []
     self.values = []
     self.systems = []
+    self.links = []
     self.notes = []
     self.unicode_name = None
     self.unicode_sequence = None
@@ -459,7 +510,8 @@ class Form:
         str(self.unicode_age) if self.unicode_age else None,
         str(self.unicode_note) if self.unicode_note else None,
         "\n".join(str(value) for value in self.values),
-        "\n".join(str(system) for system in self.systems)) if lines)
+        "\n".join(str(system) for system in self.systems),
+        "\n".join(str(link) for link in self.links)) if lines)
 
   def __str__(self):
     return "\n".join(lines for lines in (
@@ -503,6 +555,8 @@ class Form:
         result.values.append(Value.parse(parser))
       elif entry.tag == SystemBinding.tag:
         result.systems.append(SystemBinding.parse(parser))
+      elif entry.tag == Link.tag:
+        result.links.append(Link.parse(parser))
       elif entry.tag == Fake.tag:
         result.fake = Fake.parse(parser)
       else:
@@ -569,6 +623,7 @@ class SignList:
     self.notes = []
     self.sources = {}
     self.systems = {}
+    self.link_types = {}
     self.signs = []
 
     self.signs_by_name = {}
@@ -580,6 +635,9 @@ class SignList:
 
   def add_system(self, system: System):
     self.systems[system.name] = system
+
+  def add_link_type(self, link_type: LinkType):
+    self.link_types[link_type.name] = link_type
 
   def add_sign(self, sign: SignLike, parser: Parser):
     self.signs.append(sign)
@@ -628,6 +686,7 @@ class SignList:
       "\n\n".join(str(note) for note in self.notes),
       "\n\n".join(str(source) for source in self.sources.values()),
       "\n\n".join(str(system) for system in self.systems.values()),
+      "\n\n".join(str(link_type) for link_type in self.link_types.values()),
       "\n\n".join(str(sign) for sign in self.signs)))
 
   @classmethod
@@ -644,6 +703,8 @@ class SignList:
         result.add_source(Source.parse(parser))
       elif entry.tag == System.tag:
         result.add_system(System.parse(parser))
+      elif entry.tag == LinkType.tag:
+        result.add_link_type(LinkType.parse(parser))
       else:
         for entry_type in SignLike.__subclasses__():
           if entry.tag == entry_type.tag:
