@@ -71,6 +71,8 @@ for name, forms in osl.forms_by_name.items():
     if form.deprecated:
       continue
     if form.unicode_cuneiform or form.unicode_map:
+      # Note that we prefer the ucun to the umap, which allows us to ignore the
+      # hack from https://github.com/oracc/osl/commit/e7de0d92682afc043726c6689e407551f7466652.
       xsux = (form.unicode_cuneiform or osl.forms_by_name[form.unicode_map.text][0].unicode_cuneiform).text;
       if "X" in xsux:
         continue
