@@ -443,7 +443,7 @@ class CompoundOnly(SignLike):
 
 class Form:
   tag = "form"
-  oid: OID
+  oid: Optional[OID]
   deprecated: bool
   names: list[str]
   pname: Optional[str]
@@ -466,6 +466,7 @@ class Form:
   links: list[Link]
 
   def __init__(self, name: str):
+    self.oid = None
     self.names = [name]
     self.pname = None
     self.sources = []
@@ -496,7 +497,7 @@ class Form:
 
   def form_components_str(self):
     return "\n".join(lines for lines in (
-        str(self.oid),
+        str(self.oid) if self.oid else None,
         str(self.pname) if self.pname else None,
         "\n".join("@aka\t%s" % name for name in self.names[1:]),
         str(self.fake) if self.fake else None,
