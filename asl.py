@@ -98,6 +98,9 @@ class Literature(Note):
 class Project(TextTag):
   tag = "project"
 
+class Domain(TextTag):
+  tag = "domain"
+
 # Not actually arbitrary text.
 class Reference(Note):
   tag = "ref"
@@ -607,6 +610,7 @@ class Sign(Form, SignLike):
 class SignList:
   tag = "signlist"
   project: Project
+  domain: Domain
   name: str
   # Not documented, nor really used, except that one of the listdefs is
   # @inoted out.
@@ -618,9 +622,10 @@ class SignList:
   forms_by_name: defaultdict[str, list[Form]]
   forms_by_source: defaultdict[Source, defaultdict[SourceRange, list[Form]]]
 
-  def __init__(self, project: Project, name: str):
+  def __init__(self, project: Project, name: str, domain: Domain):
     self.project = project
     self.name = name
+    self.domain = domain
     self.notes = []
     self.sources = {}
     self.systems = {}
@@ -663,6 +668,9 @@ class SignList:
         elif not self.signs_by_name[name] and sign.deprecated:
           return
         else:
+          # TODO(egg): Talk to Steve about deduplicating this.
+          if name in ("1(DIŠ)",):
+            continue
           parser.raise_error(
               "Duplicate sign %s. Existing:\n%s\nNew:\n%s" % (
                   name,
@@ -684,6 +692,7 @@ class SignList:
     return "\n\n".join((
       str(self.project),
       f"@{self.tag} {self.name}",
+      str(self.domain),
       "\n\n".join(str(note) for note in self.notes),
       "\n\n".join(str(source) for source in self.sources.values()),
       "\n\n".join(str(system) for system in self.systems.values()),
@@ -695,7 +704,8 @@ class SignList:
     project = Project.parse(parser)
     entry = parser.next()
     entry.validate(cls, parser)
-    result = cls(project, entry.text)
+    domain = Domain.parse(parser)
+    result = cls(project, entry.text, domain)
 
     while entry := parser.peek():
       if entry.tag == InternalNote.tag:
