@@ -5,9 +5,12 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved
 
+#include <algorithm>
 #include <optional>
 #include <set>
 #include <string>
+
+#define NOMINMAX
 
 #include "Private.h"
 #include "Globals.h"
@@ -42,7 +45,7 @@ BOOL RegisterProfiles()
 {
     𒂗𒈨𒅕𒃸::Log(L"Registering profiles...");
     HRESULT hr = S_FALSE;
-    LANGID langid = TEXTSERVICE_LANGID;
+    //LANGID langid = TEXTSERVICE_LANGID;
 
     ITfInputProcessorProfileMgr *pITfInputProcessorProfileMgr = nullptr;
     hr = CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER,
@@ -70,9 +73,9 @@ BOOL RegisterProfiles()
         wil::reg::key_access::readwrite);
       constexpr PCWSTR 𒂗𒈨𒅕𒃸_tag = L"akk-Xsux";
       std::optional<wil::unique_hkey> 𒂗𒈨𒅕𒃸_language;
-      std::optional<LCID> 𒂗𒈨𒅕𒃸_langid;
+      std::optional<LANGID> 𒂗𒈨𒅕𒃸_langid;
       // List from https://learn.microsoft.com/en-us/windows/win32/sysinfo/enumerating-registry-subkeys.
-      std::set<LCID> unused_transient_lcids{
+      std::set<LANGID> unused_transient_langids{
           0x2000, 0x2400, 0x2800, 0x2C00,
           0x3000, 0x3400, 0x3800, 0x3C00,
           0x4000, 0x4400, 0x4800, 0x4C00 };
@@ -84,29 +87,31 @@ BOOL RegisterProfiles()
           wil::reg::key_access::readwrite);
         if (auto const langid = wil::reg::try_get_value<DWORD>(language.get(), L"TransientLangId"); langid.has_value()) {
           if (language_tag == 𒂗𒈨𒅕𒃸_tag) {
-            𒂗𒈨𒅕𒃸_langid = *langid;
+            𒂗𒈨𒅕𒃸_langid = static_cast<LANGID>(*langid);
           }
-          unused_transient_lcids.erase(*langid);
+          unused_transient_langids.erase(static_cast<LANGID>(*langid));
         }
         if (language_tag == 𒂗𒈨𒅕𒃸_tag) {
           𒂗𒈨𒅕𒃸_language = std::move(language);
         }
       }
       if (!𒂗𒈨𒅕𒃸_langid.has_value()) {
-        if (unused_transient_lcids.empty()) {
+        if (unused_transient_langids.empty()) {
           MessageBoxW(
             nullptr, L"All transient LANGIDs in use", nullptr,
             MB_OK | MB_ICONERROR);
           goto Exit;
         }
-        𒂗𒈨𒅕𒃸_langid = *unused_transient_lcids.begin();
+        𒂗𒈨𒅕𒃸_langid = *unused_transient_langids.begin();
       }
+      std::wstring const 𒂗𒈨𒅕𒃸_langid_string = std::format(L"{:04X}", *𒂗𒈨𒅕𒃸_langid);
+      std::wstring const 𒂗𒈨𒅕𒃸_padded_langid_string = L"0000" + 𒂗𒈨𒅕𒃸_langid_string;
       if (!𒂗𒈨𒅕𒃸_language.has_value()) {
         𒂗𒈨𒅕𒃸_language = wil::reg::create_unique_key(international_user_profile.get(), 𒂗𒈨𒅕𒃸_tag,
           wil::reg::key_access::readwrite);
       }
-      wil::reg::set_value(𒂗𒈨𒅕𒃸_language->get(), L"TransientLangId", *𒂗𒈨𒅕𒃸_langid);
-      std::wstring const input_profile = std::format(L"{:04X}:{{F87CB858-5A61-42FF-98E4-CF3966457808}}", *𒂗𒈨𒅕𒃸_langid);
+      wil::reg::set_value<DWORD>(𒂗𒈨𒅕𒃸_language->get(), L"TransientLangId", *𒂗𒈨𒅕𒃸_langid);
+      std::wstring const input_profile = 𒂗𒈨𒅕𒃸_langid_string + L":{F87CB858-5A61-42FF-98E4-CF3966457808}";
       if (wil::reg::try_get_value<DWORD>(𒂗𒈨𒅕𒃸_language->get(), input_profile.c_str()) != 1) {
         wil::reg::set_value(𒂗𒈨𒅕𒃸_language->get(), input_profile.c_str(), 1);
       }
@@ -115,8 +120,53 @@ BOOL RegisterProfiles()
         languages.emplace_back(𒂗𒈨𒅕𒃸_tag);
         wil::reg::set_value(international_user_profile.get(), L"Languages", languages);
       }
+      MessageBoxW(
+        nullptr, std::format(L"Registering with transient LANGID {:04X}", *𒂗𒈨𒅕𒃸_langid).c_str(), nullptr,
+        MB_OK | MB_ICONINFORMATION);
+      auto const keyboard_layout_preload = wil::reg::open_unique_key(
+        HKEY_CURRENT_USER,
+        LR"(Keyboard Layout\Preload)",
+        wil::reg::key_access::readwrite);
+      int highest_index = 0;
+      std::optional<int> 𒂗𒈨𒅕𒃸_preload_index;
+      for (auto const& value : wil::make_range(wil::reg::value_iterator{ keyboard_layout_preload.get() }, wil::reg::value_iterator{})) {
+        std::string ascii_key;
+        std::transform(value.name.begin(), value.name.end(),
+                       std::back_inserter(ascii_key),
+                       [](wchar_t c) { return c <= 0x7F ? c : '?'; });
+        int index;
+        if (std::from_chars(ascii_key.data(), ascii_key.data() + ascii_key.size(), index).ec == std::errc{}) {
+          highest_index = std::max(highest_index, index);
+          if (wil::reg::get_value<std::wstring>(keyboard_layout_preload.get(), value.name.c_str()) == 𒂗𒈨𒅕𒃸_padded_langid_string) {
+            𒂗𒈨𒅕𒃸_preload_index = index;
+          }
+        }
+      }
+      if (!𒂗𒈨𒅕𒃸_preload_index.has_value()) {
+        𒂗𒈨𒅕𒃸_preload_index = highest_index + 1;
+        wil::reg::set_value(
+            keyboard_layout_preload.get(),
+            std::to_wstring(*𒂗𒈨𒅕𒃸_preload_index).c_str(),
+            𒂗𒈨𒅕𒃸_padded_langid_string.c_str());
+      }
+      auto const keyboard_layout_substitutes = wil::reg::open_unique_key(
+        HKEY_CURRENT_USER,
+        LR"(Keyboard Layout\Substitutes)",
+        wil::reg::key_access::readwrite);
+      wil::reg::set_value(
+        keyboard_layout_substitutes.get(),
+        𒂗𒈨𒅕𒃸_padded_langid_string.c_str(),
+        L"00000409");
+      auto const hidden_dummy_layouts = wil::reg::open_unique_key(
+        HKEY_CURRENT_USER,
+        LR"(Software\Microsoft\CTF\HiddenDummyLayouts)",
+        wil::reg::key_access::readwrite);
+      wil::reg::set_value(
+        hidden_dummy_layouts.get(),
+        𒂗𒈨𒅕𒃸_padded_langid_string.c_str(),
+        L"00000409");
       hr = pITfInputProcessorProfileMgr->RegisterProfile(Global::SampleIMECLSID,
-          langid,
+          *𒂗𒈨𒅕𒃸_langid,
           Global::SampleIMEGuidProfile,
           TEXTSERVICE_DESC,
           static_cast<ULONG>(lenOfDesc),
