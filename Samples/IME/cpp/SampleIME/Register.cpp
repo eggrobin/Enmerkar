@@ -5,8 +5,14 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved
 
+#include <optional>
+#include <set>
+#include <string>
+
 #include "Private.h"
 #include "Globals.h"
+
+#include <wil/registry.h>
 
 #include "logging.h"
 
@@ -58,25 +64,57 @@ BOOL RegisterProfiles()
     {
         goto Exit;
     } else {
-#if 0
-        HKEY international_user_profile;
-        auto const status = RegOpenKeyEx(
-            HKEY_CURRENT_USER,
-            LR"(Control Panel\International\User Profile)",
-            /*ulOptions=*/0, KEY_ALL_ACCESS, & international_user_profile);
-            if (status == ERROR_SUCCESS) {
-              std::vector<wchar_t> languages(1024, '\0');
-              DWORD size;
-              RegGetValue(
-                HKEY_CURRENT_USER,
-                ,
-                L"Languages",
-                RRF_RT_REG_MULTI_SZ,
-                /*pdwType=*/nullptr,
-                languages.data(),
-                &size);
-            }
- #endif
+      auto const international_user_profile = wil::reg::open_unique_key(
+        HKEY_CURRENT_USER,
+        LR"(Control Panel\International\User Profile)",
+        wil::reg::key_access::readwrite);
+      constexpr PCWSTR 𒂗𒈨𒅕𒃸_tag = L"akk-Xsux";
+      std::optional<wil::unique_hkey> 𒂗𒈨𒅕𒃸_language;
+      std::optional<LCID> 𒂗𒈨𒅕𒃸_langid;
+      // List from https://learn.microsoft.com/en-us/windows/win32/sysinfo/enumerating-registry-subkeys.
+      std::set<LCID> unused_transient_lcids{
+          0x2000, 0x2400, 0x2800, 0x2C00,
+          0x3000, 0x3400, 0x3800, 0x3C00,
+          0x4000, 0x4400, 0x4800, 0x4C00 };
+      for (auto const& subkey : wil::make_range(wil::reg::key_iterator{international_user_profile.get()}, wil::reg::key_iterator{})) {
+        auto const& language_tag = subkey.name;
+        wil::unique_hkey language = wil::reg::open_unique_key(
+          international_user_profile.get(),
+          language_tag.c_str(),
+          wil::reg::key_access::readwrite);
+        if (auto const langid = wil::reg::try_get_value<DWORD>(language.get(), L"TransientLangId"); langid.has_value()) {
+          if (language_tag == 𒂗𒈨𒅕𒃸_tag) {
+            𒂗𒈨𒅕𒃸_langid = *langid;
+          }
+          unused_transient_lcids.erase(*langid);
+        }
+        if (language_tag == 𒂗𒈨𒅕𒃸_tag) {
+          𒂗𒈨𒅕𒃸_language = std::move(language);
+        }
+      }
+      if (!𒂗𒈨𒅕𒃸_langid.has_value()) {
+        if (unused_transient_lcids.empty()) {
+          MessageBoxW(
+            nullptr, L"All transient LANGIDs in use", nullptr,
+            MB_OK | MB_ICONERROR);
+          goto Exit;
+        }
+        𒂗𒈨𒅕𒃸_langid = *unused_transient_lcids.begin();
+      }
+      if (!𒂗𒈨𒅕𒃸_language.has_value()) {
+        𒂗𒈨𒅕𒃸_language = wil::reg::create_unique_key(international_user_profile.get(), 𒂗𒈨𒅕𒃸_tag,
+          wil::reg::key_access::readwrite);
+      }
+      wil::reg::set_value(𒂗𒈨𒅕𒃸_language->get(), L"TransientLangId", *𒂗𒈨𒅕𒃸_langid);
+      std::wstring const input_profile = std::format(L"{:04X}:{{F87CB858-5A61-42FF-98E4-CF3966457808}}", *𒂗𒈨𒅕𒃸_langid);
+      if (wil::reg::try_get_value<DWORD>(𒂗𒈨𒅕𒃸_language->get(), input_profile.c_str()) != 1) {
+        wil::reg::set_value(𒂗𒈨𒅕𒃸_language->get(), input_profile.c_str(), 1);
+      }
+      auto languages = wil::reg::get_value<std::vector<std::wstring>>(international_user_profile.get(), L"Languages");
+      if (std::find(languages.begin(), languages.end(), 𒂗𒈨𒅕𒃸_tag) == languages.end()) {
+        languages.emplace_back(𒂗𒈨𒅕𒃸_tag);
+        wil::reg::set_value(international_user_profile.get(), L"Languages", languages);
+      }
       hr = pITfInputProcessorProfileMgr->RegisterProfile(Global::SampleIMECLSID,
           langid,
           Global::SampleIMEGuidProfile,
