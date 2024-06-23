@@ -72,6 +72,7 @@
     <ClInclude Include="TfTextLayoutSink.h" />
     <ClInclude Include="TipCandidateList.h" />
     <ClInclude Include="TipCandidateString.h" />
+    <ClInclude Include="𒂗𒈨𒅕𒃸\registry.h" />
     <ClInclude Include="𒂗𒈨𒅕𒃸\settings.h" />
     <ClInclude Include="𒂗𒈨𒅕𒃸\transcription.h" />
   </ItemGroup>
@@ -123,6 +124,7 @@
     <ClCompile Include="ThreadMgrEventSink.cpp" />
     <ClCompile Include="TipCandidateList.cpp" />
     <ClCompile Include="TipCandidateString.cpp" />
+    <ClCompile Include="𒂗𒈨𒅕𒃸\registry.cpp" />
     <ClCompile Include="𒂗𒈨𒅕𒃸\settings.cpp" />
     <ClCompile Include="𒂗𒈨𒅕𒃸\transcription.cpp" />
   </ItemGroup>

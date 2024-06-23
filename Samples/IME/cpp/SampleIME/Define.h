@@ -9,7 +9,6 @@
 #include "resource.h"
 
 #define TEXTSERVICE_MODEL        L"Apartment"
-#define TEXTSERVICE_LANGID        0x3000;
 #define TEXTSERVICE_ICON_INDEX   -IDIS_SAMPLEIME
 
 #define IME_MODE_ON_ICON_INDEX      IDI_IME_MODE_ON

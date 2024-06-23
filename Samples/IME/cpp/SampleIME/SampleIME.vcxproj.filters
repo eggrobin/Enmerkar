@@ -165,6 +165,9 @@
     <ClInclude Include="logging.h">
       <Filter>Header Files\𒂊𒂗𒈨𒅕𒃸</Filter>
     </ClInclude>
+    <ClInclude Include="𒂗𒈨𒅕𒃸\registry.h">
+      <Filter>Header Files\𒂊𒂗𒈨𒅕𒃸</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ActiveLanguageProfileNotifySink.cpp">
@@ -314,6 +317,9 @@
     <ClCompile Include="logging.cpp">
       <Filter>Source Files\𒂊𒂗𒈨𒅕𒃸</Filter>
     </ClCompile>
+    <ClCompile Include="𒂗𒈨𒅕𒃸\registry.cpp">
+      <Filter>Source Files\𒂊𒂗𒈨𒅕𒃸</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SampleIME.rc">
@@ -339,5 +345,8 @@
     <Text Include="𒂗𒈨𒅕𒃸\layout_ʾṣṭpŋf.txt">
       <Filter>Resource Files</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natvis" />
   </ItemGroup>
 </Project>
