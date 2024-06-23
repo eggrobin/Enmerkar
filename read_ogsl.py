@@ -104,7 +104,7 @@ def compute_expected_unicode_name(string, inner_plus=True):
   return name.replace(".", " ") if inner_plus else name.replace(".", " PLUS ")
 
 
-with open(r"..\ogsl\00lib\ogsl.asl", encoding="utf-8") as f:
+with open(r"..\osl\00lib\osl.asl", encoding="utf-8") as f:
   lines = f.read().split("\n")
 
 sign_name = None
@@ -233,7 +233,7 @@ try:
       if value in "dfm":
         # We do determinative shorthands by hand.
         continue
-      if value in ("𒑱", ':"', ":.", ":"):
+      if value in ("𒑱", ':"', ":.", ":") or re.match("^p[₁₂₃₄₅]$", value):
         # We do punctuation by hand.
         continue
       if value[0] == "{":
@@ -538,7 +538,7 @@ for name, forms in forms_by_name.items():
   if not encoding:
     continue
 
-  if 'X' in encoding:
+  if 'X' in encoding or 'O' in encoding:
     continue
 
   if name == "ASAL₂~a":
@@ -586,6 +586,10 @@ for name, forms in forms_by_name.items():
     # The unicode name is a value here rather than the catalogue number.
     expected_unicode_name = "ZAMX"
 
+  if expected_unicode_name == "LAK-776":
+    # The unicode name is a value here rather than the catalogue number.
+    expected_unicode_name = "LU HUL2"
+
   # OGSL never decomposes LAL₂, so lets’ treat this as intentional.
   expected_unicode_name = expected_unicode_name.replace("LAL2", "LAL TIMES LAL")
 
@@ -595,7 +599,7 @@ for name, forms in forms_by_name.items():
   if expected_unicode_name == "URU TIMES MIN TIMES IGI":
     expected_unicode_name = "LAK-648 TIMES IGI"
 
-  if expected_unicode_name == "KU4~a":
+  if expected_unicode_name == "REC145":
     expected_unicode_name = "KU4 VARIANT FORM"
 
   if expected_unicode_name == "LAGAB TIMES SHITA TENU PLUS GISH":
@@ -780,19 +784,13 @@ NON_SIGNS = set((
   # It probably isn’t KWU089 contrary to Koslova, but the variant of 𒁔, consistent with both the name and the reference glyph,
   # exists—whether it deserved its own codepoint is another question…
   "𒍘",
-  # MZL680, Hittite, no values, not in the OGSL.
-  "𒍱",
-  # MZL697, HZL276, Hittite, no values, not in the OGSL.
-  "𒍲",
-  # MZL454, no values, not in the OGSL.
-  "𒍳",
   # MZL811, with explanations given at MZL748 𒁹:
   # 60šu, šuššu^šu resp. 60+šu, šuššu^+šu, the number 60.
   # Borgers writes this can be transcribed 60(KU) in assyrian, but differs from
   # KU in babylonian.  This is probably why we have a separate codepoint.
   # See CAD, entry šūši.
   # Numeric, so let’s handle that separately.
-  "𒍵",
+  #"𒍵",
   # A misreading of MZL for gaz₃, and gaz₃ itself.
   # See https://github.com/oracc/ogsl/pull/7#issuecomment-1304608990.
   "𒁿", "𒍶",
@@ -801,18 +799,14 @@ NON_SIGNS = set((
   # No idea for that one either.
   "𒎁",
   "𒎅",
-  # MZL763, no values, not in the OGSL.
-  "𒎈",
   # MZL741, variant of MZL882.  Not clear how it differs, does it have the same
   # values?  Does it only have a specific logographic value like TA*?  Punt for
   # now.
-  "𒎔",
-  # MZL194, no values, not in the OGSL.
-  "𒎖",
+  # "𒎔",
   # MZL488, a variant of 𒌝𒈨.
   # TODO(egg): should it take its place (and should the UM.ME rendition be a
   # matter for the font?)
-  "𒎘",
+  #"𒎘",
   # Unified in favour of the numeric versions.
   "𒀼", "𒅓", "𒇹",
   "𒊪", # Turned into a @nosign with: @inote unicode revision needed/deleted; sign is |ZUM×TUG₂| = LAK524.
