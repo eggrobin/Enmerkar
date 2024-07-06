@@ -72,6 +72,7 @@ LANGID GetTransientLangID() {
   }
   std::wstring const 𒂗𒈨𒅕𒃸_langid_string = std::format(L"{:04X}", *𒂗𒈨𒅕𒃸_langid);
   std::wstring const 𒂗𒈨𒅕𒃸_padded_langid_string = L"0000" + 𒂗𒈨𒅕𒃸_langid_string;
+#if 0
   MessageBoxW(
       nullptr,
       std::format(
@@ -79,6 +80,7 @@ LANGID GetTransientLangID() {
           .c_str(),
       nullptr,
       MB_OK | MB_ICONINFORMATION);
+#endif
   for (auto const& user : wil::make_range(wil::reg::key_iterator{HKEY_USERS},
                                           wil::reg::key_iterator{})) {
     if (user.name != L".DEFAULT" && !user.name.starts_with(L"S-1-5-21-") ||
