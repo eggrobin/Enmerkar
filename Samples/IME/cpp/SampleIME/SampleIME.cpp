@@ -24,7 +24,6 @@
 /* static */
 HRESULT CSampleIME::CreateInstance(_In_ IUnknown *pUnkOuter, REFIID riid, _Outptr_ void **ppvObj)
 {
-    𒂗𒈨𒅕𒃸::GetTransientLangID();
     CSampleIME* pSampleIME = nullptr;
     HRESULT hr = S_OK;
 
