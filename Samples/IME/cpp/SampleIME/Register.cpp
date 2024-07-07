@@ -102,33 +102,15 @@ void UnregisterProfiles()
     {
         goto Exit;
     } else {
-      // TODO(egg): I would want to EnumProfiles and unregister all matching
-      // SampleIMECLSID, but EnumProfiles also wants a LANGID.  Check the
-      // documentation and/or eggsperiment to see if we can get anything out of
-      // that...
-      // ITfInputProcessorProfiles::GetLanguageList?
-      ITfInputProcessorProfiles* profiles = nullptr;
-      hr = TF_CreateInputProcessorProfiles(&profiles);
-      if (FAILED(hr)) {
-        goto Exit;
-      }
-      LANGID* langids;
-      ULONG langids_size;
-      hr = profiles->GetLanguageList(&langids, &langids_size);
-      if (FAILED(hr)) {
-        goto Exit;
-      }
-      for (int i = 0; i < langids_size; ++i) {
-        LANGID const langid = langids[i];
-        // TODO(egg): I guess this will fail if it is not there, so we need to
-        // check that there is a profile with this CLSID for the current language?
-        // Check the docs after landing.
-        hr = pITfInputProcessorProfileMgr->UnregisterProfile(Global::SampleIMECLSID, langid, Global::SampleIMEGuidProfile, 0);
-        if (FAILED(hr))
-        {
-          goto Exit;
-        }
-      }
+      // See https://learn.microsoft.com/en-us/windows/win32/api/msctf/nf-msctf-itfinputprocessorprofilemgr-unregisterprofile:
+      // TF_URP_ALLPROFILES: If this bit is on, UnregistrProfile (sic)
+      //                     unregisters all profiles of the rclsid parameter.
+      //                     The langid and guidProfile parameters are ignored.
+      hr = pITfInputProcessorProfileMgr->UnregisterProfile(
+          /*rclsid=*/Global::SampleIMECLSID,
+          /*langid=*/{},
+          /*guidProfile=*/{},
+          /*dwFlags=*/TF_URP_ALLPROFILES);
       if (FAILED(hr))
       {
           goto Exit;
