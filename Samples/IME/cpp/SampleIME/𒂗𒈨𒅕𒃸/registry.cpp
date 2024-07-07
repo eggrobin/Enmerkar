@@ -102,8 +102,6 @@ LANGID GetTransientLangID() {
         𒂗𒈨𒅕𒃸_language.get(), L"TransientLangId", *𒂗𒈨𒅕𒃸_langid);
     wil::reg::set_value(
         𒂗𒈨𒅕𒃸_language.get(), L"CachedLanguageName", L"Akkadian");
-    // TODO(egg): Do I need to add it to HKCU\Software\Microsoft\CTF\SortOrder\Language?
-    // Yes.
     std::wstring const input_profile =
         𒂗𒈨𒅕𒃸_langid_string + L":{F87CB858-5A61-42FF-98E4-CF3966457808}";
     if (wil::reg::try_get_value<DWORD>(𒂗𒈨𒅕𒃸_language.get(),
@@ -118,52 +116,89 @@ LANGID GetTransientLangID() {
       wil::reg::set_value(
           international_user_profile.get(), L"Languages", languages);
     }
-    auto const keyboard_layout_preload =
-        wil::reg::open_unique_key(hkey_user.get(),
-                                  LR"(Keyboard Layout\Preload)",
-                                  wil::reg::key_access::readwrite);
-    int highest_index = 0;
-    std::optional<int> 𒂗𒈨𒅕𒃸_preload_index;
-    for (auto const& value : wil::make_range(
-             wil::reg::value_iterator{keyboard_layout_preload.get()},
-             wil::reg::value_iterator{})) {
-      std::string ascii_key;
-      std::transform(value.name.begin(),
-                     value.name.end(),
-                     std::back_inserter(ascii_key),
-                     [](wchar_t c) { return c <= 0x7F ? c : '?'; });
-      int index;
-      if (std::from_chars(
-              ascii_key.data(), ascii_key.data() + ascii_key.size(), index)
-              .ec == std::errc{}) {
-        highest_index = std::max(highest_index, index);
-        if (wil::reg::get_value<std::wstring>(keyboard_layout_preload.get(),
-                                              value.name.c_str()) ==
-            𒂗𒈨𒅕𒃸_padded_langid_string) {
-          𒂗𒈨𒅕𒃸_preload_index = index;
+    {
+      auto const ctf_sort_order_language = wil::reg::open_unique_key(
+          hkey_user.get(),
+          LR"(Software\Microsoft\CTF\SortOrder\Language)",
+          wil::reg::key_access::readwrite);
+      std::optional<int> language_sort_order_index;
+      int highest_index = 0;
+      for (auto const& value : wil::make_range(
+               wil::reg::value_iterator{ctf_sort_order_language.get()},
+               wil::reg::value_iterator{})) {
+        std::string ascii_key;
+        std::transform(value.name.begin(),
+                       value.name.end(),
+                       std::back_inserter(ascii_key),
+                       [](wchar_t c) { return c <= 0x7F ? c : '?'; });
+        int index;
+        if (std::from_chars(
+                ascii_key.data(), ascii_key.data() + ascii_key.size(), index)
+                .ec == std::errc{}) {
+          highest_index = std::max(highest_index, index);
+          if (wil::reg::get_value<std::wstring>(ctf_sort_order_language.get(),
+                                                value.name.c_str()) ==
+              𒂗𒈨𒅕𒃸_padded_langid_string) {
+            language_sort_order_index = index;
+          }
         }
       }
+      if (!language_sort_order_index.has_value()) {
+        language_sort_order_index = highest_index + 1;
+        wil::reg::set_value(
+            ctf_sort_order_language.get(),
+            std::format(L"{:08d}", *language_sort_order_index).c_str(),
+            𒂗𒈨𒅕𒃸_padded_langid_string.c_str());
+      }
     }
-    if (!𒂗𒈨𒅕𒃸_preload_index.has_value()) {
-      𒂗𒈨𒅕𒃸_preload_index = highest_index + 1;
-      wil::reg::set_value(keyboard_layout_preload.get(),
-                          std::to_wstring(*𒂗𒈨𒅕𒃸_preload_index).c_str(),
-                          𒂗𒈨𒅕𒃸_padded_langid_string.c_str());
+    {
+      auto const keyboard_layout_preload =
+          wil::reg::open_unique_key(hkey_user.get(),
+                                    LR"(Keyboard Layout\Preload)",
+                                    wil::reg::key_access::readwrite);
+      int highest_index = 0;
+      std::optional<int> 𒂗𒈨𒅕𒃸_preload_index;
+      for (auto const& value : wil::make_range(
+               wil::reg::value_iterator{keyboard_layout_preload.get()},
+               wil::reg::value_iterator{})) {
+        std::string ascii_key;
+        std::transform(value.name.begin(),
+                       value.name.end(),
+                       std::back_inserter(ascii_key),
+                       [](wchar_t c) { return c <= 0x7F ? c : '?'; });
+        int index;
+        if (std::from_chars(
+                ascii_key.data(), ascii_key.data() + ascii_key.size(), index)
+                .ec == std::errc{}) {
+          highest_index = std::max(highest_index, index);
+          if (wil::reg::get_value<std::wstring>(keyboard_layout_preload.get(),
+                                                value.name.c_str()) ==
+              𒂗𒈨𒅕𒃸_padded_langid_string) {
+            𒂗𒈨𒅕𒃸_preload_index = index;
+          }
+        }
+      }
+      if (!𒂗𒈨𒅕𒃸_preload_index.has_value()) {
+        𒂗𒈨𒅕𒃸_preload_index = highest_index + 1;
+        wil::reg::set_value(keyboard_layout_preload.get(),
+                            std::to_wstring(*𒂗𒈨𒅕𒃸_preload_index).c_str(),
+                            𒂗𒈨𒅕𒃸_padded_langid_string.c_str());
+      }
+      auto const keyboard_layout_substitutes =
+          wil::reg::open_unique_key(hkey_user.get(),
+                                    LR"(Keyboard Layout\Substitutes)",
+                                    wil::reg::key_access::readwrite);
+      wil::reg::set_value(keyboard_layout_substitutes.get(),
+                          𒂗𒈨𒅕𒃸_padded_langid_string.c_str(),
+                          L"00000409");
+      auto const hidden_dummy_layouts = wil::reg::open_unique_key(
+          hkey_user.get(),
+          LR"(Software\Microsoft\CTF\HiddenDummyLayouts)",
+          wil::reg::key_access::readwrite);
+      wil::reg::set_value(hidden_dummy_layouts.get(),
+                          𒂗𒈨𒅕𒃸_padded_langid_string.c_str(),
+                          L"00000409");
     }
-    auto const keyboard_layout_substitutes =
-        wil::reg::open_unique_key(hkey_user.get(),
-                                  LR"(Keyboard Layout\Substitutes)",
-                                  wil::reg::key_access::readwrite);
-    wil::reg::set_value(keyboard_layout_substitutes.get(),
-                        𒂗𒈨𒅕𒃸_padded_langid_string.c_str(),
-                        L"00000409");
-    auto const hidden_dummy_layouts = wil::reg::open_unique_key(
-        hkey_user.get(),
-        LR"(Software\Microsoft\CTF\HiddenDummyLayouts)",
-        wil::reg::key_access::readwrite);
-    wil::reg::set_value(hidden_dummy_layouts.get(),
-                        𒂗𒈨𒅕𒃸_padded_langid_string.c_str(),
-                        L"00000409");
   }
   return *𒂗𒈨𒅕𒃸_langid;
   } catch (wil::ResultException e) {
