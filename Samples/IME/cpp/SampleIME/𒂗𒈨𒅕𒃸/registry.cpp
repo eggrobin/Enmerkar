@@ -103,6 +103,7 @@ LANGID GetTransientLangID() {
     wil::reg::set_value(
         𒂗𒈨𒅕𒃸_language.get(), L"CachedLanguageName", L"Akkadian");
     // TODO(egg): Do I need to add it to HKCU\Software\Microsoft\CTF\SortOrder\Language?
+    // Yes.
     std::wstring const input_profile =
         𒂗𒈨𒅕𒃸_langid_string + L":{F87CB858-5A61-42FF-98E4-CF3966457808}";
     if (wil::reg::try_get_value<DWORD>(𒂗𒈨𒅕𒃸_language.get(),

@@ -50,6 +50,7 @@ HRESULT CSampleIME::_HandleCandidateFinalize(TfEditCookie ec, _In_ ITfContext *p
       std::wstring with_a = std::wstring(candidate) + L"𒀀";
       zwsp = candidate == L"\u200B";
       if (zwsp) {
+        // TODO(egg): Can we do that on Word only?
         candidateString.Set(with_a.data(), with_a.size());
       }
 
