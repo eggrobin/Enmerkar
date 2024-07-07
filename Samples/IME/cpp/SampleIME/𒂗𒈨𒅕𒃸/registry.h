@@ -8,4 +8,6 @@ namespace 𒂗𒈨𒅕𒃸 {
 
 LANGID GetTransientLangID();
 
+void RemoveLanguageIfUnused();
+
 }  // namespace 𒂗𒈨𒅕𒃸

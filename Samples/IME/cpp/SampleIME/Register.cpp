@@ -102,11 +102,38 @@ void UnregisterProfiles()
     {
         goto Exit;
     } else {
-      hr = pITfInputProcessorProfileMgr->UnregisterProfile(Global::SampleIMECLSID, 𒂗𒈨𒅕𒃸::GetTransientLangID(), Global::SampleIMEGuidProfile, 0);
+      // TODO(egg): I would want to EnumProfiles and unregister all matching
+      // SampleIMECLSID, but EnumProfiles also wants a LANGID.  Check the
+      // documentation and/or eggsperiment to see if we can get anything out of
+      // that...
+      // ITfInputProcessorProfiles::GetLanguageList?
+      ITfInputProcessorProfiles* profiles = nullptr;
+      hr = TF_CreateInputProcessorProfiles(&profiles);
+      if (FAILED(hr)) {
+        goto Exit;
+      }
+      LANGID* langids;
+      ULONG langids_size;
+      hr = profiles->GetLanguageList(&langids, &langids_size);
+      if (FAILED(hr)) {
+        goto Exit;
+      }
+      for (int i = 0; i < langids_size; ++i) {
+        LANGID const langid = langids[i];
+        // TODO(egg): I guess this will fail if it is not there, so we need to
+        // check that there is a profile with this CLSID for the current language?
+        // Check the docs after landing.
+        hr = pITfInputProcessorProfileMgr->UnregisterProfile(Global::SampleIMECLSID, langid, Global::SampleIMEGuidProfile, 0);
+        if (FAILED(hr))
+        {
+          goto Exit;
+        }
+      }
       if (FAILED(hr))
       {
           goto Exit;
       }
+      𒂗𒈨𒅕𒃸::RemoveLanguageIfUnused();
     }
 
 Exit:
