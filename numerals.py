@@ -17,20 +17,20 @@ BASIC_FRACTIONS = {
 # being the 3-row one, described as the normal Babylonian form in Friberg
 # (2007), 0.4 f.  See also Friberg p. 50-52.
 # Note that this is reversed from
-# http://oracc.museum.upenn.edu/doc/help/editinginatf/metrology/metrologicaltables/index.html,
+# http://oracc.museum.upenn.edu/doc/help/editinginatf/maths/index.html,
 # but same as
-# http://oracc.museum.upenn.edu/doc/help/editinginatf/maths/index.html.
+# http://oracc.museum.upenn.edu/doc/help/editinginatf/metrology/metrologicaltables/index.html.
 DIŠ_NUMERALS = [
   [],
   ['𒁹'],
   ['𒈫'],
   ['𒐈'],
-  ['𒐼', '𒐉'],
+  ['𒐉', '𒐼'],
   ['𒐊'],
   ['𒐋'],
-  ['𒑂', '𒐌'],
-  ['𒑄', '𒐍'],
-  ['𒑆', '𒐎'],
+  ['𒐌', '𒑂'],
+  ['𒐍', '𒑄'],
+  ['𒐎', '𒑆'],
 ]
 
 # Only the first five are used as part of the counting number systems, the rest
@@ -41,12 +41,12 @@ U_NUMERALS = [
   ['𒌋'],
   ['𒎙'],
   ['𒌍'],
-  ['𒑩', '𒐏'],
-  ['𒑪', '𒐐'],
-  ['𒑫', '𒐑'],
-  ['𒑬', '𒐒'],
-  ['𒑭', '𒐓'],
-  ['𒑮', '𒐔'],
+  ['𒐏', '𒑩'],
+  ['𒐐', '𒑪'],
+  ['𒐑', '𒑫'],
+  ['𒐒', '𒑬'],
+  ['𒐓', '𒑭'],
+  ['𒐔', '𒑮'],
 ]
 
 GÉŠ_NUMERALS = [
