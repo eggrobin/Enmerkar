@@ -794,7 +794,7 @@ class SignList:
     return result
 
 osl_hash = subprocess.check_output(
-  ['git', 'rev-parse', 'HEAD'],
+  ['git', 'describe', '--tags', '--always', '--dirty', '--abbrev=40', '--long'],
   cwd=r"..\osl").decode('ascii').strip()
 osl_date = datetime.datetime.fromisoformat(
   subprocess.check_output(
