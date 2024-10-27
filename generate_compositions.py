@@ -98,7 +98,7 @@ for name, forms in osl.forms_by_name.items():
             encoded_forms_by_list_number[number][xsux] = []
           encoded_forms_by_list_number[number][xsux].append(form)
 
-compositions: dict[str, str] = {}
+compositions: dict[str, list[str]] = {}
 
 for value, forms_by_codepoints in sorted(encoded_forms_by_value.items()):
   normalized_value = ""
