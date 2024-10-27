@@ -2,7 +2,8 @@ import re
 
 import asl
 from asl import osl
-import numbers
+import numerals
+import unicodedata
 
 for forms in osl.forms_by_name.values():
   for form in forms:
@@ -35,14 +36,16 @@ encoded_forms_by_list_number: dict[str, dict[str, list[asl.Form]]] = {}
 
 for name, forms in osl.forms_by_name.items():
   if any (form.unicode_cuneiform for form in forms):
-    encodings = set(form.unicode_cuneiform.text for form in forms if form.unicode_cuneiform)
+    encodings = {form.unicode_cuneiform.text: form for form in forms if form.unicode_cuneiform}
     if len(encodings) != 1:
       raise ValueError(f"Multiple encodings for {name}: {encodings}")
-    encoding = list(encodings)[0]
+    encoding, source_form = list(encodings.items())[0]
     for form in forms:
       if not form.unicode_cuneiform:
         print(f"*** Missing {encoding} on {form.names[0]}")
         form.unicode_cuneiform = asl.UnicodeCuneiform(encoding)
+        form.unicode_age = source_form.unicode_age
+        form.unicode_pua = source_form.unicode_pua
 
 for name, forms in osl.forms_by_name.items():
   for form in forms:
@@ -51,7 +54,15 @@ for name, forms in osl.forms_by_name.items():
     if form.unicode_cuneiform or form.unicode_map:
       # Note that we prefer the ucun to the umap, which allows us to ignore the
       # hack from https://github.com/oracc/osl/commit/e7de0d92682afc043726c6689e407551f7466652.
-      xsux = (form.unicode_cuneiform or osl.forms_by_name[form.unicode_map.text][0].unicode_cuneiform).text;
+      xsux = (form.unicode_cuneiform or osl.forms_by_name[form.unicode_map.text][0].unicode_cuneiform).text
+      if form.unicode_age and form.unicode_age.text == "ACN":
+        continue
+      if form.unicode_pua:
+        continue
+      if any(unicodedata.category(c) == 'Cn' for c in xsux):
+        raise ValueError(f"Unassigned characters in {form}")
+      if any(unicodedata.category(c) == 'Co' for c in xsux):
+        raise ValueError(f"Private use characters in {form}")
       if "X" in xsux:
         continue
       if "O" in xsux:
@@ -98,7 +109,7 @@ for name, forms in osl.forms_by_name.items():
             encoded_forms_by_list_number[number][xsux] = []
           encoded_forms_by_list_number[number][xsux].append(form)
 
-compositions: dict[str, str] = {}
+compositions: dict[str, list[str]] = {}
 
 for value, forms_by_codepoints in sorted(encoded_forms_by_value.items()):
   normalized_value = ""
@@ -146,7 +157,7 @@ for list_number, forms_by_codepoints in encoded_forms_by_list_number.items():
     else:
       compositions.setdefault(composition, []).append(encoding)
 
-for composition, encoding in numbers.compositions.items():
+for composition, encoding in numerals.compositions.items():
   compositions.setdefault(composition, []).append(encoding)
 
 
@@ -199,5 +210,9 @@ for filename, encoding in (("sign_list.txt", "utf-16"),
                            ("sign_list.utf-8.txt", "utf-8")):
   with open(fr".\Samples\IME\cpp\SampleIME\Dictionary\{filename}",
             "w", encoding=encoding) as f:
+    print(f'"_OSL_revision"="{osl.revision}"', file=f)
+    if not osl.date:
+      raise ValueError("OSL has no date")
+    print(f'"_OSL_date"="{osl.date.isoformat()}"', file=f)
     for composition, encodings in sorted(compositions.items()):
       print(f'"{composition}"="{encodings[0]}"', file=f)

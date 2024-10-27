@@ -1,11 +1,13 @@
 # Based on http://oracc.org/osl/asloslfileformat/index.html.
 
 from collections import defaultdict
+import datetime
 import difflib
 import re
 import sys
 import textwrap
 from typing import DefaultDict, Optional, Literal, Tuple
+import subprocess
 
 class RawEntry:
   def __init__(self, line: str, parser: "Parser"):
@@ -13,8 +15,9 @@ class RawEntry:
       parser.raise_error(f"Tag does not start with @: {line}")
     tag, *tail = line.split(maxsplit=1)
     self.tag = tag[1:]
+    self.default = self.tag.endswith("+")
     self.deprecated = self.tag.endswith("-")
-    if self.deprecated:
+    if self.default or self.deprecated:
       self.tag = self.tag[:-1]
     self.text = tail[0] if tail else ""
 
@@ -101,6 +104,15 @@ class Project(TextTag):
 class Domain(TextTag):
   tag = "domain"
 
+class ScriptDef(TextTag):
+  tag = "scriptdef"
+
+class Script(TextTag):
+  tag = "script"
+
+class Images(TextTag):
+  tag = "images"
+
 # Not actually arbitrary text.
 class Reference(Note):
   tag = "ref"
@@ -110,8 +122,8 @@ class Reference(Note):
 class UnicodeName(TextTag):
   tag = "uname"
 
-class UnicodeSequence(TextTag):
-  tag = "useq"
+class UnicodePrivateUseArea(TextTag):
+  tag = "upua"
 
 class UnicodeCuneiform(TextTag):
   tag = "ucun"
@@ -448,6 +460,7 @@ class Form:
   tag = "form"
   oid: Optional[OID]
   deprecated: bool
+  default: bool
   names: list[str]
   pname: Optional[str]
   fake: Optional[Fake]
@@ -456,10 +469,12 @@ class Form:
   # TODO(egg): Structure.
   unicode_name: Optional[UnicodeName]
   unicode_sequence: Optional[UnicodeSequence]
+  unicode_pua: Optional[UnicodePrivateUseArea]
   unicode_cuneiform: Optional[UnicodeCuneiform]
   unicode_age: Optional[UnicodeAge]
   unicode_note: Optional[UnicodeNote]
   unicode_map: Optional[UnicodeMap]
+  script: Optional[Script]
 
   sign: Optional["Sign"]
 
@@ -478,11 +493,13 @@ class Form:
     self.links = []
     self.notes = []
     self.unicode_name = None
+    self.unicode_pua = None
     self.unicode_sequence = None
     self.unicode_cuneiform = None
     self.unicode_age = None
     self.unicode_note = None
     self.unicode_map = None
+    self.script = None
     self.fake = None
     self.sign = None
 
@@ -508,18 +525,20 @@ class Form:
         "\n".join(str(note) for note in self.notes),
         str(self.unicode_name) if self.unicode_name else None,
         "\n".join(str(source) for source in self.sources if source.source.abbreviation == "U+"),
+        str(self.unicode_pua) if self.unicode_pua else None,
         str(self.unicode_sequence) if self.unicode_sequence else None,
         str(self.unicode_cuneiform) if self.unicode_cuneiform else None,
         str(self.unicode_map) if self.unicode_map else None,
         str(self.unicode_age) if self.unicode_age else None,
         str(self.unicode_note) if self.unicode_note else None,
+        str(self.script) if self.script else None,
         "\n".join(str(value) for value in self.values),
         "\n".join(str(system) for system in self.systems),
         "\n".join(str(link) for link in self.links)) if lines)
 
   def __str__(self):
     return "\n".join(lines for lines in (
-        f"@{self.tag}{'-' if self.deprecated else ''} {self.names[0]}",
+        f"@{self.tag}{'-' if self.deprecated else '+' if self.default else ''} {self.names[0]}",
         self.form_components_str(),
         "@@") if lines)
 
@@ -530,6 +549,7 @@ class Form:
     entry.validate(cls, parser)
     result = cls(entry.text)
     result.deprecated = entry.deprecated
+    result.default = entry.default
 
     while entry := parser.peek():
       if cls.check_end(parser, entry):
@@ -547,6 +567,8 @@ class Form:
         result.unicode_name = UnicodeName.parse(parser)
       elif entry.tag == UnicodeSequence.tag:
         result.unicode_sequence = UnicodeSequence.parse(parser)
+      elif entry.tag == UnicodePrivateUseArea.tag:
+        result.unicode_pua = UnicodePrivateUseArea.parse(parser)
       elif entry.tag == UnicodeCuneiform.tag:
         result.unicode_cuneiform = UnicodeCuneiform.parse(parser)
       elif entry.tag == UnicodeAge.tag:
@@ -555,6 +577,8 @@ class Form:
         result.unicode_note = UnicodeNote.parse(parser)
       elif entry.tag == UnicodeMap.tag:
         result.unicode_map = UnicodeMap.parse(parser)
+      elif entry.tag == Script.tag:
+        result.script = Script.parse(parser)
       elif entry.tag == Value.tag:
         result.values.append(Value.parse(parser))
       elif entry.tag == SystemBinding.tag:
@@ -607,6 +631,37 @@ class Sign(Form, SignLike):
       return True
     return False
 
+class Pcun(Form, SignLike):
+  tag = "pcun"
+  forms: list[Form]
+
+  def __str__(self):
+    return "\n".join(lines for lines in (
+        f"@{self.tag}{'-' if self.deprecated else ''} {self.names[0]}",
+        self.form_components_str(),
+        "\n".join(str(form) for form in self.forms),
+        "@end pcun") if lines)
+
+  def __init__(self, name):
+    super().__init__(name)
+    self.forms = []
+
+  def parse_extension(self, parser: Parser, sources: dict[str, Source]):
+    entry = parser.peek()
+    if entry.tag == Form.tag:
+      form = Form.parse(parser, sources)
+      form.sign = self
+      self.forms.append(form)
+      return True
+    return False
+
+  @classmethod
+  def check_end(cls, parser: Parser, entry: RawEntry):
+    if entry.tag == "end" and entry.text == "pcun":
+      parser.next()
+      return True
+    return False
+
 class SignList:
   tag = "signlist"
   project: Project
@@ -617,10 +672,14 @@ class SignList:
   notes: list[Note]
   sources: dict[str, Source]
   systems: dict[str, System]
+  scripts: list[ScriptDef]
+  images: list[Images]
   signs: list[SignLike]
   signs_by_name: dict[str, SignLike]
   forms_by_name: defaultdict[str, list[Form]]
   forms_by_source: defaultdict[Source, defaultdict[SourceRange, list[Form]]]
+  revision: str|None = None
+  date: datetime.datetime|None = None
 
   def __init__(self, project: Project, name: str, domain: Domain):
     self.project = project
@@ -630,7 +689,11 @@ class SignList:
     self.sources = {}
     self.systems = {}
     self.link_types = {}
+    self.scripts = []
+    self.images = []
     self.signs = []
+    self.revision = None
+    self.date = None
 
     self.signs_by_name = {}
     self.forms_by_name = defaultdict(list)
@@ -696,6 +759,7 @@ class SignList:
       "\n\n".join(str(note) for note in self.notes),
       "\n\n".join(str(source) for source in self.sources.values()),
       "\n\n".join(str(system) for system in self.systems.values()),
+      "\n".join(str(script) for script in self.scripts),
       "\n\n".join(str(link_type) for link_type in self.link_types.values()),
       "\n\n".join(str(sign) for sign in self.signs)))
 
@@ -716,6 +780,10 @@ class SignList:
         result.add_system(System.parse(parser))
       elif entry.tag == LinkType.tag:
         result.add_link_type(LinkType.parse(parser))
+      elif entry.tag == ScriptDef.tag:
+        result.scripts.append(ScriptDef.parse(parser))
+      elif entry.tag == Images.tag:
+        result.images.append(Images.parse(parser))
       else:
         for entry_type in SignLike.__subclasses__():
           if entry.tag == entry_type.tag:
@@ -725,9 +793,20 @@ class SignList:
           parser.raise_error(f"Expected one of {SignLike.__subclasses__()}, got {entry.tag}")
     return result
 
+osl_hash = subprocess.check_output(
+  ['git', 'describe', '--tags', '--always', '--dirty', '--abbrev=40', '--long'],
+  cwd=r"..\osl").decode('ascii').strip()
+osl_date = datetime.datetime.fromisoformat(
+  subprocess.check_output(
+    ['git', 'show', '--no-patch', '--format=%cI', 'HEAD'],
+    cwd=r"..\osl").decode('ascii').strip()).astimezone(datetime.timezone.utc)
+
 with open(r"..\osl\00lib\osl.asl", encoding="utf-8") as f:
   original_lines = f.read().splitlines()
   osl = SignList.parse(Parser(original_lines, "osl.asl"))
+
+osl.date = osl_date
+osl.revision = osl_hash
 
 print("\n".join(difflib.unified_diff(
     original_lines, str(osl).splitlines(),
