@@ -265,7 +265,7 @@ void RemoveLanguageIfUnused() {
       auto languages = wil::reg::get_value<std::vector<std::wstring>>(
           international_user_profile.get(), L"Languages");
       std::erase_if(languages, [&](std::wstring const& l) {
-        languages_to_delete.contains(l);
+        return languages_to_delete.contains(l);
       });
       wil::reg::set_value(
           international_user_profile.get(), L"Languages", languages);
