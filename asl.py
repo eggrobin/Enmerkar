@@ -1,11 +1,13 @@
 # Based on http://oracc.org/osl/asloslfileformat/index.html.
 
 from collections import defaultdict
+import datetime
 import difflib
 import re
 import sys
 import textwrap
 from typing import DefaultDict, Optional, Literal, Tuple
+import subprocess
 
 class RawEntry:
   def __init__(self, line: str, parser: "Parser"):
@@ -621,6 +623,8 @@ class SignList:
   signs_by_name: dict[str, SignLike]
   forms_by_name: defaultdict[str, list[Form]]
   forms_by_source: defaultdict[Source, defaultdict[SourceRange, list[Form]]]
+  revision: str|None = None
+  date: datetime.datetime|None = None
 
   def __init__(self, project: Project, name: str, domain: Domain):
     self.project = project
@@ -631,6 +635,8 @@ class SignList:
     self.systems = {}
     self.link_types = {}
     self.signs = []
+    self.revision = None
+    self.date = None
 
     self.signs_by_name = {}
     self.forms_by_name = defaultdict(list)
@@ -725,9 +731,20 @@ class SignList:
           parser.raise_error(f"Expected one of {SignLike.__subclasses__()}, got {entry.tag}")
     return result
 
+osl_hash = subprocess.check_output(
+  ['git', 'rev-parse', 'HEAD'],
+  cwd=r"..\osl").decode('ascii').strip()
+osl_date = datetime.datetime.fromisoformat(
+  subprocess.check_output(
+    ['git', 'show', '--no-patch', '--format=%cI', 'HEAD'],
+    cwd=r"..\osl").decode('ascii').strip()).astimezone(datetime.timezone.utc)
+
 with open(r"..\osl\00lib\osl.asl", encoding="utf-8") as f:
   original_lines = f.read().splitlines()
   osl = SignList.parse(Parser(original_lines, "osl.asl"))
+
+osl.date = osl_date
+osl.revision = osl_hash
 
 print("\n".join(difflib.unified_diff(
     original_lines, str(osl).splitlines(),

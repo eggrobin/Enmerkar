@@ -36,8 +36,6 @@ DIŠ_NUMERALS = [
 # Only the first five are used as part of the counting number systems, the rest
 # appear as BÙR.  We still put them in this list so that the signs may be
 # referred to by name as a ligature of multiple U signs.
-# Again we follow Friberg to choose the normal form, backwards from Oracc metrology,
-# same as Oracc maths (see Friberg p. 53).
 U_NUMERALS = [
   [],
   ['𒌋'],
@@ -153,11 +151,17 @@ BURʾU_NUMERALS = [
 
 BARIG_NUMERALS = [
   [],
-  ['𒁹'],
-  ['𒑖'],
-  ['𒑗'],
+  ['𒁹', '𒑣'],
+  ['𒑖', '𒑤'],
+  ['𒑗', '𒑤𒑣'],
   ['𒐉'],
 ]
+
+GUR_FRACTIONS = {
+  "1/4": ['𒑣'],
+  "1/2": ['𒑤'],
+  "3/4": ['𒑤𒑣'],
+}
 
 BÁN_NUMERALS = [
   [],
@@ -166,6 +170,16 @@ BÁN_NUMERALS = [
   ['𒑑'],
   ['𒑒', '𒑓'],
   ['𒑔', '𒑕'],
+]
+
+TENÛ_NUMERALS = [
+  [],
+  ['𒀹'],
+  ['𒑊'],
+  ['𒑋'],
+  ['𒑌'],
+  ['𒑍'],
+  ['𒑎'],
 ]
 
 def numeric_value(c):
@@ -185,6 +199,8 @@ for name, sequence in dict(globals()).items():
     for i in range(len(sequence)):
       for variant in sequence[i]:
         value = numeric_value(variant)
+        if name == 'BARIG_NUMERALS' and value is not None and unicodedata.name(variant).endswith(" GUR"):
+          value *= 4  # Fractions of the gur of 4 barig, expressed in barig.
         expected_value = 60 ** 3 * i if name == 'ŠARGAL_NUMERALS' else i
         if value is not None and value != expected_value:
           raise ValueError(
@@ -251,6 +267,11 @@ add_sexagesimal_compositions(60 ** 3, ŠARGAL_NUMERALS, ŠARʾUGAL_NUMERALS)
 # Neo-Sumerian / Old Babylonian capacity system.
 add_simple_compositions('ban2', BÁN_NUMERALS)
 add_simple_compositions('barig', BARIG_NUMERALS)
+add_simple_compositions('gur', GUR_FRACTIONS)
+
+# Ur III dates, various ED III metrological systems
+add_simple_compositions('aštenu', TENÛ_NUMERALS)
+add_simple_compositions('dištenu', TENÛ_NUMERALS)
 
 # Area system.
 add_simple_compositions('iku', IKU_FRACTIONS)
