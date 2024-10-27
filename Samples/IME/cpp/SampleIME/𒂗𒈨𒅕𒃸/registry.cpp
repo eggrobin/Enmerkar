@@ -13,7 +13,7 @@ namespace 𒂗𒈨𒅕𒃸 {
 
 LANGID GetTransientLangID() {
   try {
-  constexpr PCWSTR 𒂗𒈨𒅕𒃸_tag = L"akk-Xsux";
+    constexpr PCWSTR 𒂗𒈨𒅕𒃸_tag = L"akk-Xsux";
   // List from
   // https://learn.microsoft.com/en-us/windows/win32/sysinfo/enumerating-registry-subkeys.
   std::set<LANGID> unused_transient_langids{0x2000,
@@ -226,7 +226,7 @@ void RemoveLanguageIfUnused() {
                                 LR"(Control Panel\International\User Profile)",
                                 wil::reg::key_access::readwrite);
 
-  std::vector<std::wstring> languages_to_delete;
+  std::set<std::wstring> languages_to_delete;
   for (auto const& subkey :
        wil::make_range(wil::reg::key_iterator{international_user_profile.get()},
                        wil::reg::key_iterator{})) {
@@ -250,25 +250,25 @@ void RemoveLanguageIfUnused() {
         }
     }
     if (input_profiles == input_profiles_to_delete.size()) {
-        languages_to_delete.push_back(language_tag);
+        languages_to_delete.insert(language_tag);
     } else {
         for (auto const& profile : input_profiles_to_delete) {
           wil::reg::reg_view_details::reg_view(language.get())
               .delete_value(profile.c_str());
         }
     }
-
-    if (auto const langid =
-            wil::reg::try_get_value<DWORD>(language.get(), L"TransientLangId");
-        langid.has_value()) {
-      if (language_tag == 𒂗𒈨𒅕𒃸_tag) {
-        𒂗𒈨𒅕𒃸_langid = static_cast<LANGID>(*langid);
-      }
-      unused_transient_langids.erase(static_cast<LANGID>(*langid));
-    }
   }
-  // TODO(egg): Delete languages and remove them from |Languages|.
+  for (auto const language_tag : languages_to_delete) {
+    wil::reg::reg_view_details::reg_view(international_user_profile.get())
+        .delete_tree(language_tag.c_str());
   }
+  auto languages = wil::reg::get_value<std::vector<std::wstring>>(
+      international_user_profile.get(), L"Languages");
+  std::erase_if(languages, [&](std::wstring const& l) {
+    languages_to_delete.contains(l);
+  });
+  wil::reg::set_value(
+      international_user_profile.get(), L"Languages", languages);
 
   for (auto const& user : wil::make_range(wil::reg::key_iterator{HKEY_USERS},
                                           wil::reg::key_iterator{})) {
