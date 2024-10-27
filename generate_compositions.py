@@ -2,7 +2,7 @@ import re
 
 import asl
 from asl import osl
-import numbers
+import numerals
 
 for forms in osl.forms_by_name.values():
   for form in forms:
@@ -146,7 +146,7 @@ for list_number, forms_by_codepoints in encoded_forms_by_list_number.items():
     else:
       compositions.setdefault(composition, []).append(encoding)
 
-for composition, encoding in numbers.compositions.items():
+for composition, encoding in numerals.compositions.items():
   compositions.setdefault(composition, []).append(encoding)
 
 
