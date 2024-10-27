@@ -3,6 +3,7 @@ import re
 import asl
 from asl import osl
 import numerals
+import unicodedata
 
 for forms in osl.forms_by_name.values():
   for form in forms:
@@ -35,14 +36,16 @@ encoded_forms_by_list_number: dict[str, dict[str, list[asl.Form]]] = {}
 
 for name, forms in osl.forms_by_name.items():
   if any (form.unicode_cuneiform for form in forms):
-    encodings = set(form.unicode_cuneiform.text for form in forms if form.unicode_cuneiform)
+    encodings = {form.unicode_cuneiform.text: form for form in forms if form.unicode_cuneiform}
     if len(encodings) != 1:
       raise ValueError(f"Multiple encodings for {name}: {encodings}")
-    encoding = list(encodings)[0]
+    encoding, source_form = list(encodings.items())[0]
     for form in forms:
       if not form.unicode_cuneiform:
         print(f"*** Missing {encoding} on {form.names[0]}")
         form.unicode_cuneiform = asl.UnicodeCuneiform(encoding)
+        form.unicode_age = source_form.unicode_age
+        form.unicode_pua = source_form.unicode_pua
 
 for name, forms in osl.forms_by_name.items():
   for form in forms:
@@ -51,7 +54,15 @@ for name, forms in osl.forms_by_name.items():
     if form.unicode_cuneiform or form.unicode_map:
       # Note that we prefer the ucun to the umap, which allows us to ignore the
       # hack from https://github.com/oracc/osl/commit/e7de0d92682afc043726c6689e407551f7466652.
-      xsux = (form.unicode_cuneiform or osl.forms_by_name[form.unicode_map.text][0].unicode_cuneiform).text;
+      xsux = (form.unicode_cuneiform or osl.forms_by_name[form.unicode_map.text][0].unicode_cuneiform).text
+      if form.unicode_age and form.unicode_age.text == "ACN":
+        continue
+      if form.unicode_pua:
+        continue
+      if any(unicodedata.category(c) == 'Cn' for c in xsux):
+        raise ValueError(f"Unassigned characters in {form}")
+      if any(unicodedata.category(c) == 'Co' for c in xsux):
+        raise ValueError(f"Private use characters in {form}")
       if "X" in xsux:
         continue
       if "O" in xsux:
