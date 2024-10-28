@@ -160,7 +160,6 @@ for list_number, forms_by_codepoints in encoded_forms_by_list_number.items():
 for composition, encoding in numerals.compositions.items():
   compositions.setdefault(composition, []).append(encoding)
 
-
 # Punctuation, common determinatives, edge cases.
 for encoding, composition in {
     # MesZL 592.
@@ -189,6 +188,30 @@ for encoding, composition in {
   compositions.setdefault(composition, []).append(encoding)
 
 # Uniqueness of compositions.
+for composition, encodings in compositions.items():
+  if len(encodings) != 1:
+    raise ValueError(f"Multiple signs with composition {composition}: {encodings}")
+
+𒀭_compositions: list[str] = []
+𒂗x_compositions: list[tuple[str, str]] = []
+
+for composition, encodings in compositions.items():
+  if 'x' in composition:
+    continue
+  encoding = encodings[0]
+  if encoding == '𒀭':
+    𒀭_compositions.append(composition)
+  # DNs cited as ligated in the MZL entry for 𒂗.
+  if encoding in ('𒂗', '𒂗𒆤', '𒂗𒍪', '𒂗𒆠'):
+    𒂗x_compositions.append((composition, encoding))
+
+for 𒀭_composition in 𒀭_compositions:
+  for 𒂗x_composition, 𒂗x in 𒂗x_compositions:
+    compositions.setdefault(
+      𒀭_composition + '+' + 𒂗x_composition, []).append(
+        '𒀭' + '\u200D' + 𒂗x)
+
+# Uniqueness of compositions, again.
 for composition, encodings in compositions.items():
   if len(encodings) != 1:
     raise ValueError(f"Multiple signs with composition {composition}: {encodings}")
