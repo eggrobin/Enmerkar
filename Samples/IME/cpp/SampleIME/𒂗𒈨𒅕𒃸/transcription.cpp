@@ -110,7 +110,12 @@ OrderingKey(
   //       < {{1, 4}} < {{1, 4}, iku} < {{2}}.
 
   std::optional<InputCategory> last_category;
-  for (const wchar_t c : composition_input) {
+  for (int i = 0; i < composition_input.length(); ++i) {
+    const wchar_t c = composition_input[i];
+    const std::optional<wchar_t> lookahead =
+        i == composition_input.length()
+            ? std::nullopt
+            : std::optional(composition_input[i + 1]);
     if (Alphabet().contains(c)) {
       if (last_category != InputCategory::ReadingAlphabetic) {
         reading.emplace_back();
@@ -137,6 +142,10 @@ OrderingKey(
       reading.back().back() = std::numeric_limits<int>::max();
       last_category = InputCategory::ReadingNumeric;
     } else if (c == L'+' || c == L'-') {
+      if (lookahead.has_value() && Alphabet().contains(*lookahead)) {
+        // Force ligatures to the end of the candidate list.
+        reading.insert(reading.begin(), {std::numeric_limits<int>::max()});
+      }
       if (last_category != InputCategory::ReadingNumeric) {
         // Treat an absence of numeric reading as a numeric reading of -1, so it
         // sorts before any numeric reading, but still allows us to append a key
@@ -257,6 +266,8 @@ std::wstring PrettyTranscriptionHint(std::wstring_view composition_input,
     if (IsDigit(composition_input[i]) && entered_size <= i) {
       subscript_has_been_entered = false;
     }
+    // TODO(egg): This does not work for things like il₃+suen—though admittedly
+    // such compositions are silly.
     if (vowels.contains(composition_input[i])) {
       ++vowel_count;
     }
@@ -305,7 +316,14 @@ std::wstring PrettyTranscriptionHint(std::wstring_view composition_input,
           token_hint += L"ᶠ";
         } else if (composition_input == L"d") {
           token_hint += L"ᵈ";
-        } else if (composition_input[i] == L'+') {
+        } else if (i == 0 && composition_input[0] == L'd' &&
+                   composition_input.length() > 1 &&
+                   !Alphabet().contains(composition_input[1])) {
+          token_hint += L"ᵈ";
+        } else if (composition_input[i] == L'+' &&
+                   ((i == 1 && composition_input[0] == L'd') ||
+                    composition_input.length() == i + 1 ||
+                    !Alphabet().contains(composition_input[i + 1]))) {
           token_hint += L'⁺';
         } else if (composition_input[i] == L'-') {
           token_hint += L'⁻';
