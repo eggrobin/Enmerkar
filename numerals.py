@@ -98,7 +98,7 @@ GEŠʾU_NUMERALS = [
 ]
 
 ŠARGAL_NUMERALS = [
-  [sign + '𒃲' for sign in signs] for signs in ŠÁR_NUMERALS
+  ([sign + '𒃲' for sign in signs] or ['𒃲']) for signs in ŠÁR_NUMERALS
 ]
 ŠARGAL_NUMERALS[1] += '𒐲'
 ŠARGAL_NUMERALS[2] += '𒐳'
@@ -266,7 +266,7 @@ add_sexagesimal_compositions(1, DIŠ_NUMERALS, U_NUMERALS),
 # Neo-Sumerian / Old Babylonian counting number system.
 add_sexagesimal_compositions(60, GÉŠ_NUMERALS, GEŠʾU_NUMERALS)
 add_sexagesimal_compositions(60 ** 2, ŠÁR_NUMERALS, ŠARʾU_NUMERALS)
-add_sexagesimal_compositions(60 ** 3, ŠARGAL_NUMERALS, ŠARʾUGAL_NUMERALS)
+add_sexagesimal_compositions(60 ** 3, ŠARGAL_NUMERALS, ŠARʾU_NUMERALS)
 
 # Neo-Sumerian / Old Babylonian capacity system.
 add_simple_compositions('ban2', BÁN_NUMERALS)
@@ -283,19 +283,21 @@ add_simple_compositions('iku', IKU_NUMERALS)
 add_simple_compositions('eše3', ÈŠE_NUMERALS)
 add_sexagesimal_compositions('bur3', BÙR_NUMERALS, BURʾU_NUMERALS)
 add_sexagesimal_compositions('šar2', ŠÁR_NUMERALS, ŠARʾU_NUMERALS)
-add_sexagesimal_compositions('šargal', ŠARGAL_NUMERALS, ŠARʾUGAL_NUMERALS)
+add_sexagesimal_compositions('šargal', ŠARGAL_NUMERALS, ŠARʾU_NUMERALS)
 add_simple_compositions('šarkid', ŠARKID_NUMERALS)
 
 # Referring to Neo-Sumerian / Old Babylonian sexagesimal positions by name.
 add_sexagesimal_compositions('geš2', GÉŠ_NUMERALS, GEŠʾU_NUMERALS)
+add_sexagesimal_compositions('ŋeš2', GÉŠ_NUMERALS, GEŠʾU_NUMERALS)
 add_sexagesimal_compositions('šar2', ŠÁR_NUMERALS, ŠARʾU_NUMERALS)
-add_sexagesimal_compositions('šargal', ŠARGAL_NUMERALS, ŠARʾUGAL_NUMERALS)
+add_sexagesimal_compositions('šargal', ŠARGAL_NUMERALS, ŠARʾU_NUMERALS)
 
 # Referring to signs by by name (except DIŠ since it is our default).
 add_simple_compositions('aš', AŠ_NUMERALS)
 add_simple_compositions('u', U_NUMERALS)
 add_simple_compositions('burʾu', BURʾU_NUMERALS)
-add_simple_compositions('gešu', GEŠʾU_NUMERALS)
+add_simple_compositions('gešʾu', GEŠʾU_NUMERALS)
+add_simple_compositions('ŋešʾu', GEŠʾU_NUMERALS)
 add_simple_compositions('šarʾu', ŠARʾU_NUMERALS)
 add_simple_compositions('šarʾugal', ŠARʾUGAL_NUMERALS)
 
