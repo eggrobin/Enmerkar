@@ -11,6 +11,10 @@ BASIC_FRACTIONS = {
   "1/3": ['𒑚'],
   "2/3": ['𒑛'],
   "5/6": ['𒑜'],
+  # OA 1/4 and 1/6 are just 1/4(disz) and 1/6(disz) in CDLI, so since we use
+  # dišless transliterations we make those 1/4 and 1/6.
+  "1/4": ['𒑢'],
+  "1/6": ['𒑡'],
 }
 
 # For these we provide both the 3-row and the 2-row variants, the first one
