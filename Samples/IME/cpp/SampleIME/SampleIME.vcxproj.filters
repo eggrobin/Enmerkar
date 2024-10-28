@@ -48,6 +48,7 @@
     <None Include="image\PunctuationOff.ico">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDictionaryEngine.h">
@@ -159,6 +160,9 @@
       <Filter>Header Files\𒂊𒂗𒈨𒅕𒃸</Filter>
     </ClInclude>
     <ClInclude Include="𒂗𒈨𒅕𒃸\transcription.h">
+      <Filter>Header Files\𒂊𒂗𒈨𒅕𒃸</Filter>
+    </ClInclude>
+    <ClInclude Include="𒂗𒈨𒅕𒃸\registry.h">
       <Filter>Header Files\𒂊𒂗𒈨𒅕𒃸</Filter>
     </ClInclude>
   </ItemGroup>
@@ -307,6 +311,9 @@
     <ClCompile Include="𒂗𒈨𒅕𒃸\transcription.cpp">
       <Filter>Source Files\𒂊𒂗𒈨𒅕𒃸</Filter>
     </ClCompile>
+    <ClCompile Include="𒂗𒈨𒅕𒃸\registry.cpp">
+      <Filter>Source Files\𒂊𒂗𒈨𒅕𒃸</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SampleIME.rc">
@@ -332,5 +339,8 @@
     <Text Include="𒂗𒈨𒅕𒃸\layout_ʾṣṭpŋf.txt">
       <Filter>Resource Files</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natvis" />
   </ItemGroup>
 </Project>

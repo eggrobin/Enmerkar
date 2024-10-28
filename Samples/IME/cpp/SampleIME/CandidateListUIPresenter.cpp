@@ -35,6 +35,7 @@ HRESULT CSampleIME::_HandleCandidateFinalize(TfEditCookie ec, _In_ ITfContext *p
     DWORD_PTR candidateLen = 0;
     const WCHAR* pCandidateString = nullptr;
     CStringRange candidateString;
+    bool emitted_zwsp_with_xsux_junk = false;
 
     if (nullptr == _pCandidateListUIPresenter)
     {
@@ -43,29 +44,60 @@ HRESULT CSampleIME::_HandleCandidateFinalize(TfEditCookie ec, _In_ ITfContext *p
 
     candidateLen = _pCandidateListUIPresenter->_GetSelectedCandidateString(&pCandidateString);
 
-    candidateString.Set(pCandidateString, candidateLen);
-
-    if (candidateLen)
     {
-        ITfRange* clone;
-        hr = _AddComposingAndChar(ec, pContext, &candidateString, &clone);
-        if (clone != nullptr) {
-          clone->SetGravity(ec, TF_GRAVITY_FORWARD, TF_GRAVITY_BACKWARD);
-          if (emitted_ranges_.size() >= 128) {
-            emitted_ranges_.pop_front();
+      candidateString.Set(pCandidateString, candidateLen);
+      std::wstring_view const candidate(pCandidateString, candidateLen);
+      // Defined here rather than in the branch below so it lives long enough.
+      std::wstring with_a;
+      if (candidate == L"\u200B") {
+        std::wstring s(7, L'\0');
+        std::wstring_view process_path;
+        for (;;) {
+          std::size_t size = GetModuleFileNameW(/*hModule=*/nullptr, s.data(), s.size());
+          if (size < s.size()) {
+            process_path = std::wstring_view(s).substr(0, size);
+            break;
           }
-          emitted_ranges_.emplace_back(clone, std::wstring_view(pCandidateString, candidateLen));
+          else {
+            s.resize(2 * s.size());
+          }
         }
+        if (process_path.ends_with(LR"(\WINWORD.EXE)")) {
+          with_a = std::wstring(candidate) + L"𒀀";
+          candidateString.Set(with_a.data(), with_a.size());
+          emitted_zwsp_with_xsux_junk = true;
+        }
+      }
 
-        if (FAILED(hr))
-        {
-            return hr;
-        }
+      if (candidateLen)
+      {
+          ITfRange* clone;
+          hr = _AddComposingAndChar(ec, pContext, &candidateString, &clone);
+          if (clone != nullptr) {
+            clone->SetGravity(ec, TF_GRAVITY_FORWARD, TF_GRAVITY_BACKWARD);
+            if (emitted_ranges_.size() >= 128) {
+              emitted_ranges_.pop_front();
+            }
+            emitted_ranges_.emplace_back(clone, std::wstring_view(pCandidateString, candidateLen));
+          }
+
+          if (FAILED(hr))
+          {
+              return hr;
+          }
+      }
     }
 
 NoPresenter:
 
     _HandleComplete(ec, pContext);
+
+    if (emitted_zwsp_with_xsux_junk) {
+      LONG shifted;
+      emitted_ranges_.back().range().ShiftStart(ec, 1, &shifted, nullptr);
+      emitted_ranges_.back().range().SetText(ec, 0, L"", 0);
+      emitted_ranges_.pop_back();
+    }
 
     return hr;
 }

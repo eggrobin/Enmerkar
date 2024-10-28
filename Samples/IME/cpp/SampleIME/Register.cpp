@@ -5,6 +5,8 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved
 
+#include "𒂗𒈨𒅕𒃸/registry.h"
+
 #include "Private.h"
 #include "Globals.h"
 
@@ -17,12 +19,12 @@ static const WCHAR TEXTSERVICE_DESC[] = L"𒂗𒈨𒅕𒃸 Cuneiform IME";
 static const GUID SupportCategories[] = {
     GUID_TFCAT_TIP_KEYBOARD,
     GUID_TFCAT_DISPLAYATTRIBUTEPROVIDER,
-    GUID_TFCAT_TIPCAP_UIELEMENTENABLED,
+    //GUID_TFCAT_TIPCAP_UIELEMENTENABLED,
     GUID_TFCAT_TIPCAP_SECUREMODE,
     GUID_TFCAT_TIPCAP_COMLESS,
-    GUID_TFCAT_TIPCAP_INPUTMODECOMPARTMENT,
+    //GUID_TFCAT_TIPCAP_INPUTMODECOMPARTMENT,
     GUID_TFCAT_TIPCAP_IMMERSIVESUPPORT,
-    GUID_TFCAT_TIPCAP_SYSTRAYSUPPORT,
+    //GUID_TFCAT_TIPCAP_SYSTRAYSUPPORT,
 };
 //+---------------------------------------------------------------------------
 //
@@ -33,6 +35,7 @@ static const GUID SupportCategories[] = {
 BOOL RegisterProfiles()
 {
     HRESULT hr = S_FALSE;
+    //LANGID langid = TEXTSERVICE_LANGID;
 
     ITfInputProcessorProfileMgr *pITfInputProcessorProfileMgr = nullptr;
     hr = CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER,
@@ -53,15 +56,16 @@ BOOL RegisterProfiles()
     if (hr != S_OK)
     {
         goto Exit;
+    } else {
+      hr = pITfInputProcessorProfileMgr->RegisterProfile(Global::SampleIMECLSID,
+          𒂗𒈨𒅕𒃸::GetTransientLangID(),
+          Global::SampleIMEGuidProfile,
+          TEXTSERVICE_DESC,
+          static_cast<ULONG>(lenOfDesc),
+          achIconFile,
+          cchA,
+          (UINT)TEXTSERVICE_ICON_INDEX, NULL, 0, TRUE, 0);
     }
-    hr = pITfInputProcessorProfileMgr->RegisterProfile(Global::SampleIMECLSID,
-        TEXTSERVICE_LANGID,
-        Global::SampleIMEGuidProfile,
-        TEXTSERVICE_DESC,
-        static_cast<ULONG>(lenOfDesc),
-        achIconFile,
-        cchA,
-        (UINT)TEXTSERVICE_ICON_INDEX, NULL, 0, TRUE, 0);
 
     if (FAILED(hr))
     {
@@ -93,12 +97,21 @@ void UnregisterProfiles()
     if (FAILED(hr))
     {
         goto Exit;
-    }
-
-    hr = pITfInputProcessorProfileMgr->UnregisterProfile(Global::SampleIMECLSID, TEXTSERVICE_LANGID, Global::SampleIMEGuidProfile, 0);
-    if (FAILED(hr))
-    {
-        goto Exit;
+    } else {
+      // See https://learn.microsoft.com/en-us/windows/win32/api/msctf/nf-msctf-itfinputprocessorprofilemgr-unregisterprofile:
+      // TF_URP_ALLPROFILES: If this bit is on, UnregistrProfile (sic)
+      //                     unregisters all profiles of the rclsid parameter.
+      //                     The langid and guidProfile parameters are ignored.
+      hr = pITfInputProcessorProfileMgr->UnregisterProfile(
+          /*rclsid=*/Global::SampleIMECLSID,
+          /*langid=*/{},
+          /*guidProfile=*/{},
+          /*dwFlags=*/TF_URP_ALLPROFILES);
+      if (FAILED(hr))
+      {
+          goto Exit;
+      }
+      𒂗𒈨𒅕𒃸::RemoveLanguageIfUnused();
     }
 
 Exit:
@@ -133,7 +146,8 @@ BOOL RegisterCategories()
     }
 
     pCategoryMgr->Release();
-
+    if ((hr == S_OK)) {
+    }
     return (hr == S_OK);
 }
 

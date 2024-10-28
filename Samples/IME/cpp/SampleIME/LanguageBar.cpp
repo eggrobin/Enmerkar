@@ -22,40 +22,40 @@ void CSampleIME::_UpdateLanguageBarOnSetFocus(_In_ ITfDocumentMgr *pDocMgrFocus)
 {
     BOOL needDisableButtons = FALSE;
 
-    if (!pDocMgrFocus) 
+    if (!pDocMgrFocus)
     {
         needDisableButtons = TRUE;
-    } 
-    else 
+    }
+    else
     {
         IEnumTfContexts* pEnumContext = nullptr;
 
-        if (FAILED(pDocMgrFocus->EnumContexts(&pEnumContext)) || !pEnumContext) 
+        if (FAILED(pDocMgrFocus->EnumContexts(&pEnumContext)) || !pEnumContext)
         {
             needDisableButtons = TRUE;
-        } 
-        else 
+        }
+        else
         {
             ULONG fetched = 0;
             ITfContext* pContext = nullptr;
 
-            if (FAILED(pEnumContext->Next(1, &pContext, &fetched)) || fetched != 1) 
+            if (FAILED(pEnumContext->Next(1, &pContext, &fetched)) || fetched != 1)
             {
                 needDisableButtons = TRUE;
             }
 
-            if (!pContext) 
+            if (!pContext)
             {
                 // context is not associated
                 needDisableButtons = TRUE;
-            } 
-            else 
+            }
+            else
             {
                 pContext->Release();
             }
         }
 
-        if (pEnumContext) 
+        if (pEnumContext)
         {
             pEnumContext->Release();
         }
@@ -129,7 +129,7 @@ CLangBarItemButton::CLangBarItemButton(REFGUID guidLangBar, LPCWSTR description,
 		size_t len = 0;
 		if (StringCchLength(tooltip, STRSAFE_MAX_CCH, &len) != S_OK)
         {
-            len = 0; 
+            len = 0;
         }
         bufLen = static_cast<DWORD>(len) + 1;
         _pTooltipText = (LPCWSTR) new (std::nothrow) WCHAR[ bufLen ];
@@ -137,7 +137,7 @@ CLangBarItemButton::CLangBarItemButton(REFGUID guidLangBar, LPCWSTR description,
         {
             StringCchCopy((LPWSTR)_pTooltipText, bufLen, tooltip);
         }
-    }   
+    }
 }
 
 //+---------------------------------------------------------------------------
@@ -167,10 +167,10 @@ void CLangBarItemButton::CleanUp()
     }
 
     ITfThreadMgr* pThreadMgr = nullptr;
-    HRESULT hr = CoCreateInstance(CLSID_TF_ThreadMgr, 
-        NULL, 
-        CLSCTX_INPROC_SERVER, 
-        IID_ITfThreadMgr, 
+    HRESULT hr = CoCreateInstance(CLSID_TF_ThreadMgr,
+        NULL,
+        CLSCTX_INPROC_SERVER,
+        IID_ITfThreadMgr,
         (void**)&pThreadMgr);
     if (SUCCEEDED(hr))
     {
@@ -301,24 +301,24 @@ void CLangBarItemButton::SetStatus(DWORD dwStatus, BOOL fSet)
 {
     BOOL isChange = FALSE;
 
-    if (fSet) 
+    if (fSet)
     {
-        if (!(_status & dwStatus)) 
+        if (!(_status & dwStatus))
         {
             _status |= dwStatus;
             isChange = TRUE;
         }
-    } 
-    else 
+    }
+    else
     {
-        if (_status & dwStatus) 
+        if (_status & dwStatus)
         {
             _status &= ~dwStatus;
             isChange = TRUE;
         }
     }
 
-    if (isChange && _pLangBarItemSink) 
+    if (isChange && _pLangBarItemSink)
     {
         _pLangBarItemSink->OnUpdate(TF_LBI_STATUS | TF_LBI_ICON);
     }

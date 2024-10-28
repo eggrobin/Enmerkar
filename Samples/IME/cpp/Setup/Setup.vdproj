@@ -15,6 +15,12 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_014C0033E2DAC61557D56F97DC31E67F"
+        "OwnerKey" = "8:_04FAF4A668EA44A0962F31E0909856BF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_04FAF4A668EA44A0962F31E0909856BF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -23,6 +29,12 @@
         {
         "MsmKey" = "8:_067D2C1DAD9C4109ABE6B8F5741ABF98"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_0E32E082D505D6AE012A7166112AB65A"
+        "OwnerKey" = "8:_04FAF4A668EA44A0962F31E0909856BF"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -65,6 +77,12 @@
         {
         "MsmKey" = "8:_3FAE5239A9FB41F3A994A9B43F15608A"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4BE8B1082D8F5E42BFFF973098F150A9"
+        "OwnerKey" = "8:_04FAF4A668EA44A0962F31E0909856BF"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -225,6 +243,26 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_014C0033E2DAC61557D56F97DC31E67F"
+            {
+            "SourcePath" = "8:api-ms-win-crt-filesystem-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-filesystem-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FE5394AF044D49989D329EA12B85C763"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_067D2C1DAD9C4109ABE6B8F5741ABF98"
             {
             "SourcePath" = "8:enmerkar.bmp"
@@ -243,6 +281,26 @@
             "Register" = "3:1"
             "Exclude" = "11:TRUE"
             "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0E32E082D505D6AE012A7166112AB65A"
+            {
+            "SourcePath" = "8:api-ms-win-crt-math-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-math-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FE5394AF044D49989D329EA12B85C763"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1637E64E1CB44057BECC3C317D7D42A9"
@@ -383,6 +441,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4BE8B1082D8F5E42BFFF973098F150A9"
+            {
+            "SourcePath" = "8:MSVCP140_ATOMIC_WAIT.dll"
+            "TargetName" = "8:MSVCP140_ATOMIC_WAIT.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FE5394AF044D49989D329EA12B85C763"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_63D6C3B10B114F2EA35575C64DAB5AB6"
@@ -695,7 +773,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Enmerkar"
         "ProductCode" = "8:{81AB21F1-E9E0-418C-A19E-5FB99828AF60}"
-        "PackageCode" = "8:{678690FF-CE08-4E21-B8A4-623CFEFEA22F}"
+        "PackageCode" = "8:{6B80473B-EE19-4BC0-972C-D3087386C0E5}"
         "UpgradeCode" = "8:{D949C6DA-17B2-4C66-92BB-2A8EE7749B33}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -910,7 +988,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:This software is based on the sample IME from Windows classic samples, available under the MIT license. The sign list used by this input method is based on the Oracc Global Sign List by the OGSL Project, available under the CC BY-SA 3.0 license."
+                            "Value" = "8:This software is based on the sample IME from Windows classic samples by Microsoft Corporation, available under the MIT license. The sign list used by this input method is based on the Oracc Sign List by Steve Tinney and Niek Veldhuis, available under a CC0 license."
                             "DefaultValue" = "8:#1202"
                             "UsePlugInResources" = "11:TRUE"
                             }
@@ -1227,7 +1305,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:This software is based on the sample IME from Windows classic samples by Microsoft Corporation, available under the MIT license. The sign list used by this input method is based on the Oracc Global Sign List by the OGSL Project, available under the CC BY-SA 3.0 license."
+                            "Value" = "8:This software is based on the sample IME from Windows classic samples by Microsoft Corporation, available under the MIT license. The sign list used by this input method is based on the Oracc Sign List by Steve Tinney and Niek Veldhuis, available under a CC0 license."
                             "DefaultValue" = "8:#1202"
                             "UsePlugInResources" = "11:TRUE"
                             }

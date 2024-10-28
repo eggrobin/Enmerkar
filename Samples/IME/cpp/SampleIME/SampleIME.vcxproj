@@ -32,6 +32,7 @@
     <None Include="image\PunctuationOff.ico" />
     <None Include="image\PunctuationOn.ico" />
     <None Include="image\SampleIme.ico" />
+    <None Include="packages.config" />
     <None Include="SampleIME.def" />
   </ItemGroup>
   <ItemGroup>
@@ -70,6 +71,7 @@
     <ClInclude Include="TfTextLayoutSink.h" />
     <ClInclude Include="TipCandidateList.h" />
     <ClInclude Include="TipCandidateString.h" />
+    <ClInclude Include="𒂗𒈨𒅕𒃸\registry.h" />
     <ClInclude Include="𒂗𒈨𒅕𒃸\settings.h" />
     <ClInclude Include="𒂗𒈨𒅕𒃸\transcription.h" />
   </ItemGroup>
@@ -120,6 +122,7 @@
     <ClCompile Include="ThreadMgrEventSink.cpp" />
     <ClCompile Include="TipCandidateList.cpp" />
     <ClCompile Include="TipCandidateString.cpp" />
+    <ClCompile Include="𒂗𒈨𒅕𒃸\registry.cpp" />
     <ClCompile Include="𒂗𒈨𒅕𒃸\settings.cpp" />
     <ClCompile Include="𒂗𒈨𒅕𒃸\transcription.cpp" />
   </ItemGroup>
@@ -298,5 +301,12 @@
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\Microsoft.Windows.ImplementationLibrary.1.0.240122.1\build\native\Microsoft.Windows.ImplementationLibrary.targets" Condition="Exists('..\packages\Microsoft.Windows.ImplementationLibrary.1.0.240122.1\build\native\Microsoft.Windows.ImplementationLibrary.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Windows.ImplementationLibrary.1.0.240122.1\build\native\Microsoft.Windows.ImplementationLibrary.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.ImplementationLibrary.1.0.240122.1\build\native\Microsoft.Windows.ImplementationLibrary.targets'))" />
+  </Target>
 </Project>
