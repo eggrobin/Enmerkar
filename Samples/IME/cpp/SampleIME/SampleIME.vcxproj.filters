@@ -162,9 +162,6 @@
     <ClInclude Include="𒂗𒈨𒅕𒃸\transcription.h">
       <Filter>Header Files\𒂊𒂗𒈨𒅕𒃸</Filter>
     </ClInclude>
-    <ClInclude Include="logging.h">
-      <Filter>Header Files\𒂊𒂗𒈨𒅕𒃸</Filter>
-    </ClInclude>
     <ClInclude Include="𒂗𒈨𒅕𒃸\registry.h">
       <Filter>Header Files\𒂊𒂗𒈨𒅕𒃸</Filter>
     </ClInclude>
@@ -312,9 +309,6 @@
       <Filter>Source Files\𒂊𒂗𒈨𒅕𒃸</Filter>
     </ClCompile>
     <ClCompile Include="𒂗𒈨𒅕𒃸\transcription.cpp">
-      <Filter>Source Files\𒂊𒂗𒈨𒅕𒃸</Filter>
-    </ClCompile>
-    <ClCompile Include="logging.cpp">
       <Filter>Source Files\𒂊𒂗𒈨𒅕𒃸</Filter>
     </ClCompile>
     <ClCompile Include="𒂗𒈨𒅕𒃸\registry.cpp">

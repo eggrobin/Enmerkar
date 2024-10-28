@@ -12,8 +12,6 @@
 #include "Globals.h"
 #include "Compartment.h"
 
-#include "logging.h"
-
 //+---------------------------------------------------------------------------
 //
 // CSampleIME::_UpdateLanguageBarOnSetFocus
@@ -96,7 +94,6 @@ VOID CCompositionProcessorEngine::SetLanguageBarStatus(DWORD status, BOOL isSet)
 
 CLangBarItemButton::CLangBarItemButton(REFGUID guidLangBar, LPCWSTR description, LPCWSTR tooltip, DWORD onIconIndex, DWORD offIconIndex, BOOL isSecureMode)
 {
-    𒂗𒈨𒅕𒃸::Log(L"Constructing CLangBarItemButton...");
     DWORD bufLen = 0;
 
     DllAddRef();
@@ -366,7 +363,6 @@ STDAPI CLangBarItemButton::GetTooltipString(_Out_ BSTR *pbstrToolTip)
 
 STDAPI CLangBarItemButton::OnClick(TfLBIClick click, POINT pt, _In_ const RECT *prcArea)
 {
-    𒂗𒈨𒅕𒃸::Log(L"CLangBarItemButton::OnClick...");
     click;pt;
     prcArea;
 

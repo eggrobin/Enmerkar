@@ -19,7 +19,6 @@
 #include "RegKey.h"
 
 #include "𒂗𒈨𒅕𒃸/settings.h"
-#include "logging.h"
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -42,24 +41,18 @@ BOOL CSampleIME::_AddTextProcessorEngine()
     // Get default profile.
     CTfInputProcessorProfile profile;
 
-    𒂗𒈨𒅕𒃸::Log(L"CreateInstance...");
     if (FAILED(profile.CreateInstance()))
     {
-        𒂗𒈨𒅕𒃸::Log(L"Failed");
         return FALSE;
     }
 
-    𒂗𒈨𒅕𒃸::Log(L"GetCurrentLanguage...");
     if (FAILED(profile.GetCurrentLanguage(&langid)))
     {
-        𒂗𒈨𒅕𒃸::Log(L"Failed");
         return FALSE;
     }
 
-    𒂗𒈨𒅕𒃸::Log(L"GetDefaultLanguageProfile...");
     if (FAILED(profile.GetDefaultLanguageProfile(langid, GUID_TFCAT_TIP_KEYBOARD, &clsid, &guidProfile)))
     {
-        𒂗𒈨𒅕𒃸::Log(L"Failed");
         return FALSE;
     }
 
@@ -86,11 +79,9 @@ BOOL CSampleIME::_AddTextProcessorEngine()
         return FALSE;
     }
 
-    𒂗𒈨𒅕𒃸::Log(L"SetupLanguageProfile...");
     // setup composition processor engine
     if (FALSE == _pCompositionProcessorEngine->SetupLanguageProfile(langid, guidProfile, _GetThreadMgr(), _GetClientId(), _IsSecureMode(), _IsComLess()))
     {
-        𒂗𒈨𒅕𒃸::Log(L"Failed...");
         return FALSE;
     }
 

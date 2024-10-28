@@ -10,8 +10,6 @@
 #include "Private.h"
 #include "Globals.h"
 
-#include "logging.h"
-
 static const WCHAR RegInfo_Prefix_CLSID[] = L"CLSID\\";
 static const WCHAR RegInfo_Key_InProSvr32[] = L"InProcServer32";
 static const WCHAR RegInfo_Key_ThreadModel[] = L"ThreadingModel";
@@ -36,7 +34,6 @@ static const GUID SupportCategories[] = {
 
 BOOL RegisterProfiles()
 {
-    𒂗𒈨𒅕𒃸::Log(L"Registering profiles...");
     HRESULT hr = S_FALSE;
     //LANGID langid = TEXTSERVICE_LANGID;
 
@@ -74,7 +71,6 @@ BOOL RegisterProfiles()
     {
         goto Exit;
     }
-    𒂗𒈨𒅕𒃸::Log(L"Success");
 
 Exit:
     if (pITfInputProcessorProfileMgr)
@@ -135,7 +131,6 @@ Exit:
 
 BOOL RegisterCategories()
 {
-    𒂗𒈨𒅕𒃸::Log(L"Registering categories...");
     ITfCategoryMgr* pCategoryMgr = nullptr;
     HRESULT hr = S_OK;
 
@@ -152,7 +147,6 @@ BOOL RegisterCategories()
 
     pCategoryMgr->Release();
     if ((hr == S_OK)) {
-    𒂗𒈨𒅕𒃸::Log(L"Success");
     }
     return (hr == S_OK);
 }

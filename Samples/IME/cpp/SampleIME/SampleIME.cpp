@@ -12,7 +12,6 @@
 #include "CompositionProcessorEngine.h"
 #include "Compartment.h"
 
-#include "logging.h"
 #include "𒂗𒈨𒅕𒃸/registry.h"
 
 //+---------------------------------------------------------------------------
@@ -60,7 +59,6 @@ HRESULT CSampleIME::CreateInstance(_In_ IUnknown *pUnkOuter, REFIID riid, _Outpt
 
 CSampleIME::CSampleIME()
 {
-    𒂗𒈨𒅕𒃸::Log(L"CSampleIME Constructor...");
     DllAddRef();
 
     _pThreadMgr = nullptr;
@@ -223,7 +221,6 @@ STDAPI_(ULONG) CSampleIME::Release()
 
 STDAPI CSampleIME::ActivateEx(ITfThreadMgr *pThreadMgr, TfClientId tfClientId, DWORD dwFlags)
 {
-    𒂗𒈨𒅕𒃸::Log(L"ActivateEx...");
     _pThreadMgr = pThreadMgr;
     _pThreadMgr->AddRef();
 
