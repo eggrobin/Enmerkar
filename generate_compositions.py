@@ -86,6 +86,8 @@ for name, forms in osl.forms_by_name.items():
           continue
         if "{" in value.text:
           continue
+        if "~" in value.text:
+          continue
         if value.text in ("o", "oo"):
           continue
         if re.match(r"p[₁-₅]", value.text):
