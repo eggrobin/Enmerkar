@@ -98,6 +98,9 @@ class InternalNote(Note):
 class Literature(Note):
   tag = "lit"
 
+class Ligature(TextTag):
+  tag = "liga"
+
 class Project(TextTag):
   tag = "project"
 
@@ -466,6 +469,7 @@ class Form:
   fake: Optional[Fake]
   sources: list[SourceReference]
   notes: list[Note]
+  ligatures: list[Ligature]
   # TODO(egg): Structure.
   unicode_name: Optional[UnicodeName]
   unicode_sequence: Optional[UnicodeSequence]
@@ -492,6 +496,7 @@ class Form:
     self.systems = []
     self.links = []
     self.notes = []
+    self.ligatures = []
     self.unicode_name = None
     self.unicode_pua = None
     self.unicode_sequence = None
@@ -534,7 +539,8 @@ class Form:
         str(self.script) if self.script else None,
         "\n".join(str(value) for value in self.values),
         "\n".join(str(system) for system in self.systems),
-        "\n".join(str(link) for link in self.links)) if lines)
+        "\n".join(str(link) for link in self.links),
+        "\n".join(str(ligature) for ligature in self.ligatures)) if lines)
 
   def __str__(self):
     return "\n".join(lines for lines in (
@@ -587,6 +593,8 @@ class Form:
         result.links.append(Link.parse(parser))
       elif entry.tag == Fake.tag:
         result.fake = Fake.parse(parser)
+      elif entry.tag == Ligature.tag:
+        result.ligatures.append(Ligature.parse(parser))
       else:
         for entry_type in (Note, *Note.__subclasses__()):
           if entry.tag == entry_type.tag:

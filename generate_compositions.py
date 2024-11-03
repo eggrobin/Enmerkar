@@ -105,6 +105,7 @@ for name, forms in osl.forms_by_name.items():
         abbreviations = ("ŠL", "MÉA") if source.source.abbreviation == "SLLHA" else (source.source.abbreviation,);
         for abbreviation in abbreviations:
           number = abbreviation + str(source.number.first) + source.number.suffix
+          number = number.split("^")[0]
           if number not in encoded_forms_by_list_number:
             encoded_forms_by_list_number[number] = {}
           if xsux not in encoded_forms_by_list_number[number]:
@@ -145,7 +146,7 @@ for value, forms_by_codepoints in sorted(encoded_forms_by_value.items()):
 
 
 for list_number, forms_by_codepoints in encoded_forms_by_list_number.items():
-  composition = "x" + list_number.lower().replace("é", "e").replace("c", "š").replace("hzl", "ḫzl").replace("'", "ʾ")
+  composition = "x" + list_number.lower().replace("é", "e").replace("c", "š").replace("hzl", "ḫzl")
   if not re.match(r"^[bdgptkʾṭqzšsṣḫmnrlwyaeiuŋśaeui0-9xf]+$", composition):
     print("Weird characters in list number %s" % list_number)
     continue
