@@ -171,11 +171,13 @@ OrderingKey(
   return key;
 }
 
-constexpr std::array<std::pair<std::wstring_view, std::wstring_view>, 13>
+constexpr std::array<std::pair<std::wstring_view, std::wstring_view>, 16>
     sign_lists{{
         {L"abzl", L"aBZL"},
+        {L"asŋ", L"ASy"},
         {L"bau", L"BAU"},
         {L"elles", L"ELLes"},
+        {L"gšsl", L"GCSL"},
         {L"ḫzl", L"HZL"},
         {L"kwu", L"KWU"},
         {L"lak", L"LAK"},
@@ -184,6 +186,7 @@ constexpr std::array<std::pair<std::wstring_view, std::wstring_view>, 13>
         {L"ptaše", L"PTACE"},
         {L"reš", L"RÉC"},
         {L"rsp", L"RSP"},
+        {L"sŋa", L"SyA"},
         {L"šl", L"ŠL"},
         {L"zatu", L"ZATU"},
     }};

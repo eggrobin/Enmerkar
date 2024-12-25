@@ -146,8 +146,8 @@ for value, forms_by_codepoints in sorted(encoded_forms_by_value.items()):
 
 
 for list_number, forms_by_codepoints in encoded_forms_by_list_number.items():
-  composition = "x" + list_number.lower().replace("é", "e").replace("c", "š").replace("hzl", "ḫzl")
-  if not re.match(r"^[bdgptkʾṭqzšsṣḫmnrlwyaeiuŋśaeui0-9xf]+$", composition):
+  composition = "x" + list_number.lower().replace("é", "e").replace("c", "š").replace("y", "ŋ").replace("hzl", "ḫzl")
+  if not re.match(r"^[bdgptkʾṭqzšsṣḫmnrlwaeiuŋśaeui0-9xf]+$", composition):
     print("Weird characters in list number %s" % list_number)
     continue
   main_form_encodings = [encoding for encoding, forms in forms_by_codepoints.items()
