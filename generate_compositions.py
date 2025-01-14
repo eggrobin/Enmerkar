@@ -62,7 +62,8 @@ for name, forms in osl.forms_by_name.items():
       if any(unicodedata.category(c) == 'Cn' for c in xsux):
         raise ValueError(f"Unassigned characters in {form}")
       if any(unicodedata.category(c) == 'Co' for c in xsux):
-        raise ValueError(f"Private use characters in {form}")
+        print(f"Private use characters in {form}")
+        continue
       if "X" in xsux:
         continue
       if "O" in xsux:
