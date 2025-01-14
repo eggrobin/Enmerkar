@@ -106,7 +106,7 @@ with open("La paleografia dei testi dell’amministrazione e della cancelleria d
     forms = [form for n in laks.split(", ") for form in osl.forms_by_source[lak][SourceRange(n)]] if laks else []
     if forms:
       if catagnoti_number in egg_concordance:
-        raise ValueError("PTACE%s %s is %s, no need for exceptional concordance" % (catagnoti_number, catagnoti_name, forms))
+        raise ValueError("PTACE%s %s is %s, no need for exceptional concordance" % (catagnoti_number, catagnoti_name, "\n".join("%s" % form for form in forms)))
     else:
       if False:
         if catagnoti_number in egg_concordance:
