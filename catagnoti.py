@@ -29,22 +29,12 @@ osl.forms_by_name["LAK776"][0].unicode_cuneiform = asl.UnicodeCuneiform("𒇻�
 # See comment in read_osl.
 #osl.forms_by_name["LAK20"][0].unicode_cuneiform = asl.UnicodeCuneiform("𒆱")
 
-# Catagnoti name to osl name.
-NAME_BASED_IDENTIFICATIONS = {
-  "DAR": "DAR",
-  "ZÍ": "ZE₂",
-  "PIRIG": "PIRIG",
-  "ITI": "|UD×(U.U.U)|",
-  "IL": "IL",
-  "DIB": "DIB"
-}
-
 osl_by_catagnoti = {}
 
 unencoded_catagnoti = []
 diri_variant_catagnoti = []
 
-def to_numeric(value):
+def to_numeric(value : str):
   value = unicodedata.normalize("NFD", value)
   if '\u0301' in value:
     value = value + "₂"
@@ -53,7 +43,7 @@ def to_numeric(value):
   value = value.replace('\u0301', '').replace('\u0300', '')
   return unicodedata.normalize("NFC", value)
 
-def oraccify_name(name):
+def oraccify_name(name : str) -> str:
   parts = re.split("([×-])", name.replace('Ḫ', 'H'))
   result = ""
   for i, part in enumerate(parts):
@@ -93,11 +83,14 @@ egg_concordance = {
 catagnoti_easy = {}
 catagnoti_not_so_easy = set()
 refinements = {}
-mismatches = []
+mismatches : list[str] = []
 
 with open("La paleografia dei testi dell’amministrazione e della cancelleria di Ebla - Source.csv", encoding="utf-8") as f:
   lines = list(csv.reader(f))
   for catagnoti_number, catagnoti_name, laks in lines[1:]:
+    if SourceRange(catagnoti_number) in osl.forms_by_source[ptace]:
+      #print("+++ PTACE%s already in OSL" % catagnoti_number)
+      continue
     if catagnoti_number == "331":
       break
     if not laks and catagnoti_number not in egg_concordance:
@@ -107,42 +100,6 @@ with open("La paleografia dei testi dell’amministrazione e della cancelleria d
     if forms:
       if catagnoti_number in egg_concordance:
         raise ValueError("PTACE%s %s is %s, no need for exceptional concordance" % (catagnoti_number, catagnoti_name, "\n".join("%s" % form for form in forms)))
-    else:
-      if False:
-        if catagnoti_number in egg_concordance:
-          forms = osl.forms_by_name[egg_concordance[catagnoti_number]]
-          #print("PTACE%s %s has no LAK, but is %s" % (catagnoti_number, catagnoti_name, forms))
-        elif catagnoti_name == "GIŠGAL" and laks == "648":
-          # Doubly encoded, LAK648 as an @form.
-          forms = osl.forms_by_name["|URU×MIN|"]
-        elif catagnoti_name == "ÁŠ" and laks == "162":
-          # LAK162 split between AŠ₂ and ZIZ₂.
-          forms = osl.forms_by_name["AŠ₂"]
-        elif catagnoti_name == "ERIM" and laks == "280":
-          # LAK280 in osl, but affected by a not-yet-upstreamed disunification
-          # and I forgot to carry over the list numbers.
-          forms = osl.forms_by_name["ERIN₂"]
-        elif catagnoti_name == "KIBgunû" and laks == "278":
-          # LAK278a in osl. KIB is GIŠ%GIŠ. What’s in a name?
-          forms = osl.forms_by_name["|EŠ₂%EŠ₂|"]
-        elif catagnoti_name == "TUMgunû" and laks == "497":
-          # LAK497a in osl.
-          forms = osl.forms_by_name["|TUM×(DIŠ.DIŠ.DIŠ)|"]
-        elif catagnoti_name == "MUNŠUB" and laks == "672":
-          # LAK672b in osl.
-          forms = osl.forms_by_name["MUNSUB"]
-        elif catagnoti_name == "GURUŠ" and laks == "709":
-          # LAK709a in osl.
-          forms = osl.forms_by_name["GURUŠ"]
-        elif catagnoti_name == "KAL" and laks == "709":
-          # LAK709b in osl.
-          forms = osl.forms_by_name["KAL"]
-        else:
-          print("PTACE%s %s = LAK%s not in osl" % (catagnoti_number, catagnoti_name, laks))
-
-    #if catagnoti_name in NAME_BASED_IDENTIFICATIONS:
-    #  for form in forms:
-    #    form.sign = osl.signs_by_name[NAME_BASED_IDENTIFICATIONS[catagnoti_name]]
     oracc_name = oraccify_name(catagnoti_name)
     if oracc_name not in osl.forms_by_name:
       oracc_name = None
