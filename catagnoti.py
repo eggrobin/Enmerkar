@@ -157,7 +157,6 @@ print(len(catagnoti_easy), "partially easy")
 print(len(mismatches), "mismatches")
 print(len(refinements.keys() - catagnoti_not_so_easy), "easy refinements")
 print(len(refinements), "total refinements")
-print('\n'.join(mismatches))
 
 for catagnoti_number, name in refinements.items():
   if catagnoti_number in catagnoti_not_so_easy:
