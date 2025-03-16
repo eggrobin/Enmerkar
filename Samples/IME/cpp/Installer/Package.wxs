@@ -1,0 +1,38 @@
+﻿<Wix
+    xmlns="http://wixtoolset.org/schemas/v4/wxs"
+    xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+  <Package
+      Name="Enmerkar"
+      Manufacturer="mockingbirdnest"
+      Version="1.0.0.0"
+      UpgradeCode="D949C6DA-17B2-4C66-92BB-2A8EE7749B33">
+    <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
+
+    <Feature Id="Main">
+      <Component Directory="INSTALLFOLDER">
+        <File Source="..\SampleIME\𒂗𒈨𒅕𒃸\fonts.txt"/>
+      </Component>
+      <Component Directory="INSTALLFOLDER">
+        <File Source="..\SampleIME\𒂗𒈨𒅕𒃸\layout_ʾṣṭpŋf.txt" Name="layout.txt"/>
+      </Component>
+      <Component Directory="INSTALLFOLDER">
+        <File Source="..\SampleIME\image\SampleIme.ico"/>
+      </Component>
+      <Component Directory="INSTALLFOLDER">
+        <File Source="..\SampleIME\Dictionary\sign_list.txt"/>
+      </Component>
+      <Component Directory="INSTALLFOLDER">
+          <File Source="..\..\..\..\LICENSE"/>
+        </Component>
+      <Component Directory="InstallFolderx64">
+        <File Source="..\Release\x64\SampleIME.dll" SelfRegCost="1"></File>
+      </Component>
+      <Component Directory="InstallFolderWin32">
+        <File Source="..\Release\Win32\SampleIME.dll" SelfRegCost="1"></File>
+      </Component>
+    </Feature>
+    <ui:WixUI
+      Id="EnmerkarInstallerUI"
+      InstallDirectory="INSTALLFOLDER" />
+  </Package>
+</Wix>
