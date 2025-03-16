@@ -1,5 +1,9 @@
 ﻿<Project Sdk="WixToolset.Sdk/5.0.2">
   <ItemGroup>
+    <Content Include="enmerkar.bmp" />
+    <Content Include="enmerkar_banner.bmp" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
   </ItemGroup>
 </Project>

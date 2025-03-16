@@ -34,5 +34,11 @@
     <ui:WixUI
       Id="EnmerkarInstallerUI"
       InstallDirectory="INSTALLFOLDER" />
+    <WixVariable
+        Id="WixUIBannerBmp"
+        Value="enmerkar_banner.bmp"/>
+    <WixVariable
+        Id="WixUIDialogBmp"
+        Value="enmerkar.bmp"/>
   </Package>
 </Wix>
