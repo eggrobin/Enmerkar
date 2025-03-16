@@ -57,6 +57,8 @@ BOOL RegisterProfiles()
     {
         goto Exit;
     } else {
+      // As far as I understand, this is what creates the keys in
+      // HKEY_CURRENT_USER\Software\Microsoft\CTF\SortOrder\AssemblyItem.
       hr = pITfInputProcessorProfileMgr->RegisterProfile(Global::SampleIMECLSID,
           𒂗𒈨𒅕𒃸::GetTransientLangID(),
           Global::SampleIMEGuidProfile,

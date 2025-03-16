@@ -7,9 +7,28 @@
 #include <set>
 #include <string>
 
+#include "Globals.h"
 #include "wil/registry.h"
 
 namespace 𒂗𒈨𒅕𒃸 {
+
+std::wstring GUIDToBracketedString(GUID guid) {
+  return std::format(
+      L"{{{:08X}-{:04X}-{:04X}-"
+      L"{:02X}{:02X}-{:02X}{:02X}{:02X}{:02X}{:02X}{:02X}}}",
+      guid.Data1,
+      guid.Data2,
+      guid.Data3,
+      guid.Data4[0],
+      guid.Data4[1],
+      guid.Data4[2],
+      guid.Data4[3],
+      guid.Data4[4],
+      guid.Data4[5],
+      guid.Data4[6],
+      guid.Data4[7],
+      guid.Data4[8]);
+}
 
 LANGID GetTransientLangID() {
   try {
@@ -152,6 +171,22 @@ LANGID GetTransientLangID() {
               𒂗𒈨𒅕𒃸_padded_langid_string.c_str());
         }
       }
+      // It is important that we set the Enable=1 value in
+      // HKCU\Software\Microsoft\CTF\TIP\..., above because otherwise
+      // any call to powershell Set-WinUserLanguageList would set Enable=0,
+      // preventing that IME from being used.
+      {
+        auto const ctf_sort_order_tip = wil::reg::create_unique_key(
+            hkey_user.get(),
+            std::format(
+                LR"(Software\Microsoft\CTF\TIP\{}\LanguageProfile\0x{}\{})",
+                GUIDToBracketedString(Global::SampleIMECLSID),
+                𒂗𒈨𒅕𒃸_padded_langid_string,
+                GUIDToBracketedString(Global::SampleIMEGuidProfile))
+                .c_str(),
+            wil::reg::key_access::readwrite);
+        wil::reg::set_value(ctf_sort_order_tip.get(), L"Enable", 1);
+      }
       {
         auto const keyboard_layout_preload =
             wil::reg::open_unique_key(hkey_user.get(),
@@ -201,6 +236,8 @@ LANGID GetTransientLangID() {
                             L"00000409");
       }
     }
+    // See https://github.com/keymanapp/keyman/issues/4447.
+    // TODO cloud store sync thing.
     return *𒂗𒈨𒅕𒃸_langid;
   } catch (wil::ResultException e) {
     MessageBoxA(nullptr,
@@ -271,6 +308,7 @@ void RemoveLanguageIfUnused() {
           international_user_profile.get(), L"Languages", languages);
     }
     // TODO(egg): Maybe clean up Software\Microsoft\CTF, and Keyboard Layout?
+    // TODO cloud store sync thing.
   } catch (wil::ResultException e) {
     MessageBoxA(nullptr,
                 ("Error " + std::to_string(e.GetErrorCode())).c_str(),
