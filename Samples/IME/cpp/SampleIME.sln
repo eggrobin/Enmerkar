@@ -1,16 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29521.150
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SampleIME", "SampleIME\SampleIME.vcxproj", "{0C8FE010-5146-44D8-AF99-82702C15FEA5}"
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{02FC1D16-854F-41A4-894C-86D65ADE5F77}"
 EndProject
+Project("{840C416C-B8F3-42BC-B0DD-F6BB14C9F8CB}") = "Installer", "Installer\Installer.aiproj", "{A9650578-CCE3-4756-8B29-7EC32B44B303}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
 		Debug|x64 = Debug|x64
+		DefaultBuild|Win32 = DefaultBuild|Win32
+		DefaultBuild|x64 = DefaultBuild|x64
 		Release KSP 1.7.3|Win32 = Release KSP 1.7.3|Win32
 		Release KSP 1.7.3|x64 = Release KSP 1.7.3|x64
 		Release_LLVM|Win32 = Release_LLVM|Win32
@@ -23,6 +27,10 @@ Global
 		{0C8FE010-5146-44D8-AF99-82702C15FEA5}.Debug|Win32.Build.0 = Debug|Win32
 		{0C8FE010-5146-44D8-AF99-82702C15FEA5}.Debug|x64.ActiveCfg = Debug|x64
 		{0C8FE010-5146-44D8-AF99-82702C15FEA5}.Debug|x64.Build.0 = Debug|x64
+		{0C8FE010-5146-44D8-AF99-82702C15FEA5}.DefaultBuild|Win32.ActiveCfg = Debug|Win32
+		{0C8FE010-5146-44D8-AF99-82702C15FEA5}.DefaultBuild|Win32.Build.0 = Debug|Win32
+		{0C8FE010-5146-44D8-AF99-82702C15FEA5}.DefaultBuild|x64.ActiveCfg = Debug|x64
+		{0C8FE010-5146-44D8-AF99-82702C15FEA5}.DefaultBuild|x64.Build.0 = Debug|x64
 		{0C8FE010-5146-44D8-AF99-82702C15FEA5}.Release KSP 1.7.3|Win32.ActiveCfg = Release|Win32
 		{0C8FE010-5146-44D8-AF99-82702C15FEA5}.Release KSP 1.7.3|Win32.Build.0 = Release|Win32
 		{0C8FE010-5146-44D8-AF99-82702C15FEA5}.Release KSP 1.7.3|x64.ActiveCfg = Release|x64
@@ -37,6 +45,10 @@ Global
 		{0C8FE010-5146-44D8-AF99-82702C15FEA5}.Release|x64.Build.0 = Release|x64
 		{02FC1D16-854F-41A4-894C-86D65ADE5F77}.Debug|Win32.ActiveCfg = Debug
 		{02FC1D16-854F-41A4-894C-86D65ADE5F77}.Debug|x64.ActiveCfg = Debug
+		{02FC1D16-854F-41A4-894C-86D65ADE5F77}.DefaultBuild|Win32.ActiveCfg = Debug
+		{02FC1D16-854F-41A4-894C-86D65ADE5F77}.DefaultBuild|Win32.Build.0 = Debug
+		{02FC1D16-854F-41A4-894C-86D65ADE5F77}.DefaultBuild|x64.ActiveCfg = Debug
+		{02FC1D16-854F-41A4-894C-86D65ADE5F77}.DefaultBuild|x64.Build.0 = Debug
 		{02FC1D16-854F-41A4-894C-86D65ADE5F77}.Release KSP 1.7.3|Win32.ActiveCfg = Release
 		{02FC1D16-854F-41A4-894C-86D65ADE5F77}.Release KSP 1.7.3|Win32.Build.0 = Release
 		{02FC1D16-854F-41A4-894C-86D65ADE5F77}.Release KSP 1.7.3|x64.ActiveCfg = Release
@@ -47,6 +59,26 @@ Global
 		{02FC1D16-854F-41A4-894C-86D65ADE5F77}.Release_LLVM|x64.Build.0 = Release
 		{02FC1D16-854F-41A4-894C-86D65ADE5F77}.Release|Win32.ActiveCfg = Release
 		{02FC1D16-854F-41A4-894C-86D65ADE5F77}.Release|x64.ActiveCfg = Release
+		{A9650578-CCE3-4756-8B29-7EC32B44B303}.Debug|Win32.ActiveCfg = DefaultBuild
+		{A9650578-CCE3-4756-8B29-7EC32B44B303}.Debug|Win32.Build.0 = DefaultBuild
+		{A9650578-CCE3-4756-8B29-7EC32B44B303}.Debug|x64.ActiveCfg = DefaultBuild
+		{A9650578-CCE3-4756-8B29-7EC32B44B303}.Debug|x64.Build.0 = DefaultBuild
+		{A9650578-CCE3-4756-8B29-7EC32B44B303}.DefaultBuild|Win32.ActiveCfg = DefaultBuild
+		{A9650578-CCE3-4756-8B29-7EC32B44B303}.DefaultBuild|Win32.Build.0 = DefaultBuild
+		{A9650578-CCE3-4756-8B29-7EC32B44B303}.DefaultBuild|x64.ActiveCfg = DefaultBuild
+		{A9650578-CCE3-4756-8B29-7EC32B44B303}.DefaultBuild|x64.Build.0 = DefaultBuild
+		{A9650578-CCE3-4756-8B29-7EC32B44B303}.Release KSP 1.7.3|Win32.ActiveCfg = DefaultBuild
+		{A9650578-CCE3-4756-8B29-7EC32B44B303}.Release KSP 1.7.3|Win32.Build.0 = DefaultBuild
+		{A9650578-CCE3-4756-8B29-7EC32B44B303}.Release KSP 1.7.3|x64.ActiveCfg = DefaultBuild
+		{A9650578-CCE3-4756-8B29-7EC32B44B303}.Release KSP 1.7.3|x64.Build.0 = DefaultBuild
+		{A9650578-CCE3-4756-8B29-7EC32B44B303}.Release_LLVM|Win32.ActiveCfg = DefaultBuild
+		{A9650578-CCE3-4756-8B29-7EC32B44B303}.Release_LLVM|Win32.Build.0 = DefaultBuild
+		{A9650578-CCE3-4756-8B29-7EC32B44B303}.Release_LLVM|x64.ActiveCfg = DefaultBuild
+		{A9650578-CCE3-4756-8B29-7EC32B44B303}.Release_LLVM|x64.Build.0 = DefaultBuild
+		{A9650578-CCE3-4756-8B29-7EC32B44B303}.Release|Win32.ActiveCfg = DefaultBuild
+		{A9650578-CCE3-4756-8B29-7EC32B44B303}.Release|Win32.Build.0 = DefaultBuild
+		{A9650578-CCE3-4756-8B29-7EC32B44B303}.Release|x64.ActiveCfg = DefaultBuild
+		{A9650578-CCE3-4756-8B29-7EC32B44B303}.Release|x64.Build.0 = DefaultBuild
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

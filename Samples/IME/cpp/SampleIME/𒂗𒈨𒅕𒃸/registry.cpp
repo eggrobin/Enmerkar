@@ -285,11 +285,6 @@ LANGID GetTransientLangID() {
                             L"00000409");
       }
     }
-    std::system(
-        "powershell Set-WinUserLanguageList"
-        " -LanguageList (Get-WinUserLanguageList)"
-        " -Force");
-    SyncLanguageDataToCloud();
     return *𒂗𒈨𒅕𒃸_langid;
   } catch (wil::ResultException e) {
     MessageBoxA(nullptr,
@@ -361,11 +356,6 @@ void RemoveLanguageIfUnused() {
           international_user_profile.get(), L"Languages", languages);
     }
     // TODO(egg): Maybe clean up Software\Microsoft\CTF, and Keyboard Layout?
-    std::system(
-        "powershell Set-WinUserLanguageList"
-        " -LanguageList (Get-WinUserLanguageList)"
-        " -Force");
-    SyncLanguageDataToCloud();
   } catch (wil::ResultException e) {
     MessageBoxA(nullptr,
                 ("Error " + std::to_string(e.GetErrorCode())).c_str(),
