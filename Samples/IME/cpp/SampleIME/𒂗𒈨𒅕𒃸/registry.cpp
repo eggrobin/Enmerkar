@@ -7,8 +7,11 @@
 #include <set>
 #include <string>
 
-#include "Globals.h"
+#include <combaseapi.h>
+
 #include "wil/registry.h"
+
+#include "Globals.h"
 
 namespace 𒂗𒈨𒅕𒃸 {
 
@@ -28,6 +31,52 @@ std::wstring GUIDToBracketedString(GUID guid) {
       guid.Data4[6],
       guid.Data4[7],
       guid.Data4[8]);
+}
+
+// Not clear that this is needed, not called for now.  Changing the language
+// list by hand sets this.
+void SetPreferredUILanguagesPending(HKEY hkey_user) {
+  auto const desktop = wil::reg::open_unique_key(
+      hkey_user, LR"(Control Panel\Desktop)", wil::reg::key_access::readwrite);
+  std::optional preferred_ui_languages = wil::reg::try_get_value_multistring(
+      desktop.get(), L"PreferredUILanguages");
+  if (preferred_ui_languages.has_value()) {
+    wil::reg::set_value_multistring(
+        desktop.get(), L"PreferredUILanguagesPending", *preferred_ui_languages);
+  }
+}
+
+// See https://github.com/keymanapp/keyman/issues/4447.
+// Although that bug mentions a claim of a fix, powershell
+// Set-WinUserLanguageList still does not appear to do it.
+void SyncLanguageDataToCloud() {
+  if (!SUCCEEDED(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED))) {
+    MessageBoxA(
+        nullptr, "CoInitializeEx failed", nullptr, MB_OK | MB_ICONERROR);
+  } else {
+    HMODULE handle = LoadLibrary(L"coreglobconfig.dll");
+    if (handle == nullptr) {
+      MessageBoxA(nullptr,
+                  "LoadLibrary(coreglobconfig.dll) failed",
+                  nullptr,
+                  MB_OK | MB_ICONERROR);
+    } else {
+      using VoidWinAPI = void WINAPI();
+      VoidWinAPI* sync_language_data_to_cloud =
+          (VoidWinAPI*)GetProcAddress(handle, "SyncLanguageDataToCloud");
+      if (sync_language_data_to_cloud == nullptr) {
+        MessageBoxA(nullptr,
+                    "Could not find SyncLanguageDataToCloud",
+                    nullptr,
+                    MB_OK | MB_ICONERROR);
+      } else {
+        sync_language_data_to_cloud();
+      }
+      Sleep(10000);
+      FreeLibrary(handle);
+    }
+    CoUninitialize();
+  }
 }
 
 LANGID GetTransientLangID() {
@@ -236,8 +285,11 @@ LANGID GetTransientLangID() {
                             L"00000409");
       }
     }
-    // See https://github.com/keymanapp/keyman/issues/4447.
-    // TODO cloud store sync thing.
+    std::system(
+        "powershell Set-WinUserLanguageList"
+        " -LanguageList (Get-WinUserLanguageList)"
+        " -Force");
+    SyncLanguageDataToCloud();
     return *𒂗𒈨𒅕𒃸_langid;
   } catch (wil::ResultException e) {
     MessageBoxA(nullptr,
@@ -258,6 +310,7 @@ void RemoveLanguageIfUnused() {
       }
       auto const hkey_user = wil::reg::open_unique_key(
           HKEY_USERS, user.name.c_str(), wil::reg::key_access::read);
+
       auto const international_user_profile = wil::reg::open_unique_key(
           hkey_user.get(),
           LR"(Control Panel\International\User Profile)",
@@ -308,7 +361,11 @@ void RemoveLanguageIfUnused() {
           international_user_profile.get(), L"Languages", languages);
     }
     // TODO(egg): Maybe clean up Software\Microsoft\CTF, and Keyboard Layout?
-    // TODO cloud store sync thing.
+    std::system(
+        "powershell Set-WinUserLanguageList"
+        " -LanguageList (Get-WinUserLanguageList)"
+        " -Force");
+    SyncLanguageDataToCloud();
   } catch (wil::ResultException e) {
     MessageBoxA(nullptr,
                 ("Error " + std::to_string(e.GetErrorCode())).c_str(),
