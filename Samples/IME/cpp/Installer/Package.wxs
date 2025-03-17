@@ -43,9 +43,15 @@
         <File Source="..\Release\Win32\SampleIME.dll" SelfRegCost="1"></File>
       </Component>
     </Feature>
-    <CustomAction Id="SyncLanguagesToCloud" Execute="commit" Impersonate="yes"
-    Directory="INSTALLFOLDER"
-    ExeCommand="powershell.exe Set-WinUserLanguageList -LanguageList (Get-WinUserLanguageList) -Force; Set-Content ~\a.txt $env:username"/>
+    <InstallExecuteSequence>
+      <Custom Action="SyncLanguagesToCloud" After="InstallFiles"/>
+    </InstallExecuteSequence>
+    <CustomAction
+        Id="SyncLanguagesToCloud"
+        Execute="commit"
+        Impersonate="yes"
+        Directory="PersonalFolder"
+        ExeCommand="powershell.exe Set-WinUserLanguageList -LanguageList (Get-WinUserLanguageList) -Force"/>
     <ui:WixUI
       Id="EnmerkarInstallerUI"
       InstallDirectory="INSTALLFOLDER" />
