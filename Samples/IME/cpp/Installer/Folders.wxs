@@ -5,9 +5,6 @@
         <Directory Id="InstallFolderx64" Name="x64"></Directory>
         <Directory Id="InstallFolderWin32" Name="Win32"></Directory>
       </Directory>
-      <Directory Id="LayoutAZERTY" Name="!(bind.Property.Manufacturer)\!(bind.Property.ProductName)"></Directory>
-      <Directory Id="LayoutQWERTY" Name="!(bind.Property.Manufacturer)\!(bind.Property.ProductName)"></Directory>
-      <Directory Id="LayoutQWERTZ" Name="!(bind.Property.Manufacturer)\!(bind.Property.ProductName)"></Directory>
     </StandardDirectory>
   </Fragment>
 </Wix>

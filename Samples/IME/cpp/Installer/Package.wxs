@@ -15,17 +15,17 @@
       <Component Directory="INSTALLFOLDER">
         <File Source="..\SampleIME\𒂗𒈨𒅕𒃸\fonts.txt"/>
       </Component>
-      <Component Directory="LayoutAZERTY" Condition="LAYOUT=0" Guid="{74876265-B2EA-4E02-9357-BB45DF6B1B20}">
-        <File Source="..\SampleIME\𒂗𒈨𒅕𒃸\layout_azertŋ.txt" Name="layout.txt"/>
+      <Component Id="LayoutAZERTY" Directory="INSTALLFOLDER" Condition="LAYOUT=0" Guid="{74876265-B2EA-4E02-9357-BB45DF6B1B20}">
+        <File Id="azerty" Source="..\SampleIME\𒂗𒈨𒅕𒃸\layout_azertŋ.txt" Name="layout.txt"/>
       </Component>
-      <Component Directory="LayoutQWERTY" Condition="LAYOUT=1" Guid="{E7B5A20C-8FA8-4B3B-A235-86141292717B}">
-        <File Source="..\SampleIME\𒂗𒈨𒅕𒃸\layout_qwertŋ.txt" Name="layout.txt"/>
+      <Component Id="LayoutQWERTY" Directory="INSTALLFOLDER" Condition="LAYOUT=1" Guid="{E7B5A20C-8FA8-4B3B-A235-86141292717B}">
+        <File Id="qwerty" Source="..\SampleIME\𒂗𒈨𒅕𒃸\layout_qwertŋ.txt" Name="layout.txt"/>
       </Component>
-      <Component Directory="LayoutQWERTZ" Condition="LAYOUT=2" Guid="{212654FA-2AAA-453D-8C02-7647A525D4A0}">
-        <File Source="..\SampleIME\𒂗𒈨𒅕𒃸\layout_qwertz.txt" Name="layout.txt"/>
+      <Component Id="LayoutQWERTZ" Directory="INSTALLFOLDER" Condition="LAYOUT=2" Guid="{212654FA-2AAA-453D-8C02-7647A525D4A0}">
+        <File Id="qwertz" Source="..\SampleIME\𒂗𒈨𒅕𒃸\layout_qwertz.txt" Name="layout.txt"/>
       </Component>
-      <Component Directory="INSTALLFOLDER" Condition="LAYOUT=3" Guid="{45A798E9-58BE-49D2-890D-D66F984275BF}">
-        <File Source="..\SampleIME\𒂗𒈨𒅕𒃸\layout_ʾṣṭpŋf.txt" Name="layout.txt"/>
+      <Component Id="LayoutDvorak" Directory="INSTALLFOLDER" Condition="LAYOUT=3" Guid="{45A798E9-58BE-49D2-890D-D66F984275BF}">
+        <File Id="dvorak" Source="..\SampleIME\𒂗𒈨𒅕𒃸\layout_ʾṣṭpŋf.txt" Name="layout.txt"/>
       </Component>
       <Component Directory="INSTALLFOLDER">
         <File Source="..\SampleIME\image\SampleIme.ico"/>
