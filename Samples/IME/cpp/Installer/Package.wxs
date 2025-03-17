@@ -45,15 +45,19 @@
       </Component>
     </Feature>
     <InstallExecuteSequence>
-      <Custom Action="SyncLanguagesToCloud" After="InstallFiles"/>
+      <Custom Action="AddAkkXsux" Before="SelfRegModules" Condition="REMOVE&lt;&gt;&quot;ALL&quot;"/>
+      <Custom Action="SyncLanguageSettings" After="SelfUnregModules" Condition="REMOVE=&quot;ALL&quot;"/>
     </InstallExecuteSequence>
     <CustomAction
-        Id="SyncLanguagesToCloud"
-        Execute="commit"
+        Id="AddAkkXsux"
         Impersonate="yes"
         Directory="PersonalFolder"
-        ExeCommand="powershell.exe echo meow " />
-        <!--Set-WinUserLanguageList -LanguageList (Get-WinUserLanguageList) -Force"-->
+        ExeCommand="powershell.exe Write-Host 'Adding akk-Xsux...';$list=Get-WinUserLanguageList; $list.Add('akk-Xsux'); Set-WinUserLanguageList -LanguageList $list -Force"/>
+    <CustomAction
+        Id="SyncLanguageSettings"
+        Impersonate="yes"
+        Directory="PersonalFolder"
+        ExeCommand="powershell.exe Write-Host 'Synchronizing language settings...';Set-WinUserLanguageList -LanguageList (Get-WinUserLanguageList) -Force"/>
     <ui:WixUI
       Id="EnmerkarInstallerUI"
       InstallDirectory="INSTALLFOLDER" />

@@ -82,20 +82,6 @@ void SyncLanguageDataToCloud() {
 LANGID GetTransientLangID() {
   try {
     constexpr PCWSTR 𒂗𒈨𒅕𒃸_tag = L"akk-Xsux";
-    // List from
-    // https://learn.microsoft.com/en-us/windows/win32/sysinfo/enumerating-registry-subkeys.
-    std::set<LANGID> unused_transient_langids{0x2000,
-                                              0x2400,
-                                              0x2800,
-                                              0x2C00,
-                                              0x3000,
-                                              0x3400,
-                                              0x3800,
-                                              0x3C00,
-                                              0x4000,
-                                              0x4400,
-                                              0x4800,
-                                              0x4C00};
     std::optional<LANGID> 𒂗𒈨𒅕𒃸_langid;
     for (auto const& user : wil::make_range(wil::reg::key_iterator{HKEY_USERS},
                                             wil::reg::key_iterator{})) {
@@ -124,19 +110,17 @@ LANGID GetTransientLangID() {
           if (language_tag == 𒂗𒈨𒅕𒃸_tag) {
             𒂗𒈨𒅕𒃸_langid = static_cast<LANGID>(*langid);
           }
-          unused_transient_langids.erase(static_cast<LANGID>(*langid));
         }
       }
     }
     if (!𒂗𒈨𒅕𒃸_langid.has_value()) {
-      if (unused_transient_langids.empty()) {
-        MessageBoxW(nullptr,
-                    L"All transient LANGIDs in use",
-                    nullptr,
-                    MB_OK | MB_ICONERROR);
-        return 0x2000;
-      }
-      𒂗𒈨𒅕𒃸_langid = *unused_transient_langids.begin();
+      MessageBoxW(
+          nullptr,
+          std::format(L"Could not find transient LANGID for {}", 𒂗𒈨𒅕𒃸_tag)
+              .c_str(),
+          nullptr,
+          MB_OK | MB_ICONERROR);
+      return 0x2000;
     }
     std::wstring const 𒂗𒈨𒅕𒃸_langid_string =
         std::format(L"{:04X}", *𒂗𒈨𒅕𒃸_langid);
@@ -220,10 +204,8 @@ LANGID GetTransientLangID() {
               𒂗𒈨𒅕𒃸_padded_langid_string.c_str());
         }
       }
-      // It is important that we set the Enable=1 value in
-      // HKCU\Software\Microsoft\CTF\TIP\..., above because otherwise
-      // any call to powershell Set-WinUserLanguageList would set Enable=0,
-      // preventing that IME from being used.
+      // powershell Set-WinUserLanguageList will set Enable=0; setting Enable=1
+      // here allows us to bring back the IME by reinstalling.
       {
         auto const ctf_sort_order_tip = wil::reg::create_unique_key(
             hkey_user.get(),
