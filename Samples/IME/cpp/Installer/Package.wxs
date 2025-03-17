@@ -9,6 +9,9 @@
     <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
 
     <Feature Id="Main">
+      <Component Directory="FontsFolder">
+        <File Source="C:\Users\robin\Downloads\NotoSansCuneiform-Regular.ttf" TrueType="yes"/>
+      </Component>
       <Component Directory="INSTALLFOLDER">
         <File Source="..\SampleIME\𒂗𒈨𒅕𒃸\fonts.txt"/>
       </Component>
