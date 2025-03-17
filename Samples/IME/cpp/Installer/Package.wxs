@@ -5,7 +5,8 @@
       Name="Enmerkar"
       Manufacturer="mockingbirdnest"
       Version="1.0.0.0"
-      UpgradeCode="D949C6DA-17B2-4C66-92BB-2A8EE7749B33">
+      UpgradeCode="D949C6DA-17B2-4C66-92BB-2A8EE7749B33"
+      Codepage="65001">
     <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
 
     <Feature Id="Main">

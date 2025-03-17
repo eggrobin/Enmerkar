@@ -13,10 +13,10 @@
         <Control Id="Description" Type="Text" X="20" Y="60" Width="280" Height="20" Transparent="yes" NoPrefix="yes" Text="Choose a keyboard layout; you can customize it later by editing %APPDATA%\mockingbirdnest\Enmerkar\layout.txt." />
         <Control Id="BothScopes" Type="RadioButtonGroup" X="20" Y="90" Width="330" Height="120" Property="LAYOUT">
           <RadioButtonGroup Property="LAYOUT">
-            <RadioButton Value="0" X="0" Y="0" Width="295" Height="16" Text="AZERTY" />
-            <RadioButton Value="1" X="0" Y="30" Width="295" Height="16" Text="QWERTY" />
+            <RadioButton Value="0" X="0" Y="0" Width="295" Height="16" Text="AZERTŊ" />
+            <RadioButton Value="1" X="0" Y="30" Width="295" Height="16" Text="QWERTŊ" />
             <RadioButton Value="2" X="0" Y="60" Width="295" Height="16" Text="QWERTZ" />
-            <RadioButton Value="3" X="0" Y="90" Width="295" Height="16" Text="(Dvorak)" />
+            <RadioButton Value="3" X="0" Y="90" Width="295" Height="16" Text="ʾṢṬPŊF (Dvorak)" />
           </RadioButtonGroup>
         </Control>
         <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
