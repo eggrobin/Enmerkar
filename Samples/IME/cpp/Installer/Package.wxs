@@ -52,7 +52,8 @@
         Execute="commit"
         Impersonate="yes"
         Directory="PersonalFolder"
-        ExeCommand="powershell.exe Set-WinUserLanguageList -LanguageList (Get-WinUserLanguageList) -Force"/>
+        ExeCommand="powershell.exe echo meow " />
+        <!--Set-WinUserLanguageList -LanguageList (Get-WinUserLanguageList) -Force"-->
     <ui:WixUI
       Id="EnmerkarInstallerUI"
       InstallDirectory="INSTALLFOLDER" />
