@@ -310,7 +310,7 @@ class SourceReference:
   def parse(cls, parser: Parser, sources: dict[str, Source]):
     entry = parser.next()
     entry.validate(cls, parser)
-    abbreviation, number = re.split(r"(?=\d)", entry.text, maxsplit=1)
+    abbreviation, number = re.split(r"(?=\d)|(?<=\+)", entry.text, maxsplit=1)
     source = sources[abbreviation]
     return cls(source, SourceRange(number.rstrip("?"), source.base), number.endswith("?"))
 
