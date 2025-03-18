@@ -5,6 +5,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <SuppressIces>ICE30</SuppressIces>
   </PropertyGroup>
+  <PropertyGroup>
+    <OutputName>Enmerkar</OutputName>
+  </PropertyGroup>
   <ItemGroup>
     <Content Include="enmerkar.bmp" />
     <Content Include="enmerkar_banner.bmp" />
