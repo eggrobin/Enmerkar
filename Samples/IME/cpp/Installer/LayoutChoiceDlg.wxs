@@ -10,7 +10,7 @@
         <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
         <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
         <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="{\WixUI_Font_Title}Choose layout" />
-        <Control Id="Description" Type="Text" X="20" Y="60" Width="280" Height="20" Transparent="yes" NoPrefix="yes" Text="Choose a keyboard layout; you can customize it later by editing %APPDATA%\mockingbirdnest\Enmerkar\layout.txt." />
+        <Control Id="Description" Type="Text" X="20" Y="60" Width="280" Height="20" Transparent="yes" NoPrefix="yes" Text="Choose a keyboard layout; you can customize it later by editing [%APPDATA]\mockingbirdnest\Enmerkar\layout.txt." />
         <Control Id="BothScopes" Type="RadioButtonGroup" X="20" Y="90" Width="330" Height="120" Property="LAYOUT">
           <RadioButtonGroup Property="LAYOUT">
             <RadioButton Value="0" X="0" Y="0" Width="295" Height="16" Text="AZERTŊ" />
