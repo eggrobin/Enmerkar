@@ -8,6 +8,7 @@
       UpgradeCode="D949C6DA-17B2-4C66-92BB-2A8EE7749B33"
       Codepage="65001">
     <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
+    <MediaTemplate EmbedCab="yes" />
 
     <Feature Id="Main">
       <Component Directory="FontsFolder">
