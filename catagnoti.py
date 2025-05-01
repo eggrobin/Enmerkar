@@ -25,10 +25,6 @@ def catagnotify(osl_name, catagnoti_number):
   osl.add_source_mapping(osl_name, ptace, SourceRange("%03d" % int(catagnoti_number)))
 
 
-osl.forms_by_name["LAK776"][0].unicode_cuneiform = asl.UnicodeCuneiform("𒇻𒄾")
-# See comment in read_osl.
-#osl.forms_by_name["LAK20"][0].unicode_cuneiform = asl.UnicodeCuneiform("𒆱")
-
 osl_by_catagnoti = {}
 
 unencoded_catagnoti = []
