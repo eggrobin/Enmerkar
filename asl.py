@@ -828,14 +828,18 @@ print(sum([len(sign.values) for forms in osl.forms_by_name.values() for sign in 
 
 for source in osl.sources.values():
   missing = []
+  total = 0
   for n in source:
-    if n not in osl.forms_by_source[source]:
+    if n in osl.forms_by_source[source]:
+      total += 1
+    else:
       if not n.suffix and any(m.suffix and m.first == n.first for m in source):
         continue
       missing.append(n)
+      total += 1
   if missing:
-    print(f"*** {len(missing)} missing numbers from {source.abbreviation}", file=sys.stderr)
+    print(f"*** {len(missing)} / {total} missing numbers from {source.abbreviation}", file=sys.stderr)
   else:
-    print(f"--- {len(missing)} missing numbers from {source.abbreviation}", file=sys.stderr)
+    print(f"--- {len(missing)} / {total} missing numbers from {source.abbreviation}", file=sys.stderr)
   if len(missing) < 20:
     print(f"***   {' '.join(str(n) for n in missing)}", file=sys.stderr)

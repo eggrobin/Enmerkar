@@ -19,7 +19,9 @@ for sign in osl.signs:
 old_formatted_osl = str(osl)
 
 ptace = osl.sources["PTACE"]
+elles = osl.sources["ELLES"]
 lak = osl.sources["LAK"]
+unicode = osl.sources["U+"]
 
 def catagnotify(osl_name, catagnoti_number):
   osl.add_source_mapping(osl_name, ptace, SourceRange("%03d" % int(catagnoti_number)))
@@ -123,30 +125,6 @@ with open("La paleografia dei testi dell’amministrazione e della cancelleria d
         print("!!! Match on name (%s) but not on LAK%s for PTACE%s %s" % (oracc_name, laks, catagnoti_number, catagnoti_name))
       elif forms:
         print("!!! Match on LAK%s (%s) but not on name for PTACE%s %s" % (laks, forms[0].names[0], catagnoti_number, catagnoti_name))
-    continue
-    if forms:
-      if catagnoti_number not in osl_by_catagnoti:
-          osl_by_catagnoti[catagnoti_number] = []
-      osl_by_catagnoti[catagnoti_number] = forms
-      log_unicode_status = False
-      if log_unicode_status:
-        if not any(form.unicode_cuneiform or form.sign and form.sign.unicode_cuneiform for form in forms):
-          print("--- PTACE%s %s = LAK%s has no encoding: %s, %s" % (catagnoti_number, catagnoti_name, laks, [f.names[0] for f in forms], [s.source.abbreviation + str(s.number) for form in forms for s in form.sources]))
-        elif not any(form.unicode_cuneiform or form.sign and len(form.sign.unicode_cuneiform.text) == 1 for form in forms):
-          print("+++ PTACE%s %s = LAK%s is a variant of a diri: %s, %s" % (catagnoti_number, catagnoti_name, laks, [f.names[0] for f in forms], [s.source.abbreviation + str(s.number) for form in forms for s in form.sources]))
-
-      values = [value.text for form in forms for value in form.values] + [
-                value.text for form in forms if form.sign for value in form.sign.values]
-      if oraccify_name(catagnoti_name) in set(form.names[0] for form in forms):
-        continue
-      elif oraccify_name(catagnoti_name) in osl.forms_by_name:
-        print("*** PTACE%s %s name suggests %s instead identified with %s" %
-                (catagnoti_number, catagnoti_name,
-                 oraccify_name(catagnoti_name),
-                 [form.names[0] for form in forms]))
-      else:
-        print("!!! PTACE%s %s %s" % (catagnoti_number, catagnoti_name, values))
-        continue
 
 print(len(catagnoti_easy.keys() - catagnoti_not_so_easy), "really easy")
 print(len(catagnoti_easy), "partially easy")
@@ -162,14 +140,44 @@ for catagnoti_number, name in refinements.items():
 with open("catagnotify.diff", "w", encoding="utf-8", newline='\n') as f:
   print("\n".join(difflib.unified_diff(old_formatted_osl.splitlines(), str(osl).splitlines(),fromfile="a/00lib/osl.asl",tofile="b/00lib/osl.asl", lineterm="")), file=f)
 
-print(f"{len(osl_by_catagnoti)} Catagnoti signs in osl")
+print(f"{len(osl.forms_by_source[ptace])} Catagnoti signs in osl")
 #print(f"{len(osl.forms_by_source[elles])} ELLes signs in osl")
 
-elles_inter_catagnoti = [(catagnoti_number, forms) for catagnoti_number, forms in osl_by_catagnoti.items() if any(s.source == elles for form in forms for s in form.sources)]
+elles_inter_catagnoti = [(catagnoti_number, forms) for catagnoti_number, forms in osl.forms_by_source[ptace].items() if any(s.source == elles for form in forms for s in form.sources)]
 print(f"{len(elles_inter_catagnoti)} Catagnoti signs in ELLes")
 
-elles_inter_catagnoti_no_lak = [(catagnoti_number, [f.names[0] for f in forms], [s.source.abbreviation + str(s.number) for form in forms for s in form.sources]) for catagnoti_number, forms in elles_inter_catagnoti if not any(s.source is lak for form in forms for s in form.sources)]
-print(f"{len(elles_inter_catagnoti_no_lak)} Catagnoti signs in ELLes with no LAK: {elles_inter_catagnoti_no_lak}")
+print("Catagnoti & ELLes signs with no other lists")
+elles_inter_catagnoti_no_other = [(catagnoti_number, [f.names[0] for f in forms], [s.source.abbreviation + str(s.number) for form in forms for s in form.sources]) for catagnoti_number, forms in elles_inter_catagnoti if not any(s.source not in (elles, ptace, unicode) for form in forms for s in form.sources)]
+print(f"{len(elles_inter_catagnoti_no_other)} Catagnoti signs in ELLes with no other list:")
+n = 0
+for _, names, numbers in elles_inter_catagnoti_no_other:
+  print("=".join(numbers), names)
+  n += 1
+print ("Total:", n)
+
+print("Catagnoti signs with no ucun nor parent ucun")
+n = 0
+for number, forms in osl.forms_by_source[ptace].items():
+  if not any(form.unicode_cuneiform or (form.sign and form.sign.unicode_cuneiform) for form in forms):
+    print(number, ' '.join(form.names[0] for form in forms))
+    n += 1
+print("Total:", n)
+
+print("Catagnoti signs with no ucun nor atomic parent ucun")
+n = 0
+for number, forms in osl.forms_by_source[ptace].items():
+  if not any(form.unicode_cuneiform or (form.sign and form.sign.unicode_cuneiform and len(form.sign.unicode_cuneiform.text) == 1) for form in forms):
+    print(number, ' '.join(form.names[0] for form in forms))
+    n += 1
+print("Total:", n)
+
+print("Catagnoti signs with no ucun")
+n = 0
+for number, forms in osl.forms_by_source[ptace].items():
+  if not any(form.unicode_cuneiform for form in forms):
+    print(number, ' '.join(form.names[0] for form in forms))
+    n += 1
+print("Total:", n)
 
 if False:
   for i in range(1, 398):
