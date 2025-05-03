@@ -3,7 +3,7 @@ from typing import Dict
 import unicodedata
 
 import asl
-from asl import osl, SourceRange
+from asl import UnicodeCuneiform, osl, SourceRange
 import difflib
 
 import re
@@ -155,10 +155,13 @@ for _, names, numbers in elles_inter_catagnoti_no_other:
   n += 1
 print ("Total:", n)
 
+def non_pua(ucun : UnicodeCuneiform | None) -> bool:
+  return ucun and not any(unicodedata.category(c) == "Co" for c in ucun.text)
+
 print("Catagnoti signs with no ucun nor parent ucun")
 n = 0
 for number, forms in osl.forms_by_source[ptace].items():
-  if not any(form.unicode_cuneiform or (form.sign and form.sign.unicode_cuneiform) for form in forms):
+  if not any(non_pua(form.unicode_cuneiform) or (form.sign and non_pua(form.sign.unicode_cuneiform)) for form in forms):
     print(number, ' '.join(form.names[0] for form in forms))
     n += 1
 print("Total:", n)
@@ -166,7 +169,7 @@ print("Total:", n)
 print("Catagnoti signs with no ucun nor atomic parent ucun")
 n = 0
 for number, forms in osl.forms_by_source[ptace].items():
-  if not any(form.unicode_cuneiform or (form.sign and form.sign.unicode_cuneiform and len(form.sign.unicode_cuneiform.text) == 1) for form in forms):
+  if not any(non_pua(form.unicode_cuneiform) or (form.sign and non_pua(form.sign.unicode_cuneiform) and len(form.sign.unicode_cuneiform.text) == 1) for form in forms):
     print(number, ' '.join(form.names[0] for form in forms))
     n += 1
 print("Total:", n)
@@ -174,7 +177,7 @@ print("Total:", n)
 print("Catagnoti signs with no ucun")
 n = 0
 for number, forms in osl.forms_by_source[ptace].items():
-  if not any(form.unicode_cuneiform for form in forms):
+  if not any(non_pua(form.unicode_cuneiform) for form in forms):
     print(number, ' '.join(form.names[0] for form in forms))
     n += 1
 print("Total:", n)
