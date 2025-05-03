@@ -155,7 +155,7 @@ for _, names, numbers in elles_inter_catagnoti_no_other:
   n += 1
 print ("Total:", n)
 
-def non_pua(ucun : UnicodeCuneiform | None) -> bool:
+def non_pua(ucun : UnicodeCuneiform | None):
   return ucun and not any(unicodedata.category(c) == "Co" for c in ucun.text)
 
 print("Catagnoti signs with no ucun nor parent ucun")
