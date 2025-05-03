@@ -816,9 +816,14 @@ with open(r"..\osl\00lib\osl.asl", encoding="utf-8") as f:
 osl.date = osl_date
 osl.revision = osl_hash
 
-print("\n".join(difflib.unified_diff(
+diff = list(difflib.unified_diff(
     original_lines, str(osl).splitlines(),
-    fromfile="osl.asl", tofile="formatted")))
+    fromfile="osl.asl", tofile="formatted"))
+
+if len(diff) > 40:
+  print("*** Large diff when regenerating OSL")
+else:
+  print("\n".join(diff))
 if str(SignList.parse(Parser(str(osl).splitlines(), "str(osl)"))) != str(osl):
   raise ValueError("Not idempotent")
 
