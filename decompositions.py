@@ -1,7 +1,10 @@
-import asl
+from collections import defaultdict
 import re
 
+import asl
+
 with open("decompositions.txt", "w", encoding="utf-8") as f:
+    mapping = defaultdict(list)
     for name, forms in asl.osl.forms_by_name.items():
         xsux = [form.unicode_cuneiform.text
                 for form in forms
@@ -21,6 +24,13 @@ with open("decompositions.txt", "w", encoding="utf-8") as f:
                     break
             else:
                 parts.append(part)
-        if ''.join(part for part in parts if part not in "|.×()&") != xsux:
+        mapping[xsux].append(parts)
+    for xsux, decompositions in mapping.items():
+
+        if any(''.join(part
+                        for part in parts
+                        if part not in "|.×()&") != xsux
+                for parts in decompositions):
             print(xsux, file=f)
-            print("  →", "".join(parts), file=f)
+            for parts in decompositions:
+                print("  →", "".join(parts), file=f)
