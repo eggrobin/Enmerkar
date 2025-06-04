@@ -13,6 +13,8 @@ with open("decompositions.txt", "w", encoding="utf-8") as f:
             continue
         if len(set(xsux)) > 1:
             raise ValueError(name, xsux)
+        if 'X' in xsux:
+            continue
         xsux = xsux[0]
         if "|" not in name:
             continue
