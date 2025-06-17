@@ -31,7 +31,7 @@ with open("decompositions.txt", "w", encoding="utf-8") as f:
 
         if any(''.join(part
                         for part in parts
-                        if part not in "|.×()&+%") != xsux
+                        if part not in "|.+") != xsux
                 for parts in decompositions):
             print(xsux, file=f)
             for parts in decompositions:
