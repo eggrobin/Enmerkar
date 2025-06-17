@@ -16,7 +16,7 @@ with open("decompositions.txt", "w", encoding="utf-8") as f:
         xsux = xsux[0]
         if 'X' in xsux or 'x' in xsux:
             continue
-        if "|" not in name:
+        if "|" not in name and "@" not in name:
             continue
         parts : list[str] = []
         for part in re.split(r"([|.×()&+%]|@(?:[cfgstv]|180)?)", name):
