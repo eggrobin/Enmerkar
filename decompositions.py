@@ -13,13 +13,13 @@ with open("decompositions.txt", "w", encoding="utf-8") as f:
             continue
         if len(set(xsux)) > 1:
             raise ValueError(name, xsux)
-        if 'X' in xsux:
-            continue
         xsux = xsux[0]
+        if 'X' in xsux or 'x' in xsux:
+            continue
         if "|" not in name:
             continue
         parts : list[str] = []
-        for part in re.split(r"([|.×()&+])", name):
+        for part in re.split(r"([|.×()&+%])", name):
             for form in asl.osl.forms_by_name.get(part) or []:
                 if form.unicode_cuneiform:
                     parts.append(form.unicode_cuneiform.text)
@@ -31,7 +31,7 @@ with open("decompositions.txt", "w", encoding="utf-8") as f:
 
         if any(''.join(part
                         for part in parts
-                        if part not in "|.×()&+") != xsux
+                        if part not in "|.×()&+%") != xsux
                 for parts in decompositions):
             print(xsux, file=f)
             for parts in decompositions:
