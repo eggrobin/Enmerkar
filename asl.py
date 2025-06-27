@@ -6,8 +6,11 @@ import difflib
 import re
 import sys
 import textwrap
-from typing import DefaultDict, Optional, Literal, Tuple
+from typing import DefaultDict, Optional, Literal, Tuple, TypeVar
 import subprocess
+
+class Tag:
+  tag: str
 
 class RawEntry:
   def __init__(self, line: str, parser: "Parser"):
@@ -21,7 +24,7 @@ class RawEntry:
       self.tag = self.tag[:-1]
     self.text = tail[0] if tail else ""
 
-  def validate(self, entry_type, parser):
+  def validate(self, entry_type: type[Tag], parser: "Parser"):
     if self.tag != entry_type.tag:
       raise parser.raise_error(f"Expected @{entry_type.tag}, got @{self.tag} {self.text}")
 
@@ -59,11 +62,19 @@ class Parser:
         break
     return result
 
+  def next_expecting(self, cls: type[Tag]) -> RawEntry:
+    entry = self.next()
+    if not entry:
+      self.raise_error(f"Expected @{cls.tag} at end of file")
+    entry.validate(cls, self)
+    return entry
+
   def raise_error(self, message: str):
     raise SyntaxError(f"{self.context}:{self.line_number}: {message}")
 
+TextTagSubclass = TypeVar("TextTagSubclass", bound="TextTag")
 
-class TextTag:
+class TextTag(Tag):
   tag: str
   text: str
 
@@ -74,9 +85,8 @@ class TextTag:
     return "@%s\t%s" % (self.tag, "\n\t".join(self.text.splitlines()))
 
   @classmethod
-  def parse(cls, parser: Parser, *args) -> "TextTag":
-    entry = parser.next()
-    entry.validate(cls, parser)
+  def parse(cls: type[TextTagSubclass], parser: Parser) -> TextTagSubclass:
+    entry = parser.next_expecting(cls)
     return cls(entry.text)
 
 # Undocumented.
@@ -144,6 +154,8 @@ class UnicodeSequence(TextTag):
   tag = "useq"
 
 class SourceRange:
+  base: Literal[10, 16]
+
   def __init__(self, text: str, base: Optional[Literal[10, 16]] = None):
     self.hex_prefix = text.startswith("0x")
     self.base = base or (16 if self.hex_prefix else 10)
@@ -165,7 +177,7 @@ class SourceRange:
       self.first = int(number, self.base)
       self.last = self.first
 
-  def __eq__(self, other):
+  def __eq__(self, other: object):
     return (isinstance(other, SourceRange) and
             self.first == other.first and
             self.last == other.last and
@@ -199,7 +211,7 @@ class SourceRange:
     else:
       return self.format_number(self.first) + "-" + self.format_number(self.last)
 
-class Source:
+class Source(Tag):
   """A classical sign list, e.g., RÉC, MZL, etc.
 
   We use the Unicode term source so as to avoid conflicts and confusion with
@@ -232,8 +244,7 @@ class Source:
 
   @classmethod
   def parse(cls, parser: Parser) -> "Source":
-    entry = parser.next()
-    entry.validate(cls, parser)
+    entry = parser.next_expecting(cls)
     abbreviation, numbers = entry.text.split(maxsplit=1)
     result = cls(abbreviation, [[SourceRange(r) for r in line.split()] for line in numbers.splitlines()])
     while entry := parser.peek():
@@ -252,7 +263,7 @@ class Source:
       "\n\t".join(' '.join(str(number) for number in line) for line in self.range_lines),
       "\n".join(str(note) for note in self.notes))
 
-class Value:
+class Value(Tag):
   tag = "v"
   deprecated: bool
   language: Optional[str]
@@ -272,7 +283,7 @@ class Value:
 
   @classmethod
   def parse(cls, parser: Parser):
-    entry = parser.next()
+    entry = parser.next_expecting(cls)
     language = None
     args = entry.text
     if args.startswith('%'):
@@ -288,7 +299,7 @@ class Value:
         break
     return result
 
-class SourceReference:
+class SourceReference(Tag):
   tag = "list"
   source: Source
   number: SourceRange
@@ -308,13 +319,12 @@ class SourceReference:
 
   @classmethod
   def parse(cls, parser: Parser, sources: dict[str, Source]):
-    entry = parser.next()
-    entry.validate(cls, parser)
+    entry = parser.next_expecting(cls)
     abbreviation, number = re.split(r"(?=\d)|(?<=\+)", entry.text, maxsplit=1)
     source = sources[abbreviation]
     return cls(source, SourceRange(number.rstrip("?"), source.base), number.endswith("?"))
 
-class System:
+class System(Tag):
   tag = "sysdef"
   name: str
   notes: list[Note]
@@ -330,8 +340,7 @@ class System:
 
   @classmethod
   def parse(cls, parser: Parser) -> "System":
-    entry = parser.next()
-    entry.validate(cls, parser)
+    entry = parser.next_expecting(cls)
     result = cls(entry.text)
     while entry := parser.peek():
       for entry_type in (Note, *Note.__subclasses__()):
@@ -342,7 +351,7 @@ class System:
         break
     return result
 
-class LinkType:
+class LinkType(Tag):
   tag = "linkdef"
   name: str
   notes: list[Note]
@@ -358,8 +367,7 @@ class LinkType:
 
   @classmethod
   def parse(cls, parser: Parser) -> "LinkType":
-    entry = parser.next()
-    entry.validate(cls, parser)
+    entry = parser.next_expecting(cls)
     result = cls(entry.text)
     while entry := parser.peek():
       for entry_type in (Note, *Note.__subclasses__()):
@@ -373,7 +381,7 @@ class LinkType:
 class SystemBinding(TextTag):
   tag = "sys"
 
-class Link:
+class Link(Tag):
   tag = "link"
   system: str
   identifier: str
@@ -389,15 +397,14 @@ class Link:
 
   @classmethod
   def parse(cls, parser: Parser, *args) -> "Link":
-    entry = parser.next()
-    entry.validate(cls, parser)
+    entry = parser.next_expecting(cls)
     system, identifier, url = entry.text.split(maxsplit=2)
     return cls(system, identifier, url)
 
 class SignLike:
   pass
 
-class SourceOnly(SignLike):
+class SourceOnly(Tag, SignLike):
   tag = "lref"
   name = str
   notes: list[Note]
@@ -413,8 +420,7 @@ class SourceOnly(SignLike):
 
   @classmethod
   def parse(cls, parser: Parser, sources: dict[str, Source]) -> "Form":
-    entry = parser.next()
-    entry.validate(cls, parser)
+    entry = parser.next_expecting(cls)
     result = cls(entry.text)
     result.deprecated = entry.deprecated
 
@@ -427,7 +433,7 @@ class SourceOnly(SignLike):
         break
     return result
 
-class CompoundOnly(SignLike):
+class CompoundOnly(Tag, SignLike):
   tag = "compoundonly"
   name = str
   notes: list[Note]
@@ -443,8 +449,7 @@ class CompoundOnly(SignLike):
 
   @classmethod
   def parse(cls, parser: Parser, sources: dict[str, Source]) -> "Form":
-    entry = parser.next()
-    entry.validate(cls, parser)
+    entry = parser.next_expecting(cls)
     result = cls(entry.text)
     result.deprecated = entry.deprecated
 
@@ -459,13 +464,13 @@ class CompoundOnly(SignLike):
 
 # Omitting @sref which is not actually used.
 
-class Form:
+class Form(Tag):
   tag = "form"
   oid: Optional[OID]
   deprecated: bool
   default: bool
   names: list[str]
-  pname: Optional[str]
+  pname: Optional[PlusName]
   fake: Optional[Fake]
   sources: list[SourceReference]
   notes: list[Note]
@@ -551,8 +556,7 @@ class Form:
 
   @classmethod
   def parse(cls, parser: Parser, sources: dict[str, Source]) -> "Form":
-    entry = parser.next()
-    entry.validate(cls, parser)
+    entry = parser.next_expecting(cls)
     result = cls(entry.text)
     result.deprecated = entry.deprecated
     result.default = entry.default
@@ -670,7 +674,7 @@ class Pcun(Form, SignLike):
       return True
     return False
 
-class SignList:
+class SignList(Tag):
   tag = "signlist"
   project: Project
   domain: Domain
@@ -774,8 +778,7 @@ class SignList:
   @classmethod
   def parse(cls, parser: Parser) -> "SignList":
     project = Project.parse(parser)
-    entry = parser.next()
-    entry.validate(cls, parser)
+    entry = parser.next_expecting(cls)
     domain = Domain.parse(parser)
     result = cls(project, entry.text, domain)
 
