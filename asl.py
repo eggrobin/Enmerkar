@@ -8,6 +8,7 @@ import sys
 import textwrap
 from typing import DefaultDict, Optional, Literal, Tuple, TypeVar
 import subprocess
+import unicodedata
 
 class Tag:
   tag: str
@@ -851,3 +852,19 @@ for source in osl.sources.values():
     print(f"--- {len(missing)} / {total} missing numbers from {source.abbreviation}", file=sys.stderr)
   if len(missing) < 20:
     print(f"***   {' '.join(str(n) for n in missing)}", file=sys.stderr)
+
+for forms in osl.forms_by_name.values():
+  for form in forms:
+    if form.unicode_cuneiform:
+      ucun = form.unicode_cuneiform.text
+      from_hex = None
+      if form.unicode_sequence:
+        from_hex = "".join(hex if hex in "XO" else chr(int("0" + hex, 16))
+                           for hex in form.unicode_sequence.text.split("."))
+      for ref in form.sources:
+        if ref.source.abbreviation == "U+":
+          if from_hex:
+            raise ValueError(f"Both @useq and @list U+ in {form}")
+          from_hex = chr(ref.number.first)
+      if from_hex and from_hex != ucun:
+        print(f"Inconsistent @ucun ({ucun}) and @list U+/@useq ({from_hex}) in {form}")
