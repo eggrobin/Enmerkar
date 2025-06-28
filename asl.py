@@ -17,7 +17,7 @@ class RawEntry:
   def __init__(self, line: str, parser: "Parser"):
     if not line.startswith("@"):
       parser.raise_error(f"Tag does not start with @: {line}")
-    tag, *tail = line.split(maxsplit=1)
+    tag, *tail = re.split(r"[ \t]+", line, maxsplit=1)
     self.tag = tag[1:]
     self.default = self.tag.endswith("+")
     self.deprecated = self.tag.endswith("-")
@@ -49,15 +49,15 @@ class Parser:
     while self.line_number < len(self.lines):
       line = self.lines[self.line_number]
       self.line_number += 1
-      if line.strip():
-        result = RawEntry(line.strip(), self)
+      if line.strip(" \t"):
+        result = RawEntry(line.strip(" \t"), self)
         break
     else:
       return None
     while self.line_number < len(self.lines):
       line = self.lines[self.line_number]
       if line.startswith("\t") or line.startswith(" "):
-        result.text += "\n" + line.strip()
+        result.text += "\n" + line.strip(" \t")
         self.line_number += 1
       else:
         break
@@ -856,10 +856,10 @@ for source in osl.sources.values():
 for forms in osl.forms_by_name.values():
   for form in forms:
     if form.unicode_cuneiform:
-      ucun = form.unicode_cuneiform.text
+      ucun = form.unicode_cuneiform.text.upper().replace("O", "X")
       from_hex = None
       if form.unicode_sequence:
-        from_hex = "".join(hex if hex in "XO" else chr(int("0" + hex, 16))
+        from_hex = "".join("X" if hex in "XO" else chr(int("0" + hex, 16))
                            for hex in form.unicode_sequence.text.split("."))
       for ref in form.sources:
         if ref.source.abbreviation == "U+":
@@ -867,4 +867,4 @@ for forms in osl.forms_by_name.values():
             raise ValueError(f"Both @useq and @list U+ in {form}")
           from_hex = chr(ref.number.first)
       if from_hex and from_hex != ucun:
-        print(f"Inconsistent @ucun ({ucun}) and @list U+/@useq ({from_hex}) in {form}")
+        raise ValueError(f"Inconsistent @ucun ({ucun}) and @list U+/@useq ({from_hex}) in {form}")
