@@ -44,6 +44,35 @@ def xsux_sequence(name: str):
     return sequence_parts
 
 
+atomic_sequences: dict[str, str] = {}
+for name, forms in asl.osl.forms_by_name.items():
+    xsux = [form.unicode_cuneiform.text
+            for form in forms
+            if form.unicode_cuneiform]
+    if not xsux:
+        continue
+    if len(set(xsux)) > 1:
+        raise ValueError(name, xsux)
+    xsux = xsux[0]
+    if len(xsux) > 1:
+        continue
+    if 'X' in xsux or 'x' in xsux:
+        continue
+    if name[0] != "|" or name[-1] != "|":
+        continue        
+    sequence_parts = xsux_sequence(name)
+    if sequence_parts:
+        if xsux in atomic_sequences and atomic_sequences[xsux] != ''.join(sequence_parts):
+            raise ValueError(f"Multiple decompositions {atomic_sequences[xsux]} != {sequence_parts} for {xsux}")
+        atomic_sequences[xsux] = ''.join(sequence_parts)
+
+for xsux, decomposition in atomic_sequences.items():
+    if xsux != decomposition:
+        print(f"+++ {xsux} is not {'.'.join(decomposition)}")
+print(f"--- {len(atomic_sequences)} atomically encoded sequences")
+
+atom_replacements = sorted(atomic_sequences.items(), key=lambda kv: -len(kv[1]))
+
 sequence_mapping: dict[str, list[list[str]]] = defaultdict(list)
 for name, forms in asl.osl.forms_by_name.items():
     xsux = [form.unicode_cuneiform.text
@@ -59,19 +88,14 @@ for name, forms in asl.osl.forms_by_name.items():
     if name[0] != "|" or name[-1] != "|":
         continue
     sequence_parts = xsux_sequence(name)
+    for atom, sequence in atom_replacements:
+        sequence_parts = list(''.join(sequence_parts).replace(sequence, atom))
     if sequence_parts:
         sequence_mapping[xsux].append(sequence_parts)
-sequence_count = 0
-for xsux, decompositions in sequence_mapping.items():
-    for decomposition in decompositions:
-        if xsux != ''.join(decomposition) and len(xsux) == 1:
-            sequence_count += 1
-            print(f"+++ {xsux} is not {'.'.join(decomposition)}")
-print(f"--- {sequence_count} atomically encoded sequences")
 for xsux, decompositions in sequence_mapping.items():
     for decomposition in decompositions:
         if xsux != ''.join(decomposition) and len(xsux) != 1:
-            print(f"--- {xsux} is not {'.'.join(decomposition)}")
+            print(f"*** {xsux} is not {'.'.join(decomposition)}")
 
 with open("decompositions.txt", "w", encoding="utf-8") as f:
     mapping: dict[str, list[list[str]]] = defaultdict(list)
