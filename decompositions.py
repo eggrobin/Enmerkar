@@ -69,11 +69,11 @@ for name, forms in asl.osl.forms_by_name.items():
     if sequence_parts:
         if xsux in atomic_sequences and atomic_sequences[xsux] != ''.join(sequence_parts):
             raise ValueError(f"Multiple decompositions {atomic_sequences[xsux]} != {sequence_parts} for {xsux}")
-        atomic_sequences[xsux] = ''.join(sequence_parts)
+        if len(sequence_parts) > 1:
+            atomic_sequences[xsux] = ''.join(sequence_parts)
 
 for xsux, decomposition in atomic_sequences.items():
-    if xsux != decomposition:
-        print(f"+++ {xsux} is not {'.'.join(decomposition)}")
+    print(f"+++ {xsux} is not {'.'.join(decomposition)}")
 print(f"--- {len(atomic_sequences)} atomically encoded sequences")
 
 atom_replacements = sorted(atomic_sequences.items(), key=lambda kv: -len(kv[1]))
