@@ -19,6 +19,7 @@ for sign in asl.osl.signs:
 
 with open("decompositions.txt", "w", encoding="utf-8") as f:
     mapping: dict[str, list[list[str]]] = defaultdict(list)
+    sequence_mapping: dict[str, list[list[str]]] = defaultdict(list)
     for name, forms in asl.osl.forms_by_name.items():
         xsux = [form.unicode_cuneiform.text
                 for form in forms
@@ -32,6 +33,32 @@ with open("decompositions.txt", "w", encoding="utf-8") as f:
             continue
         if "|" not in name and "@" not in name:
             continue
+        sequence_parts : list[str] = []
+        depth = 0
+        start = 1
+        if name[0] == "|" and name[-1] == "|":
+            for i, c in enumerate(name):
+                if i == 0:
+                    continue
+                if c == '(':
+                    depth += 1
+                elif c == ')':
+                    depth -= 1
+                elif depth == 0 and c == '.' or i == len(name) - 1:
+                    part_name = name[start:i]
+                    for form in (asl.osl.forms_by_name.get(part_name) or
+                                 asl.osl.forms_by_name.get(f"|{part_name}|") or
+                                    signs_by_value.get(part_name.lower()) or []):
+                        if form.unicode_cuneiform:
+                            sequence_parts.append(form.unicode_cuneiform.text)
+                            break
+                    else:
+                        sequence_parts = []
+                        print(f"*** No such sign {part_name}")
+                        break
+                    start = i + 1
+            if sequence_parts:
+                sequence_mapping[xsux].append(sequence_parts)
         parts : list[str] = []
         for part in re.split(r"([|.×()&+%]|@(?:[cfgstv]|180)?)", name):
             for form in (asl.osl.forms_by_name.get(part) or
@@ -50,3 +77,14 @@ with open("decompositions.txt", "w", encoding="utf-8") as f:
             print(xsux, file=f)
             for parts in decompositions:
                 print("  →", "".join(parts), file=f)
+    sequence_count = 0
+    for xsux, decompositions in sequence_mapping.items():
+        for decomposition in decompositions:
+            if xsux != ''.join(decomposition) and len(xsux) == 1:
+                sequence_count += 1
+                print(f"+++ {xsux} is not {'.'.join(decomposition)}")
+    print(f"--- {sequence_count} atomically encoded sequences")
+    for xsux, decompositions in sequence_mapping.items():
+        for decomposition in decompositions:
+            if xsux != ''.join(decomposition) and len(xsux) != 1:
+                print(f"--- {xsux} is not {'.'.join(decomposition)}")
