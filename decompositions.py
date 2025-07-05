@@ -17,6 +17,9 @@ for sign in asl.osl.signs:
                 raise ValueError(f"Multiple signs with value {value.text}: {signs_by_value[value.text][0].names}, {sign.names}")
             signs_by_value[value.text].append(sign)
 
+forms_by_list_number = {source.abbreviation + str(number): form
+                        for source, forms in asl.osl.forms_by_source.items()
+                        for number, form in forms.items()}
 
 def xsux_sequence(name: str):
     sequence_parts : list[str] = []
@@ -32,8 +35,10 @@ def xsux_sequence(name: str):
         elif depth == 0 and c == '.' or i == len(name) - 1:
             part_name = name[start:i]
             for form in (asl.osl.forms_by_name.get(part_name) or
-                        asl.osl.forms_by_name.get(f"|{part_name}|") or
-                            signs_by_value.get(part_name.lower()) or []):
+                         asl.osl.forms_by_name.get(f"|{part_name}|") or
+                         signs_by_value.get(part_name.lower()) or
+                         forms_by_list_number.get(part_name) or
+                         []):
                 if form.unicode_cuneiform:
                     sequence_parts.append(form.unicode_cuneiform.text)
                     break
@@ -77,14 +82,10 @@ sequence_mapping: dict[str, list[list[str]]] = defaultdict(list)
 for name, forms in asl.osl.forms_by_name.items():
     xsux = [form.unicode_cuneiform.text
             for form in forms
-            if form.unicode_cuneiform]
-    if not xsux:
-        continue
+            if form.unicode_cuneiform] or [f"(no @ucun for {name})"]
     if len(set(xsux)) > 1:
         raise ValueError(name, xsux)
     xsux = xsux[0]
-    if 'X' in xsux or 'x' in xsux:
-        continue
     if name[0] != "|" or name[-1] != "|":
         continue
     sequence_parts = xsux_sequence(name)
