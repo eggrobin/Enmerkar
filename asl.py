@@ -868,3 +868,101 @@ for forms in osl.forms_by_name.values():
           from_hex = chr(ref.number.first)
       if from_hex and from_hex != ucun:
         raise ValueError(f"Inconsistent @ucun ({ucun}) and @list U+/@useq ({from_hex}) in {form}")
+
+
+# TODO(egg): Some of this wants to be in the SignList object.
+
+signs_by_value : dict[str, list[Sign]] = defaultdict(list)
+for sign in osl.signs:
+    if isinstance(sign, Sign):
+        if sign.deprecated:
+            continue
+        for value in sign.values:
+            if value.deprecated:
+                continue
+            if value.language:
+                continue
+            if value.text in signs_by_value and "ₓ" not in value.text:
+                raise ValueError(f"Multiple signs with value {value.text}: {signs_by_value[value.text][0].names}, {sign.names}")
+            signs_by_value[value.text].append(sign)
+
+forms_by_list_number = {source.abbreviation + str(number): form
+                        for source, forms in osl.forms_by_source.items()
+                        for number, form in forms.items()}
+
+def xsux_sequence(name: str):
+    sequence_parts : list[str] = []
+    depth = 0
+    start = 1
+    for i, c in enumerate(name):
+        if i == 0:
+            continue
+        if c == '(':
+            depth += 1
+        elif c == ')':
+            depth -= 1
+        elif depth == 0 and c == '.' or i == len(name) - 1:
+            part_name = name[start:i]
+            for form in (osl.forms_by_name.get(part_name) or
+                         osl.forms_by_name.get(f"|{part_name}|") or
+                         signs_by_value.get(part_name.lower()) or
+                         forms_by_list_number.get(part_name) or
+                         []):
+                if form.unicode_cuneiform:
+                    sequence_parts.append(form.unicode_cuneiform.text)
+                    break
+            else:
+                sequence_parts = []
+                break
+            start = i + 1
+    return sequence_parts
+
+
+atomic_sequences: dict[str, str] = {}
+for name, forms in osl.forms_by_name.items():
+    xsux = [form.unicode_cuneiform.text
+            for form in forms
+            if form.unicode_cuneiform]
+    if not xsux:
+        continue
+    if len(set(xsux)) > 1:
+        raise ValueError(name, xsux)
+    xsux = xsux[0]
+    if len(xsux) > 1:
+        continue
+    if 'X' in xsux or 'x' in xsux:
+        continue
+    if name[0] != "|" or name[-1] != "|":
+        continue        
+    sequence_parts = xsux_sequence(name)
+    if sequence_parts:
+        if xsux in atomic_sequences and atomic_sequences[xsux] != ''.join(sequence_parts):
+            raise ValueError(f"Multiple decompositions {atomic_sequences[xsux]} != {sequence_parts} for {xsux}")
+        if len(sequence_parts) > 1:
+            atomic_sequences[xsux] = ''.join(sequence_parts)
+
+for xsux, decomposition in atomic_sequences.items():
+    print(f"+++ {xsux} is not {'.'.join(decomposition)}")
+print(f"--- {len(atomic_sequences)} atomically encoded sequences")
+
+atom_replacements = sorted(atomic_sequences.items(), key=lambda kv: -len(kv[1]))
+
+sequence_mapping: dict[str, list[list[str]]] = defaultdict(list)
+for name, forms in osl.forms_by_name.items():
+    xsux = [form.unicode_cuneiform.text
+            for form in forms
+            if form.unicode_cuneiform] or [f"(no @ucun for {name})"]
+    if len(set(xsux)) > 1:
+        raise ValueError(name, xsux)
+    xsux = xsux[0]
+    if name[0] != "|" or name[-1] != "|":
+        continue
+    sequence_parts = xsux_sequence(name)
+    for atom, sequence in atom_replacements:
+        sequence_parts = list(''.join(sequence_parts).replace(sequence, atom))
+    if sequence_parts:
+        sequence_mapping[xsux].append(sequence_parts)
+for xsux, decompositions in sequence_mapping.items():
+    for decomposition in decompositions:
+        if xsux != ''.join(decomposition) and len(xsux) != 1:
+            print(f"*** {xsux} is not {'.'.join(decomposition)}")
