@@ -857,17 +857,23 @@ for forms in osl.forms_by_name.values():
   for form in forms:
     if form.unicode_cuneiform:
       ucun = form.unicode_cuneiform.text.upper().replace("O", "X")
+      if len(ucun) == 1:
+        useq_from_ucun = f"U+{ord(ucun):04X}"
+      else:
+        useq_from_ucun = ".".join(f"x{ord(c):04X}" for c in ucun)
       from_hex = None
       if form.unicode_sequence:
         from_hex = "".join("X" if hex in "XO" else chr(int("0" + hex, 16))
                            for hex in form.unicode_sequence.text.split("."))
+      usource = None
       for ref in form.sources:
         if ref.source.abbreviation == "U+":
+          usource = ref
           if from_hex:
             raise ValueError(f"Both @useq and @list U+ in {form}")
-          from_hex = chr(ref.number.first)
+          from_hex = chr(usource.number.first)
       if from_hex and from_hex != ucun:
-        raise ValueError(f"Inconsistent @ucun ({ucun}) and @list U+/@useq ({from_hex}) in {form}")
+        raise ValueError(f"*** Inconsistent @ucun ({useq_from_ucun} =) {ucun}) and @list U+/@useq {form.unicode_sequence or usource} (= {from_hex})) in {form}")
 
 
 # TODO(egg): Some of this wants to be in the SignList object.
@@ -947,7 +953,7 @@ print(f"--- {len(atomic_sequences)} atomically encoded sequences")
 
 atom_replacements = sorted(atomic_sequences.items(), key=lambda kv: -len(kv[1]))
 
-sequence_mapping: dict[str, list[list[str]]] = defaultdict(list)
+sequence_mapping: dict[str, list[tuple[list[str], list[Form]]]] = defaultdict(list)
 for name, forms in osl.forms_by_name.items():
     xsux = [form.unicode_cuneiform.text
             for form in forms
@@ -961,8 +967,14 @@ for name, forms in osl.forms_by_name.items():
     for atom, sequence in atom_replacements:
         sequence_parts = list(''.join(sequence_parts).replace(sequence, atom))
     if sequence_parts:
-        sequence_mapping[xsux].append(sequence_parts)
+        sequence_mapping[xsux].append((sequence_parts, forms))
 for xsux, decompositions in sequence_mapping.items():
-    for decomposition in decompositions:
+    for decomposition, forms in decompositions:
         if xsux != ''.join(decomposition) and len(xsux) != 1:
-            print(f"*** {xsux} is not {'.'.join(decomposition)}")
+            message = f"{xsux} is not {'.'.join(decomposition)}"
+            if all(form.deprecated for form in forms):
+              print("---", message, "in deprecated form")
+            elif all(''.join(xsux_sequence(form.names[0])) == xsux for form in forms):
+              print("---", message, "from alternate name")
+            else:
+              raise ValueError(message)
