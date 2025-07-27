@@ -134,24 +134,24 @@ def parse_compound(gdl: str) -> Expression:
 import asl
 for forms in asl.osl.forms_by_name.values():
   for form in forms:
-    if form.names[0] in ("|KA×GIŠ%GIŠ|",
-                         "|KU&HI×AŠ₂|",
-                         "|KU&HI×AŠ₂.KU&HI×AŠ₂|",
-                         "|URU×TU&TU|"):
-      continue
     if form.names[0] != parse(form.names[0]).atf():
       print(f"*** {form.names[0]} != {parse(form.names[0]).atf()}")
     for name in form.names[1:]:
-      if name in ("|AŠ&AŠ&AŠ%AŠ&AŠ&AŠ|",
-                  "|BU%BU×AB|",
-                  "|MUŠ%MUŠ×AB|",
-                  "|GA₂×NUN&NUN|",
-                  "|MUŠ&MUŠ×(A.NA)|",
-                  "|MUŠ&MUŠ×AB|",
-                  "|MUŠ%MUŠ×(A.NA)|",
-                  "|MUŠ%MUŠ×MAŠ|",
-                  "|SAR×ZU&ZU|",
-                  "|(ŠE.NUN)&(ŠE.NUN)×U₂|"):
+      if name in ("|AŠ&AŠ&AŠ%AŠ&AŠ&AŠ|",  # & > %
+                  "|BU%BU×AB|",  # % > ×
+                  "|MUŠ%MUŠ×AB|",  # % > ×
+                  "|GA₂×NUN&NUN|",  # & > ×
+                  "|MUŠ&MUŠ×(A.NA)|",  # & > ×
+                  "|MUŠ&MUŠ×AB|",  # & > ×
+                  "|MUŠ%MUŠ×(A.NA)|",  # % > ×
+                  "|MUŠ%MUŠ×MAŠ|",  # % > ×
+                  "|SAR×ZU&ZU|",  # & > ×
+                  "|(ŠE.NUN)&(ŠE.NUN)×U₂|",  # & > ×
+                  "|URU×TU&TU|",  # & > ×
+                  "|KA×GIŠ%GIŠ|",  # % > ×
+                  "|KU&HI×AŠ₂|",  # × > &
+                  "|KU&HI×AŠ₂.KU&HI×AŠ₂|",  # × > &
+                  ):
         continue
       if name != parse(name).atf():
         print(f"*** {name} != {parse(name).atf()}")
