@@ -6,16 +6,16 @@ from typing import Any
 import asl
 
 class Line:
-  def __init__(self, source: str, ref: str, label: str, xsux: str) -> None:
+  def __init__(self, source: str, ref: str, label: str, xsux: str):
     self.source = source
     self.ref = ref
     self.label = label
     self.xsux = xsux
 
-  def __repr__(self) -> str:
+  def __repr__(self):
      return f"Line({repr(self.ref)}, {repr(self.label)}, {repr(self.xsux)})"
 
-  def __str__(self) -> str:
+  def __str__(self):
      return f"{self.source}/{self.ref}\t{self.label}\t{self.xsux}"
 
   def html_ref(self) -> str:
