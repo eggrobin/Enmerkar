@@ -3,6 +3,8 @@ import os
 import re
 from typing import Any
 
+import sys
+sys.path.append('C:/Users/robin/Projects/Enmerkar')
 import asl
 
 class Line:
