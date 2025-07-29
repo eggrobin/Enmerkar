@@ -3,8 +3,6 @@ import os
 import re
 from typing import Any
 
-import sys
-sys.path.append('C:/Users/robin/Projects/Enmerkar')
 import asl
 
 class Line:
@@ -84,7 +82,7 @@ def get_corpus_lines(directory: str):
 for top_level in ("atae", "riao", "rinap", "saao",
                   "tcma",
                   ):
-  get_corpus_lines(top_level)
+  get_corpus_lines("oracc/" + top_level)
 
 query = "𒈬𒅗"
 tail_regex = re.compile("")#"𒋗|𒈽")
