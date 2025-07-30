@@ -24,7 +24,7 @@ for project in sys.argv[1:]:
     subprojects : set[str] = set(corpus["proxies"].values())
 
   for subproject in subprojects:
-    if subproject in ("uet6",):
+    if subproject in ("uet6", "pcsl"):
       print(f"Skipping {subproject}")
       continue
     get_oracc_json_from_zip(subproject.replace("/", "-") + ".zip")
