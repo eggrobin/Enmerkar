@@ -44,28 +44,38 @@ def index_values(text_json: Any, period: str, genre: str, lang: str = "und"):
 def index(directory: str):
   listing = os.listdir(directory)
   if "catalogue.json" in listing:
-    print(f"Indexing {directory}...")
     with open(directory + "/catalogue.json", encoding="utf-8") as f:
       catalogue = json.loads(f.read())
-    for cdli_number, metadata in catalogue["members"].items():
-      text_file = directory + "/corpusjson/" + cdli_number + ".json"
-      if not os.path.isfile(text_file):
-        continue
+    files = [
+        (directory + "/corpusjson/" + cdli_number + ".json", metadata)
+        for cdli_number, metadata in catalogue["members"].items()
+        if os.path.isfile(directory + "/corpusjson/" + cdli_number + ".json")]
+    print(f"Indexing {len(files)} texts in {directory}...")
+    skipped : list[str] = []
+    for i, (text_file, metadata) in enumerate(files):
+      if i > 0 and i % 1000 == 0:
+        print(f"    {i}/{len(files)}...")
       with open(text_file, encoding="utf-8") as f:
         source = f.read()
         if not source:
-            print(f"*** {text_file} is empty, skipping.")
-            continue
+          skipped.append(text_file)
+          continue
         text = json.loads(source)
       index_values(
         text,
         metadata.get("period", "unknown").replace("Neo ", "Neo-"),
         metadata.get("genre", metadata.get("subgenre", "unclassified")).lower())
+    if skipped:
+      if len(skipped) < 10:
+        for file in skipped:
+          print(f"*** {file} was empty, skipped.")
+      else:
+        print(f"*** Skipped {len(skipped)} empty files.")
   for f in listing:
     if os.path.isdir(directory + "/" + f) and f != "corpusjson":
       index(directory + "/" + f)
 
-for project in ("dcclt", "tcma", "atae", "rinap", "riao", "saao", "blms", "dccmt", "dsst"):
+for project in ("",):
   index(f"oracc/{project}")
 
 sign = asl.osl.signs_by_name[sys.argv[1]]
