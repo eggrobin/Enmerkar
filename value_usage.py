@@ -75,7 +75,7 @@ def index(directory: str):
     if os.path.isdir(directory + "/" + f) and f != "corpusjson":
       index(directory + "/" + f)
 
-ORACC_PROJECTS = ("atae", "tcma", "blms", "saao", "rinap", "riao")
+ORACC_PROJECTS = ("akklove", "atae", "babcity", "balt", "blms", "dcclt", "riao", "ribo", "rinap", "saao", "tcma")
 
 for project in ORACC_PROJECTS:
   index(f"oracc/{project}")
