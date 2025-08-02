@@ -1,0 +1,9 @@
+https://cdli.earth/search?f%5Bperiod%5D%5B0%5D=Old+Akkadian+%28ca.+2340-2200+BC%29&f%5Batf_transliteration%5D%5B0%5D=With&format=atf&aspect=inscriptions&limit=10000
+https://cdli.earth/search?f%5Bperiod%5D%5B0%5D=Early+Old+Babylonian+%28ca.+2000-1900+BC%29&f%5Batf_transliteration%5D%5B0%5D=With&format=atf&aspect=inscriptions&limit=10000
+https://cdli.earth/search?f%5Bperiod%5D%5B%5D=Old+Babylonian+%28ca.+1900-1600+BC%29&f%5Blanguage%5D%5B%5D=Akkadian&f%5Blanguage%5D%5B%5D=Akkadian+%3E+Old+Babylonian&f%5Batf_transliteration%5D%5B%5D=With&format=atf&aspect=inscriptions&limit=10000
+https://cdli.earth/search?f%5Bperiod%5D%5B%5D=Old+Assyrian+%28ca.+1950-1850+BC%29&f%5Batf_transliteration%5D%5B%5D=With&format=atf&aspect=inscriptions&limit=10000
+https://cdli.earth/search?f%5Bperiod%5D%5B%5D=Middle+Assyrian+%28ca.+1400-1000+BC%29&f%5Batf_transliteration%5D%5B%5D=With&format=atf&aspect=inscriptions&limit=10000
+https://cdli.earth/search?f%5Bperiod%5D%5B%5D=Middle+Babylonian+%28ca.+1400-1100+BC%29&f%5Batf_transliteration%5D%5B%5D=With&format=atf&aspect=inscriptions&limit=10000
+https://cdli.earth/search?f%5Bperiod%5D%5B%5D=Early%20Neo-Babylonian%20(ca.%201150-730%20BC)&f%5Batf_transliteration%5D%5B%5D=With&format=atf&aspect=inscriptions&limit=10000
+https://cdli.earth/search?f%5Bperiod%5D%5B%5D=Neo-Assyrian%20(ca.%20911-612%20BC)&f%5Batf_transliteration%5D%5B%5D=With&format=atf&aspect=inscriptions&limit=10000
+https://cdli.earth/search?f%5Bperiod%5D%5B%5D=Neo-Babylonian%20(ca.%20626-539%20BC)&f%5Batf_transliteration%5D%5B%5D=With&format=atf&aspect=inscriptions&limit=10000
