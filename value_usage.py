@@ -96,7 +96,7 @@ for file in ("OAkk", "Early OB", "OA", "OB akk", "MA", "MB", "Early NB", "NA", "
 
 syllabary_index : list[asl.Sign] = []
 
-for sign in asl.osl.signs_by_name.values():
+for sign in asl.osl.signs:
   if isinstance(sign, asl.Sign):
     value_to_period_to_occurrences = language_to_value_to_period_to_occurrences["akk"]
     sign_occurrences_by_period : dict[str, list[str]] = defaultdict(list)
