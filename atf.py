@@ -156,69 +156,71 @@ def parse_transliteration(source: str, language: str):
 def get_value_counts(file: str, target_language: str, exclude: set[SpanAttribute]):
   with open(file, encoding="utf-8") as f:
     lines = f.readlines()
+  with open(file + ".log", mode="w", encoding="utf-8") as log:
+    occurrences : dict[str, list[str]] = defaultdict(list)
 
-  counts : dict[str, int] = defaultdict(int)
+    erroneous_texts : dict[str, list[str]] = defaultdict(list)
 
-  erroneous_texts : dict[str, list[str]] = defaultdict(list)
+    artefact = ""
+    language = "und"
 
-  artefact = ""
-  language = "und"
+    for line in lines:
+      if not line.strip():
+        continue
+      if line.startswith("&"):
+        artefact = line.split("=")[0][1:].strip()
+        language = "und"
+        continue
+      elif line.startswith("#"):
+        if line.startswith("#atf: lang"):
+          language = line.split()[-1]
+        continue
+      elif line.startswith(("@", "$", "|", ">")):
+        continue
+      if " " not in line:
+        print("*** No space in", repr(line), file=log)
+        continue
+      number, text = line.split(" ", 1)
+      if not number.endswith("."):
+        print("*** Bad line number", repr(number), "in", line,
+              file=log)
+      text = text.strip()
+      try:
+        graphemes = parse_transliteration(text, language)
+      except SyntaxError as e:
+        print("***", e.msg, file=log)
+        error_title = e.msg.split(":")[0]
+        erroneous_texts[error_title].append(artefact)
+        continue
+      for grapheme, language, attributes in graphemes:
+        grapheme = grapheme.rstrip("#?!*")
+        if not grapheme.strip():
+          continue
 
-  for line in lines:
-    if not line.strip():
-      continue
-    if line.startswith("&"):
-      artefact = line.split("=")[0][1:].strip()
-      language = "und"
-      continue
-    elif line.startswith("#"):
-      if line.startswith("#atf: lang"):
-        language = line.split()[-1]
-      continue
-    elif line.startswith(("@", "$", "|", ">")):
-      continue
-    if " " not in line:
-      print("*** No space in", repr(line))
-      continue
-    number, text = line.split(" ", 1)
-    if not number.endswith("."):
-      print("*** Bad line number in", line)
-    text = text.strip()
-    try:
-      graphemes = parse_transliteration(text, language)
-    except SyntaxError as e:
-      error_title = e.msg.split(":")[0]
-      erroneous_texts[error_title].append(artefact)
-      continue
-    for grapheme, language, attributes in graphemes:
-      grapheme = grapheme.rstrip("#?!*")
-      if not grapheme.strip():
-        continue
+        if any(c.isupper() for c in grapheme):
+          continue
+        if "/" in grapheme or "(" in grapheme:
+          continue
+        if grapheme in ("x", "n"):
+          continue
+        if language != target_language:
+          continue
+        if any(attribute in exclude for attribute in attributes):
+          continue
+        grapheme = grapheme.replace("sz", "š").replace("s,", "ṣ").replace("t,", "ṭ")
+        grapheme = grapheme.replace(
+            "0", "₀").replace(
+            "1", "₁").replace(
+            "2", "₂").replace(
+            "3", "₃").replace(
+            "4", "₄").replace(
+            "5", "₅").replace(
+            "6", "₆").replace(
+            "7", "₇").replace(
+            "8", "₈").replace(
+            "9", "₉")
+        occurrences[grapheme].append(artefact)
 
-      if any(c.isupper() for c in grapheme):
-        continue
-      if "/" in grapheme or "(" in grapheme:
-        continue
-      if grapheme in ("x", "n"):
-        continue
-      if language != target_language:
-        continue
-      if any(attribute in exclude for attribute in attributes):
-        continue
-      grapheme = grapheme.replace("sz", "š").replace("s,", "ṣ").replace("t,", "ṭ")
-      grapheme = grapheme.replace(
-          "0", "₀").replace(
-          "1", "₁").replace(
-          "2", "₂").replace(
-          "3", "₃").replace(
-          "4", "₄").replace(
-          "5", "₅").replace(
-          "6", "₆").replace(
-          "7", "₇").replace(
-          "8", "₈").replace(
-          "9", "₉")
-      counts[grapheme] += 1
-
-  for error_title, occurrences in erroneous_texts.items():
-    print(f"*** {error_title}: {len(occurrences)} in {len(set(occurrences))} texts")
-  return counts
+    for error_title, error_occurrences in erroneous_texts.items():
+      print(f"*** {error_title}: {len(error_occurrences)} in {len(set(error_occurrences))} texts")
+    return occurrences
