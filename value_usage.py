@@ -4,18 +4,15 @@ import os
 import sys
 from typing import Any
 
+import atf
 import asl
 
-language_to_sign_to_value_to_period_to_genre_to_usages : dict[
-  str, dict[
+language_to_value_to_period_to_usages : dict[
   str, dict[
     str, dict[
-      str, dict[
-        str, int]]]]] = defaultdict(
-          lambda: defaultdict(
-            lambda: defaultdict(
-              lambda: defaultdict(
-                lambda: defaultdict(int)))))
+      str, int]]] = defaultdict(
+        lambda: defaultdict(
+          lambda: defaultdict(int)))
 
 def index_values(text_json: Any, period: str, genre: str, lang: str = "und"):
   if "lang" in text_json:
@@ -34,12 +31,10 @@ def index_values(text_json: Any, period: str, genre: str, lang: str = "und"):
   if "seq" in text_json:
      for node in text_json["seq"]:
       index_values(node, period, genre, lang)
-  if "v" in text_json and "utf8" in text_json:
-    language_to_sign_to_value_to_period_to_genre_to_usages[
-      lang][
-        text_json["utf8"]][
-          text_json["v"]][period][genre] += 1
-
+  # We do not go down into "qualified" for now (the index is on default values).
+  if "v" in text_json:
+    language_to_value_to_period_to_usages[
+      lang][text_json["v"]][period] += 1
 
 def index(directory: str):
   listing = os.listdir(directory)
@@ -63,7 +58,9 @@ def index(directory: str):
         text = json.loads(source)
       index_values(
         text,
-        metadata.get("period", "unknown").replace("Neo ", "Neo-"),
+        metadata.get("period", "unknown").replace("Neo ", "Neo-").replace(
+          "Old ", "O").replace("Middle ", "M").replace("Neo-", "N").replace(
+          "Assyrian", "A").replace("Babylonian", "B"),
         metadata.get("genre", metadata.get("subgenre", "unclassified")).lower())
     if skipped:
       if len(skipped) < 10:
@@ -75,36 +72,34 @@ def index(directory: str):
     if os.path.isdir(directory + "/" + f) and f != "corpusjson":
       index(directory + "/" + f)
 
-for project in ("",):
+for project in ("atae", "tcma", "blms", "saao", "rinap", "riao"):
   index(f"oracc/{project}")
+
+for file in ("OAkk", "Early OB", "OA", "OB akk", "MA", "MB", "Early NB", "NA", "NB"):
+  for value, count in atf.get_value_counts(
+      f"cdli/{file}.atf",
+      "akk",
+      set((atf.SpanAttribute.DETERMINATIVE, atf.SpanAttribute.LOGOGRAM))).items():
+    language_to_value_to_period_to_usages["akk"][value][file.removesuffix(" akk")] += count
 
 sign = asl.osl.signs_by_name[sys.argv[1]]
 if isinstance(sign, asl.Sign):
   if not sign.unicode_cuneiform:
     raise ValueError(f"No Xsux for {sign.names[0]}")
-  for language, sign_to_value_to_period_to_genre_to_usages in language_to_sign_to_value_to_period_to_genre_to_usages.items():
+  for language, value_to_period_usages in language_to_value_to_period_to_usages.items():
     print(language, "values of", sign.unicode_cuneiform.text, sign.names[0])
     for value in sign.values:
-      usage = sign_to_value_to_period_to_genre_to_usages[sign.unicode_cuneiform.text][value.text]
+      usage = value_to_period_usages[value.text]
       total = 0
-      total_by_period : dict[str, int] = defaultdict(int)
-      genres_by_period : dict[str, set[str]] = defaultdict(set)
       periods : set[str] = set()
-      for period, genre_to_usages in usage.items():
-        period = period.replace(
-          "Old ", "O").replace("Middle ", "M").replace("Neo-", "N").replace(
-          "Assyrian", "A").replace("Babylonian", "B")
+      for period, usages in usage.items():
         periods.add(period)
-        for genre, usages in genre_to_usages.items():
-          total += usages
-          total_by_period[period] += usages
-          genres_by_period[period].add(genre)
+        total += usages
       if not total:
         continue
       print(value.text, total)
       chronology = {"O": 0, "M": 1, "N": 2}
-      for period in sorted(periods, key=lambda period: (chronology[period[0]] if len(period) == 2 else 9, period)):
+      for period in sorted(periods, key=lambda period: (chronology[period[0]] if len(period) == 2 else -1 if period == "OAkk" else 9, period)):
         print(" " * len(value.text),
               period,
-              total_by_period[period],
-              "(" + ", ".join(genres_by_period[period]) +")" if len(genres_by_period[period]) < 10 else "")
+              usage[period])

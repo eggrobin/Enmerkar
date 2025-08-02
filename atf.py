@@ -153,58 +153,72 @@ def parse_transliteration(source: str, language: str):
         raise SyntaxError(f"Syntax error: {source[:i]}☞{source[i:]}")
   return graphemes
 
-with open("cdli/OB akk.atf", encoding="utf-8") as f:
-  lines = f.readlines()
+def get_value_counts(file: str, target_language: str, exclude: set[SpanAttribute]):
+  with open(file, encoding="utf-8") as f:
+    lines = f.readlines()
 
-counts : dict[str, int] = defaultdict(int)
+  counts : dict[str, int] = defaultdict(int)
 
-erroneous_texts : set[str] = set()
+  erroneous_texts : dict[str, list[str]] = defaultdict(list)
 
-artefact = ""
-language = "und"
+  artefact = ""
+  language = "und"
 
-for line in lines:
-  if not line.strip():
-    continue
-  if line.startswith("&"):
-    artefact = line.split("=")[0][1:].strip()
-    language = "und"
-    continue
-  elif line.startswith("#"):
-    if line.startswith("#atf: lang"):
-      language = line.split()[-1]
-    continue
-  elif line.startswith(("@", "$", "|", ">")):
-    continue
-  if " " not in line:
-    print("*** No space in", repr(line))
-    continue
-  number, text = line.split(" ", 1)
-  if not number.endswith("."):
-    print("*** Bad line number in", line)
-  text = text.strip()
-  try:
-    graphemes = parse_transliteration(text, language)
-  except SyntaxError as e:
-    erroneous_texts.add(artefact)
-    if e.msg.split(":")[0] != "Syntax error":
+  for line in lines:
+    if not line.strip():
       continue
-    print("***", artefact, e.msg)
-    if len(erroneous_texts) == 40:
-      raise
-    continue
-  for grapheme, language, attributes in graphemes:
-    grapheme = grapheme.rstrip("#?!*")
-    if not grapheme.strip():
+    if line.startswith("&"):
+      artefact = line.split("=")[0][1:].strip()
+      language = "und"
       continue
+    elif line.startswith("#"):
+      if line.startswith("#atf: lang"):
+        language = line.split()[-1]
+      continue
+    elif line.startswith(("@", "$", "|", ">")):
+      continue
+    if " " not in line:
+      print("*** No space in", repr(line))
+      continue
+    number, text = line.split(" ", 1)
+    if not number.endswith("."):
+      print("*** Bad line number in", line)
+    text = text.strip()
+    try:
+      graphemes = parse_transliteration(text, language)
+    except SyntaxError as e:
+      error_title = e.msg.split(":")[0]
+      erroneous_texts[error_title].append(artefact)
+      continue
+    for grapheme, language, attributes in graphemes:
+      grapheme = grapheme.rstrip("#?!*")
+      if not grapheme.strip():
+        continue
 
-    if any(c.isupper() for c in grapheme):
-      continue
-    if "/" in grapheme or "(" in grapheme:
-      continue
-    counts[grapheme + " " + language + " " + ",".join(str(attribute) for attribute in attributes if attribute in (SpanAttribute.DETERMINATIVE, SpanAttribute.LOGOGRAM))] += 1
+      if any(c.isupper() for c in grapheme):
+        continue
+      if "/" in grapheme or "(" in grapheme:
+        continue
+      if grapheme in ("x", "n"):
+        continue
+      if language != target_language:
+        continue
+      if any(attribute in exclude for attribute in attributes):
+        continue
+      grapheme = grapheme.replace("sz", "š").replace("s,", "ṣ").replace("t,", "ṭ")
+      grapheme = grapheme.replace(
+          "0", "₀").replace(
+          "1", "₁").replace(
+          "2", "₂").replace(
+          "3", "₃").replace(
+          "4", "₄").replace(
+          "5", "₅").replace(
+          "6", "₆").replace(
+          "7", "₇").replace(
+          "8", "₈").replace(
+          "9", "₉")
+      counts[grapheme] += 1
 
-for value, count in sorted(counts.items(), key=lambda kv: -kv[1]):
-  if count < 10:
-    break
-  print(value, count)
+  for error_title, occurrences in erroneous_texts.items():
+    print(f"*** {error_title}: {len(occurrences)} in {len(set(occurrences))} texts")
+  return counts
