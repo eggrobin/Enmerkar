@@ -17,7 +17,7 @@ QUALIFIED =  re.compile(
 )
 
 NUMBER = re.compile(
-  fr"(?:(?:n|[\d/]+)\((?:{VALUE.pattern}(?:@(?:90|[cv]))?|{NAME.pattern}|{COMPOUND.pattern})\))"
+  fr"(?:(?:n|[\d/]+)\((?:{VALUE.pattern}(?:@(?:90|[cvt]))?|{NAME.pattern}|{COMPOUND.pattern})\))"
 )
 
 ALTERNATIVE = re.compile(
@@ -80,7 +80,7 @@ def parse_transliteration(source: str, language: str):
       if after_delimiter:
         raise SyntaxError(f"Double delimiter: {source[:i]}☞{source[i:]}")
       i += 1
-      after_delimiter = "-"
+      after_delimiter = source[i]
       continue
     if source[i] == "_":
       if after_delimiter:
