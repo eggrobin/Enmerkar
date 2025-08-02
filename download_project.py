@@ -21,7 +21,7 @@ for project in sys.argv[1:]:
 
   with open(f"oracc/{project}/corpus.json", encoding="utf-8") as f:
     corpus = json.loads(f.read())
-    subprojects : set[str] = set(corpus.get("proxies", []).values())
+    subprojects : set[str] = set(corpus.get("proxies", {}).values())
 
   for subproject in subprojects:
     if subproject in ("uet6", "pcsl"):
