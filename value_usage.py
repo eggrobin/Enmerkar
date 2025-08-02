@@ -252,13 +252,13 @@ for sign in asl.osl.signs:
             return f"""
                 <div class="count-occurrence">
                 <div class="count">{len(occurrences)}</div>
-                <div class="over-homophones">{len(occurrences) / len(homophone_occurrences):0.1%}</div>
-                <div class="over-sign">{len(occurrences) / len(sign_occurrences):0.1%}</div>
+                <div class="over-homophones">{len(occurrences) / len(homophone_occurrences):0%}</div>
+                <div class="over-sign">{len(occurrences) / len(sign_occurrences):0%}</div>
                 </div>
                 <div class="count-artefact">
                 <div class="count">{len(set(occurrences))}</div>
-                <div class="over-homophones">{len(set(occurrences)) / len(set(homophone_occurrences)):0.1%}</div>
-                <div class="over-sign">{len(set(occurrences)) / len(set(sign_occurrences)):0.1%}</div>
+                <div class="over-homophones">{len(set(occurrences)) / len(set(homophone_occurrences)):0%}</div>
+                <div class="over-sign">{len(set(occurrences)) / len(set(sign_occurrences)):0%}</div>
                 </div>"""
         print(f"""
               <tr>
