@@ -9,19 +9,19 @@ VALUE = re.compile(fr"(?:{VALUE_LETTER.pattern}+{VALUE_INDEX.pattern}?)")
 
 NAME_LETTER = re.compile(r"(?:SZ|S,|T,|[ABDEGHIKLMNPQRSTUVWYZ'])")
 NAME_INDEX = re.compile(r"(?:[0-9]+|X)")
-MODIFIER = re.compile(r"(?:\d+|[fgstnzkrh])")
-NAME = re.compile(fr"(?:[A-Z][A-Z][A-Z]+\d\d\d|{NAME_LETTER.pattern}+{NAME_INDEX.pattern}?(?:@{MODIFIER.pattern})?)")
+MODIFIER = re.compile(r"(?:\d+|[fgstnzkrhv])")
+NAME = re.compile(fr"(?:[A-Z][A-Z][A-Z]+\d\d\d|{NAME_LETTER.pattern}+{NAME_INDEX.pattern}?(?:@{MODIFIER.pattern})*)")
 COMPOUND = re.compile(r"(?:\|[^|<>{}\[\] -]+\|)")
 QUALIFIED =  re.compile(
   fr"(?:{VALUE.pattern}\((?:{NAME.pattern}|{COMPOUND.pattern})\))"
 )
 
 NUMBER = re.compile(
-  fr"(?:(?:n|[\d/]+)\((?:{VALUE.pattern}(?:@(?:90|[cvt]))?|{NAME.pattern}|{COMPOUND.pattern})\))"
+  fr"(?:(?:n|[\d/]+)\((?:{VALUE.pattern}(?:@(?:90|[cvt]))*|{NAME.pattern}|{COMPOUND.pattern})\))"
 )
 
 ALTERNATIVE = re.compile(
-  fr"(?:(?:{QUALIFIED.pattern}|{VALUE.pattern}|{NAME.pattern}|{NUMBER.pattern}|{COMPOUND.pattern})[#?!*]*)"
+  fr"(?:(?:{NUMBER.pattern}|{QUALIFIED.pattern}|{VALUE.pattern}|{NAME.pattern}|{COMPOUND.pattern})[#?!*]*)"
 )
 
 GRAPHEME = re.compile(
@@ -76,7 +76,7 @@ def parse_transliteration(source: str, language: str):
       i = match.end()
       after_delimiter = None
       continue
-    if source[i] == "-":
+    if source[i] in ("-", ":"):
       if after_delimiter:
         raise SyntaxError(f"Double delimiter: {source[:i]}☞{source[i:]}")
       i += 1
