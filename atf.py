@@ -79,8 +79,12 @@ def parse_transliteration(source: str, language: str):
     if source[i] in ("-", ":"):
       if after_delimiter:
         raise SyntaxError(f"Double delimiter: {source[:i]}☞{source[i:]}")
-      i += 1
       after_delimiter = source[i]
+      i += 1
+      continue
+    if source[i] == ";":
+      # Newline in case, see http://oracc.org/ns/gdl/1.0/gdltut.html#Intrusions.
+      i +=1
       continue
     if source[i] == "_":
       if after_delimiter:
