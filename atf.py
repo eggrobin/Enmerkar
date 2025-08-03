@@ -196,7 +196,7 @@ def get_value_counts(file: str, target_language: str, exclude: set[SpanAttribute
         error_title = e.msg.split(":")[0]
         erroneous_texts[error_title].append(artefact)
         continue
-      for grapheme, language, attributes in graphemes:
+      for grapheme, grapheme_language, attributes in graphemes:
         grapheme = grapheme.rstrip("#?!*")
         if not grapheme.strip():
           continue
@@ -207,7 +207,7 @@ def get_value_counts(file: str, target_language: str, exclude: set[SpanAttribute
           continue
         if grapheme in ("x", "n"):
           continue
-        if language != target_language:
+        if grapheme_language != target_language:
           continue
         if any(attribute in exclude for attribute in attributes):
           continue
