@@ -15,6 +15,8 @@ language_to_value_to_period_to_occurrences : dict[
           lambda: defaultdict(list)))
 
 def index_values(text_json: Any, artefact: str, period: str, genre: str, lang: str = "und"):
+  if "det" in text_json:
+    return
   if "lang" in text_json:
     lang = text_json["lang"].split("-")[0]
   if "cdl" in text_json:
