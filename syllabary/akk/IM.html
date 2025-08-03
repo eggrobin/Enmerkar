@@ -1,663 +1,667 @@
 
-            <html>
-            <head>
-            <style>
-            table {
-              border-collapse: collapse;
-            }
-            th {
-              border: 1px solid;
-              text-align: center;
-            }
-            td {
-              border: 1px solid;
-              text-align: center;
-            }
-            tr.𒆍𒀭𒊏𒆠 {
-              border-bottom: 3px double;
-            }
-            </style>
-            <script>
-            function update_from_query() {
-              params = (new URL(document.location)).searchParams;
-              document.querySelector('input[id="count-artefact"]').checked = params.get("count") === "artefact";
-              document.querySelector('input[id="over-homophones"]').checked = params.get("over") === "homophones";
-              document.querySelector('input[id="over-sign"]').checked = params.get("over") === "sign";
-              update_visibilities(false);
-            }
+<html>
+<head>
+<style>
+table {
+  border-collapse: collapse;
+}
+th {
+  border: 1px solid;
+  text-align: center;
+}
+td {
+  border: 1px solid;
+  text-align: center;
+}
+tr.𒆍𒀭𒊏𒆠 {
+  border-bottom: 3px double;
+}
+</style>
+<script>
+function update_from_query() {
+  params = (new URL(document.location)).searchParams;
+  document.querySelector('input[id="count-artefact"]').checked = params.get("count") === "artefact";
+  document.querySelector('input[id="over-homophones"]').checked = params.get("over") === "homophones";
+  document.querySelector('input[id="over-sign"]').checked = params.get("over") === "sign";
+  update_visibilities(false);
+}
 
-            function update_visibilities(push_history = true) {
-              over_homophones = document.querySelector('input[id="over-homophones"]').checked;
-              over_sign = document.querySelector('input[id="over-sign"]').checked;
-              count = !over_homophones && !over_sign;
-              count_artefacts = document.querySelector('input[id="count-artefact"]').checked;
-              if (push_history) {
-                let query = [`count=${count_artefacts?"artefact":"occurrence"}`];
-                if (over_homophones) {
-                  query.push("over=homophones");
-                } else if (over_sign) {
-                  query.push("over=sign");
-                }
-                var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?' + query.join("&");
-                window.history.pushState({ path: newurl }, '', newurl);
-              }
-              for (var div of document.getElementsByTagName("div")) {
-                if (div.className === "over-homophones") {
-                  div.style = over_homophones ? "" : "display:none";
-                }
-                if (div.className === "over-sign") {
-                  div.style = over_sign ? "" : "display:none";
-                }
-                if (div.className === "count") {
-                  div.style = count ? "" : "display:none";
-                }
-                if (div.className === "count-artefact") {
-                  div.style = count_artefacts ? "" : "display:none";
-                }
-                if (div.className === "count-occurrence") {
-                  div.style = count_artefacts ? "display:none" : "";
-                }
-              }
-            }
-            window.onload = function () {
-              for (var input of document.getElementsByTagName("input")) {
-                input.onclick = update_visibilities;
-              }
-              update_from_query();
-            }
-            </script>
-            </head>
-            <body>
-            
-<h1>akk values of 𒅎</h1>
+function update_visibilities(push_history = true) {
+  over_homophones = document.querySelector('input[id="over-homophones"]').checked;
+  over_sign = document.querySelector('input[id="over-sign"]').checked;
+  count = !over_homophones && !over_sign;
+  count_artefacts = document.querySelector('input[id="count-artefact"]').checked;
+  if (push_history) {
+    let query = [`count=${count_artefacts?"artefact":"occurrence"}`];
+    if (over_homophones) {
+      query.push("over=homophones");
+    } else if (over_sign) {
+      query.push("over=sign");
+    }
+    var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?' + query.join("&");
+    window.history.pushState({ path: newurl }, '', newurl);
+  }
+  for (var div of document.getElementsByTagName("div")) {
+    if (div.className === "over-homophones") {
+      div.style = over_homophones ? "" : "display:none";
+    }
+    if (div.className === "over-sign") {
+      div.style = over_sign ? "" : "display:none";
+    }
+    if (div.className === "count") {
+      div.style = count ? "" : "display:none";
+    }
+    if (div.className === "count-artefact") {
+      div.style = count_artefacts ? "" : "display:none";
+    }
+    if (div.className === "count-occurrence") {
+      div.style = count_artefacts ? "display:none" : "";
+    }
+  }
+}
+window.onload = function () {
+  for (var input of document.getElementsByTagName("input")) {
+    input.onclick = update_visibilities;
+  }
+  update_from_query();
+}
+</script>
+</head>
+<body>
+
+<h1>Akkadian syllabic values of 𒅎</h1>
+
 <p>Based on transliterations from CDLI and Oracc projects akklove, atae, babcity, balt, blms, dcclt, riao, ribo, rinap, saao, tcma.</p>
 
-            <p>
-            <input type="radio" name="count" value="occurrence" id="count-occurrence" checked>
-            <label for="count-occurrence">Count occurrences</label>
-            </p>
-            <p>
-            <input type="radio" name="count" value="artefact" id="count-artefact">
-            <label for="count-artefact">Count artefacts</label>
-            </p>
 
-            <p>
-            <input type="radio" name="over" value="1" id="count" checked>
-            <label for="count">Show count</label>
-            </p>
-            <p>
-            <input type="radio" name="over" value="homophones" id="over-homophones">
-            <label for="over-homophones">Show count as a proportion of homophones in same period (e.g., qi₂ as a percentage of all qi, qi₂, qi₃, etc. in MA)</label>
-            </p>
-            <p>
-            <input type="radio" name="over" value="sign" id="over-sign">
-            <label for="over-sign">Show count as a proportion of usages of the sign in same period (e.g., qi₂ as a percentage of Akkadian syllabic 𒆠 in MA)</label>
-            </p>
+<p>
+<input type="radio" name="count" value="occurrence" id="count-occurrence" checked>
+<label for="count-occurrence">Count occurrences</label>
+</p>
+<p>
+<input type="radio" name="count" value="artefact" id="count-artefact">
+<label for="count-artefact">Count artefacts</label>
+</p>
 
-            <table>
-            <tr>
-            <th rowspan="2"></th>
-            <th rowspan="2">OAkk</th>
-            <th colspan="2">OA</th>
-            <th>MA</th>
-            <th colspan="2">NA</th>
-            </tr>
-            <tr class="𒆍𒀭𒊏𒆠">
-            <th>Early OB</th>
-            <th>OB</th>
-            <th>MB</th>
-            <th>Early NB</th>
-            <th>NB</th>
-            </tr>
-            
 
-              <tr>
-              <th rowspan="2">adad</th>
-              <td rowspan="2">
-                <div class="count-occurrence">
-                <div class="count">1</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">0%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">1</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">0%</div>
-                </div></td>
-              <td colspan="2">
-                <div class="count-occurrence">
-                <div class="count">1</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">0%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">1</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">0%</div>
-                </div></td>
-              <td>&nbsp;</td>
-              <td colspan="2">
-                <div class="count-occurrence">
-                <div class="count">1</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">0%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">1</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">0%</div>
-                </div></td>
-              </tr>
-              <tr class="𒆍𒀭𒊏𒆠">
-              <td>
-                <div class="count-occurrence">
-                <div class="count">1</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">0%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">1</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">0%</div>
-                </div></td>
-              <td>&nbsp;</td>
-              <td>
-                <div class="count-occurrence">
-                <div class="count">2</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">0%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">2</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">1%</div>
-                </div></td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              </tr>
-              
+<p>
+<input type="radio" name="over" value="1" id="count" checked>
+<label for="count">Show count</label>
+</p>
+<p>
+<input type="radio" name="over" value="homophones" id="over-homophones">
+<label for="over-homophones">Show count as a proportion of homophones in same period (e.g., qi₂ as a percentage of all qi, qi₂, qi₃, etc. in MA)</label>
+</p>
+<p>
+<input type="radio" name="over" value="sign" id="over-sign">
+<label for="over-sign">Show count as a proportion of usages of the sign in same period (e.g., qi₂ as a percentage of Akkadian syllabic 𒆠 in MA)</label>
+</p>
 
-              <tr>
-              <th rowspan="2">em</th>
-              <td rowspan="2">&nbsp;</td>
-              <td colspan="2">
-                <div class="count-occurrence">
-                <div class="count">200</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">2%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">156</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">5%</div>
-                </div></td>
-              <td>
-                <div class="count-occurrence">
-                <div class="count">140</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">13%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">93</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">18%</div>
-                </div></td>
-              <td colspan="2">
-                <div class="count-occurrence">
-                <div class="count">483</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">11%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">293</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">16%</div>
-                </div></td>
-              </tr>
-              <tr class="𒆍𒀭𒊏𒆠">
-              <td>
-                <div class="count-occurrence">
-                <div class="count">34</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">2%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">30</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">5%</div>
-                </div></td>
-              <td>
-                <div class="count-occurrence">
-                <div class="count">1243</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">8%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">752</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">16%</div>
-                </div></td>
-              <td>
-                <div class="count-occurrence">
-                <div class="count">88</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">10%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">60</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">17%</div>
-                </div></td>
-              <td>&nbsp;</td>
-              <td>
-                <div class="count-occurrence">
-                <div class="count">200</div>
-                <div class="over-homophones">88%</div>
-                <div class="over-sign">15%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">143</div>
-                <div class="over-homophones">88%</div>
-                <div class="over-sign">30%</div>
-                </div></td>
-              </tr>
-              
 
-              <tr>
-              <th rowspan="2">enegi</th>
-              <td rowspan="2">&nbsp;</td>
-              <td colspan="2">&nbsp;</td>
-              <td>&nbsp;</td>
-              <td colspan="2">&nbsp;</td>
-              </tr>
-              <tr class="𒆍𒀭𒊏𒆠">
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>
-                <div class="count-occurrence">
-                <div class="count">1</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">0%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">1</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">0%</div>
-                </div></td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              </tr>
-              
+<table>
+<tr>
+<th rowspan="2"></th>
+<th rowspan="2">OAkk</th>
+<th colspan="2">OA</th>
+<th>MA</th>
+<th colspan="2">NA</th>
+</tr>
+<tr class="𒆍𒀭𒊏𒆠">
+<th>Early OB</th>
+<th>OB</th>
+<th>MB</th>
+<th>Early NB</th>
+<th>NB</th>
+</tr>
 
-              <tr>
-              <th rowspan="2">im</th>
-              <td rowspan="2">
-                <div class="count-occurrence">
-                <div class="count">638</div>
-                <div class="over-homophones">92%</div>
-                <div class="over-sign">95%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">413</div>
-                <div class="over-homophones">95%</div>
-                <div class="over-sign">96%</div>
-                </div></td>
-              <td colspan="2">
-                <div class="count-occurrence">
-                <div class="count">8213</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">89%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">3140</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">95%</div>
-                </div></td>
-              <td>
-                <div class="count-occurrence">
-                <div class="count">752</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">68%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">385</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">77%</div>
-                </div></td>
-              <td colspan="2">
-                <div class="count-occurrence">
-                <div class="count">3510</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">78%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">1538</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">85%</div>
-                </div></td>
-              </tr>
-              <tr class="𒆍𒀭𒊏𒆠">
-              <td>
-                <div class="count-occurrence">
-                <div class="count">1312</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">83%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">472</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">80%</div>
-                </div></td>
-              <td>
-                <div class="count-occurrence">
-                <div class="count">12226</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">77%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">3972</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">87%</div>
-                </div></td>
-              <td>
-                <div class="count-occurrence">
-                <div class="count">653</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">75%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">277</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">79%</div>
-                </div></td>
-              <td>
-                <div class="count-occurrence">
-                <div class="count">5</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">100%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">1</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">100%</div>
-                </div></td>
-              <td>
-                <div class="count-occurrence">
-                <div class="count">1015</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">77%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">403</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">84%</div>
-                </div></td>
-              </tr>
-              
 
-              <tr>
-              <th rowspan="2">iškur</th>
-              <td rowspan="2">
-                <div class="count-occurrence">
-                <div class="count">30</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">4%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">29</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">7%</div>
-                </div></td>
-              <td colspan="2">
-                <div class="count-occurrence">
-                <div class="count">835</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">9%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">494</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">15%</div>
-                </div></td>
-              <td>
-                <div class="count-occurrence">
-                <div class="count">206</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">19%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">84</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">17%</div>
-                </div></td>
-              <td colspan="2">
-                <div class="count-occurrence">
-                <div class="count">426</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">9%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">278</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">15%</div>
-                </div></td>
-              </tr>
-              <tr class="𒆍𒀭𒊏𒆠">
-              <td>
-                <div class="count-occurrence">
-                <div class="count">231</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">15%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">181</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">31%</div>
-                </div></td>
-              <td>
-                <div class="count-occurrence">
-                <div class="count">2403</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">15%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">1469</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">32%</div>
-                </div></td>
-              <td>
-                <div class="count-occurrence">
-                <div class="count">130</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">15%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">92</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">26%</div>
-                </div></td>
-              <td>&nbsp;</td>
-              <td>
-                <div class="count-occurrence">
-                <div class="count">96</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">7%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">55</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">11%</div>
-                </div></td>
-              </tr>
-              
+      <tr>
+      <th rowspan="2">adad</th>
+      <td rowspan="2">
+        <div class="count-occurrence">
+        <div class="count">1</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">0%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">1</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">0%</div>
+        </div></td>
+      <td colspan="2">
+        <div class="count-occurrence">
+        <div class="count">1</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">0%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">1</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">0%</div>
+        </div></td>
+      <td>&nbsp;</td>
+      <td colspan="2">
+        <div class="count-occurrence">
+        <div class="count">1</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">0%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">1</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">0%</div>
+        </div></td>
+      </tr>
+      <tr class="𒆍𒀭𒊏𒆠">
+      <td>
+        <div class="count-occurrence">
+        <div class="count">1</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">0%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">1</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">0%</div>
+        </div></td>
+      <td>&nbsp;</td>
+      <td>
+        <div class="count-occurrence">
+        <div class="count">2</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">0%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">2</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">1%</div>
+        </div></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      </tr>
+      
 
-              <tr>
-              <th rowspan="2">karkara</th>
-              <td rowspan="2">&nbsp;</td>
-              <td colspan="2">&nbsp;</td>
-              <td>&nbsp;</td>
-              <td colspan="2">&nbsp;</td>
-              </tr>
-              <tr class="𒆍𒀭𒊏𒆠">
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>
-                <div class="count-occurrence">
-                <div class="count">1</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">0%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">1</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">0%</div>
-                </div></td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              </tr>
-              
+      <tr>
+      <th rowspan="2">em</th>
+      <td rowspan="2">&nbsp;</td>
+      <td colspan="2">
+        <div class="count-occurrence">
+        <div class="count">200</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">2%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">156</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">5%</div>
+        </div></td>
+      <td>
+        <div class="count-occurrence">
+        <div class="count">140</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">13%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">93</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">18%</div>
+        </div></td>
+      <td colspan="2">
+        <div class="count-occurrence">
+        <div class="count">483</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">11%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">293</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">16%</div>
+        </div></td>
+      </tr>
+      <tr class="𒆍𒀭𒊏𒆠">
+      <td>
+        <div class="count-occurrence">
+        <div class="count">34</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">2%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">30</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">5%</div>
+        </div></td>
+      <td>
+        <div class="count-occurrence">
+        <div class="count">1243</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">8%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">752</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">16%</div>
+        </div></td>
+      <td>
+        <div class="count-occurrence">
+        <div class="count">88</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">10%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">60</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">17%</div>
+        </div></td>
+      <td>&nbsp;</td>
+      <td>
+        <div class="count-occurrence">
+        <div class="count">200</div>
+        <div class="over-homophones">88%</div>
+        <div class="over-sign">15%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">143</div>
+        <div class="over-homophones">88%</div>
+        <div class="over-sign">30%</div>
+        </div></td>
+      </tr>
+      
 
-              <tr>
-              <th rowspan="2">muru₃</th>
-              <td rowspan="2">&nbsp;</td>
-              <td colspan="2">&nbsp;</td>
-              <td>&nbsp;</td>
-              <td colspan="2">&nbsp;</td>
-              </tr>
-              <tr class="𒆍𒀭𒊏𒆠">
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>
-                <div class="count-occurrence">
-                <div class="count">1</div>
-                <div class="over-homophones">33%</div>
-                <div class="over-sign">0%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">1</div>
-                <div class="over-homophones">50%</div>
-                <div class="over-sign">0%</div>
-                </div></td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              </tr>
-              
+      <tr>
+      <th rowspan="2">enegi</th>
+      <td rowspan="2">&nbsp;</td>
+      <td colspan="2">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td colspan="2">&nbsp;</td>
+      </tr>
+      <tr class="𒆍𒀭𒊏𒆠">
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>
+        <div class="count-occurrence">
+        <div class="count">1</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">0%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">1</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">0%</div>
+        </div></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      </tr>
+      
 
-              <tr>
-              <th rowspan="2">šar₅</th>
-              <td rowspan="2">&nbsp;</td>
-              <td colspan="2">&nbsp;</td>
-              <td>&nbsp;</td>
-              <td colspan="2">
-                <div class="count-occurrence">
-                <div class="count">1</div>
-                <div class="over-homophones">0%</div>
-                <div class="over-sign">0%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">1</div>
-                <div class="over-homophones">0%</div>
-                <div class="over-sign">0%</div>
-                </div></td>
-              </tr>
-              <tr class="𒆍𒀭𒊏𒆠">
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>
-                <div class="count-occurrence">
-                <div class="count">1</div>
-                <div class="over-homophones">0%</div>
-                <div class="over-sign">0%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">1</div>
-                <div class="over-homophones">0%</div>
-                <div class="over-sign">0%</div>
-                </div></td>
-              </tr>
-              
+      <tr>
+      <th rowspan="2">im</th>
+      <td rowspan="2">
+        <div class="count-occurrence">
+        <div class="count">638</div>
+        <div class="over-homophones">92%</div>
+        <div class="over-sign">95%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">413</div>
+        <div class="over-homophones">95%</div>
+        <div class="over-sign">96%</div>
+        </div></td>
+      <td colspan="2">
+        <div class="count-occurrence">
+        <div class="count">8213</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">89%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">3140</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">95%</div>
+        </div></td>
+      <td>
+        <div class="count-occurrence">
+        <div class="count">752</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">68%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">385</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">77%</div>
+        </div></td>
+      <td colspan="2">
+        <div class="count-occurrence">
+        <div class="count">3510</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">78%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">1538</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">85%</div>
+        </div></td>
+      </tr>
+      <tr class="𒆍𒀭𒊏𒆠">
+      <td>
+        <div class="count-occurrence">
+        <div class="count">1312</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">83%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">472</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">80%</div>
+        </div></td>
+      <td>
+        <div class="count-occurrence">
+        <div class="count">12226</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">77%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">3972</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">87%</div>
+        </div></td>
+      <td>
+        <div class="count-occurrence">
+        <div class="count">653</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">75%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">277</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">79%</div>
+        </div></td>
+      <td>
+        <div class="count-occurrence">
+        <div class="count">5</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">100%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">1</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">100%</div>
+        </div></td>
+      <td>
+        <div class="count-occurrence">
+        <div class="count">1015</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">77%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">403</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">84%</div>
+        </div></td>
+      </tr>
+      
 
-              <tr>
-              <th rowspan="2">tu₁₅</th>
-              <td rowspan="2">&nbsp;</td>
-              <td colspan="2">&nbsp;</td>
-              <td>&nbsp;</td>
-              <td colspan="2">
-                <div class="count-occurrence">
-                <div class="count">64</div>
-                <div class="over-homophones">0%</div>
-                <div class="over-sign">1%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">16</div>
-                <div class="over-homophones">0%</div>
-                <div class="over-sign">1%</div>
-                </div></td>
-              </tr>
-              <tr class="𒆍𒀭𒊏𒆠">
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>
-                <div class="count-occurrence">
-                <div class="count">11</div>
-                <div class="over-homophones">0%</div>
-                <div class="over-sign">1%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">11</div>
-                <div class="over-homophones">1%</div>
-                <div class="over-sign">2%</div>
-                </div></td>
-              </tr>
-              
+      <tr>
+      <th rowspan="2">iškur</th>
+      <td rowspan="2">
+        <div class="count-occurrence">
+        <div class="count">30</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">4%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">29</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">7%</div>
+        </div></td>
+      <td colspan="2">
+        <div class="count-occurrence">
+        <div class="count">835</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">9%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">494</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">15%</div>
+        </div></td>
+      <td>
+        <div class="count-occurrence">
+        <div class="count">206</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">19%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">84</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">17%</div>
+        </div></td>
+      <td colspan="2">
+        <div class="count-occurrence">
+        <div class="count">426</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">9%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">278</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">15%</div>
+        </div></td>
+      </tr>
+      <tr class="𒆍𒀭𒊏𒆠">
+      <td>
+        <div class="count-occurrence">
+        <div class="count">231</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">15%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">181</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">31%</div>
+        </div></td>
+      <td>
+        <div class="count-occurrence">
+        <div class="count">2403</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">15%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">1469</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">32%</div>
+        </div></td>
+      <td>
+        <div class="count-occurrence">
+        <div class="count">130</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">15%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">92</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">26%</div>
+        </div></td>
+      <td>&nbsp;</td>
+      <td>
+        <div class="count-occurrence">
+        <div class="count">96</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">7%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">55</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">11%</div>
+        </div></td>
+      </tr>
+      
 
-              <tr>
-              <th rowspan="2">tumu</th>
-              <td rowspan="2">
-                <div class="count-occurrence">
-                <div class="count">1</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">0%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">1</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">0%</div>
-                </div></td>
-              <td colspan="2">&nbsp;</td>
-              <td>&nbsp;</td>
-              <td colspan="2">&nbsp;</td>
-              </tr>
-              <tr class="𒆍𒀭𒊏𒆠">
-              <td>
-                <div class="count-occurrence">
-                <div class="count">1</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">0%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">1</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">0%</div>
-                </div></td>
-              <td>
-                <div class="count-occurrence">
-                <div class="count">2</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">0%</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">2</div>
-                <div class="over-homophones">100%</div>
-                <div class="over-sign">0%</div>
-                </div></td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              </tr>
-              
+      <tr>
+      <th rowspan="2">karkara</th>
+      <td rowspan="2">&nbsp;</td>
+      <td colspan="2">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td colspan="2">&nbsp;</td>
+      </tr>
+      <tr class="𒆍𒀭𒊏𒆠">
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>
+        <div class="count-occurrence">
+        <div class="count">1</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">0%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">1</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">0%</div>
+        </div></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      </tr>
+      
+
+      <tr>
+      <th rowspan="2">muru₃</th>
+      <td rowspan="2">&nbsp;</td>
+      <td colspan="2">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td colspan="2">&nbsp;</td>
+      </tr>
+      <tr class="𒆍𒀭𒊏𒆠">
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>
+        <div class="count-occurrence">
+        <div class="count">1</div>
+        <div class="over-homophones">33%</div>
+        <div class="over-sign">0%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">1</div>
+        <div class="over-homophones">50%</div>
+        <div class="over-sign">0%</div>
+        </div></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      </tr>
+      
+
+      <tr>
+      <th rowspan="2">šar₅</th>
+      <td rowspan="2">&nbsp;</td>
+      <td colspan="2">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td colspan="2">
+        <div class="count-occurrence">
+        <div class="count">1</div>
+        <div class="over-homophones">0%</div>
+        <div class="over-sign">0%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">1</div>
+        <div class="over-homophones">0%</div>
+        <div class="over-sign">0%</div>
+        </div></td>
+      </tr>
+      <tr class="𒆍𒀭𒊏𒆠">
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>
+        <div class="count-occurrence">
+        <div class="count">1</div>
+        <div class="over-homophones">0%</div>
+        <div class="over-sign">0%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">1</div>
+        <div class="over-homophones">0%</div>
+        <div class="over-sign">0%</div>
+        </div></td>
+      </tr>
+      
+
+      <tr>
+      <th rowspan="2">tu₁₅</th>
+      <td rowspan="2">&nbsp;</td>
+      <td colspan="2">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td colspan="2">
+        <div class="count-occurrence">
+        <div class="count">64</div>
+        <div class="over-homophones">0%</div>
+        <div class="over-sign">1%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">16</div>
+        <div class="over-homophones">0%</div>
+        <div class="over-sign">1%</div>
+        </div></td>
+      </tr>
+      <tr class="𒆍𒀭𒊏𒆠">
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>
+        <div class="count-occurrence">
+        <div class="count">11</div>
+        <div class="over-homophones">0%</div>
+        <div class="over-sign">1%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">11</div>
+        <div class="over-homophones">1%</div>
+        <div class="over-sign">2%</div>
+        </div></td>
+      </tr>
+      
+
+      <tr>
+      <th rowspan="2">tumu</th>
+      <td rowspan="2">
+        <div class="count-occurrence">
+        <div class="count">1</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">0%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">1</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">0%</div>
+        </div></td>
+      <td colspan="2">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td colspan="2">&nbsp;</td>
+      </tr>
+      <tr class="𒆍𒀭𒊏𒆠">
+      <td>
+        <div class="count-occurrence">
+        <div class="count">1</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">0%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">1</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">0%</div>
+        </div></td>
+      <td>
+        <div class="count-occurrence">
+        <div class="count">2</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">0%</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">2</div>
+        <div class="over-homophones">100%</div>
+        <div class="over-sign">0%</div>
+        </div></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      </tr>
+      
 </table></body></html>
