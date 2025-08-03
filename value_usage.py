@@ -95,195 +95,238 @@ for file in ("OAkk", "Early OB", "OA", "OB akk", "MA", "MB", "Early NB", "NA", "
   print(f"--- {len(covered_by_oracc)} artefacts already covered by Oracc in {file}")
 
 syllabary_index : list[asl.Sign] = []
+base_to_values : dict[str, list[str]] = defaultdict(list)
+
+HEAD = """
+<html>
+<head>
+<style>
+table {
+  border-collapse: collapse;
+}
+th {
+  border: 1px solid;
+  text-align: center;
+}
+td {
+  border: 1px solid;
+  text-align: center;
+}
+tr.𒆍𒀭𒊏𒆠 {
+  border-bottom: 3px double;
+}
+</style>
+<script>
+function update_from_query() {
+  params = (new URL(document.location)).searchParams;
+  document.querySelector('input[id="count-artefact"]').checked = params.get("count") === "artefact";
+  document.querySelector('input[id="over-homophones"]').checked = params.get("over") === "homophones";
+  document.querySelector('input[id="over-sign"]').checked = params.get("over") === "sign";
+  update_visibilities(false);
+}
+
+function update_visibilities(push_history = true) {
+  over_homophones = document.querySelector('input[id="over-homophones"]').checked;
+  over_sign = document.querySelector('input[id="over-sign"]').checked;
+  count = !over_homophones && !over_sign;
+  count_artefacts = document.querySelector('input[id="count-artefact"]').checked;
+  if (push_history) {
+    let query = [`count=${count_artefacts?"artefact":"occurrence"}`];
+    if (over_homophones) {
+      query.push("over=homophones");
+    } else if (over_sign) {
+      query.push("over=sign");
+    }
+    var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?' + query.join("&");
+    window.history.pushState({ path: newurl }, '', newurl);
+  }
+  for (var div of document.getElementsByTagName("div")) {
+    if (div.className === "over-homophones") {
+      div.style = over_homophones ? "" : "display:none";
+    }
+    if (div.className === "over-sign") {
+      div.style = over_sign ? "" : "display:none";
+    }
+    if (div.className === "count") {
+      div.style = count ? "" : "display:none";
+    }
+    if (div.className === "count-artefact") {
+      div.style = count_artefacts ? "" : "display:none";
+    }
+    if (div.className === "count-occurrence") {
+      div.style = count_artefacts ? "display:none" : "";
+    }
+  }
+}
+window.onload = function () {
+  for (var input of document.getElementsByTagName("input")) {
+    input.onclick = update_visibilities;
+  }
+  update_from_query();
+}
+</script>
+</head>
+<body>
+"""
+
+SOURCE = f"""
+<p>Based on transliterations from CDLI and Oracc projects {", ".join(ORACC_PROJECTS)}.</p>
+"""
+
+COUNT_SELECTOR = """
+<p>
+<input type="radio" name="count" value="occurrence" id="count-occurrence" checked>
+<label for="count-occurrence">Count occurrences</label>
+</p>
+<p>
+<input type="radio" name="count" value="artefact" id="count-artefact">
+<label for="count-artefact">Count artefacts</label>
+</p>
+"""
+
+RATIO_SELECTOR = """
+<p>
+<input type="radio" name="over" value="1" id="count" checked>
+<label for="count">Show count</label>
+</p>
+<p>
+<input type="radio" name="over" value="homophones" id="over-homophones">
+<label for="over-homophones">Show count as a proportion of homophones in same period (e.g., qi₂ as a percentage of all qi, qi₂, qi₃, etc. in MA)</label>
+</p>
+<p>
+<input type="radio" name="over" value="sign" id="over-sign">
+<label for="over-sign">Show count as a proportion of usages of the sign in same period (e.g., qi₂ as a percentage of Akkadian syllabic 𒆠 in MA)</label>
+</p>
+"""
+
+TABLE_PERIODS = """
+<table>
+<tr>
+<th rowspan="2"></th>
+<th rowspan="2">OAkk</th>
+<th colspan="2">OA</th>
+<th>MA</th>
+<th colspan="2">NA</th>
+</tr>
+<tr class="𒆍𒀭𒊏𒆠">
+<th>Early OB</th>
+<th>OB</th>
+<th>MB</th>
+<th>Early NB</th>
+<th>NB</th>
+</tr>
+"""
+
+value_to_period_to_occurrences = language_to_value_to_period_to_occurrences["akk"]
+sign_to_period_to_occurrences : dict[asl.Sign, dict[str, list[str]]] = defaultdict(lambda: defaultdict(list))
+value_to_period_to_homophone_occurrences : dict[str, dict[str, list[str]]] = defaultdict(lambda: defaultdict(list))
+base_to_signs_and_values : dict[str, list[tuple[asl.Sign, asl.Value]]] = defaultdict(list)
 
 for sign in asl.osl.signs:
   if isinstance(sign, asl.Sign):
-    value_to_period_to_occurrences = language_to_value_to_period_to_occurrences["akk"]
-    sign_occurrences_by_period : dict[str, list[str]] = defaultdict(list)
     for value in sign.values:
       usage = value_to_period_to_occurrences[value.text]
       for period, occurrences in usage.items():
-        sign_occurrences_by_period[period] += occurrences
-    value_to_homophone_occurrences_by_period : dict[str, dict[str, list[str]]] = defaultdict(lambda: defaultdict(list))
-    for value in sign.values:
+        sign_to_period_to_occurrences[sign][period] += occurrences
       base = value.text.rstrip("₀₁₂₃₄₅₆₇₈₉")
+      base_to_signs_and_values[base].append((sign, value))
       for other_value, period_to_occurrences in value_to_period_to_occurrences.items():
         if other_value.rstrip("₀₁₂₃₄₅₆₇₈₉") != base:
           continue
         for period, occurrences in period_to_occurrences.items():
-          value_to_homophone_occurrences_by_period[value.text][period] += occurrences
-    for value in sign.values:
-      period_to_occurrences = value_to_period_to_occurrences[value.text]
+          value_to_period_to_homophone_occurrences[value.text][period] += occurrences
+
+def entry(period: str, value: asl.Value, sign: asl.Sign):
+  sign_occurrences = sign_to_period_to_occurrences[sign][period]
+  homophone_occurrences = value_to_period_to_homophone_occurrences[value.text][period]
+  occurrences = value_to_period_to_occurrences[value.text][period]
+  if len(occurrences) == 0:
+    return "&nbsp;"
+  else:
+    return f"""
+        <div class="count-occurrence">
+        <div class="count">{len(occurrences)}</div>
+        <div class="over-homophones">{len(occurrences) / len(homophone_occurrences):0.0%}</div>
+        <div class="over-sign">{len(occurrences) / len(sign_occurrences):0.0%}</div>
+        </div>
+        <div class="count-artefact">
+        <div class="count">{len(set(occurrences))}</div>
+        <div class="over-homophones">{len(set(occurrences)) / len(set(homophone_occurrences)):0.0%}</div>
+        <div class="over-sign">{len(set(occurrences)) / len(set(sign_occurrences)):0.0%}</div>
+        </div>"""
+
+def table_row(value: asl.Value, sign: asl.Sign, sign_specific_table: bool):
+  base = value.text.rstrip("₀₁₂₃₄₅₆₇₈₉")
+  return f"""
+      <tr>
+      <th rowspan="2"><a href="{
+        f"homophones/{base}.html" if sign_specific_table else
+        f'../{sign.names[0].replace("|", "").replace("/", "-")}.html'
+      }">{
+        value.text
+      }{
+        "" if sign_specific_table else
+        f"({sign.unicode_cuneiform.text if sign.unicode_cuneiform else sign.names[0]})"
+      }</a></th>
+      <td rowspan="2">{entry("OAkk", value, sign)}</td>
+      <td colspan="2">{entry("OA", value, sign)}</td>
+      <td>{entry("MA", value, sign)}</td>
+      <td colspan="2">{entry("NA", value, sign)}</td>
+      </tr>
+      <tr class="𒆍𒀭𒊏𒆠">
+      <td>{entry("Early OB", value, sign)}</td>
+      <td>{entry("OB", value, sign)}</td>
+      <td>{entry("MB", value, sign)}</td>
+      <td>{entry("Early NB", value, sign)}</td>
+      <td>{entry("NB", value, sign)}</td>
+      </tr>
+      """
+
+for sign in asl.osl.signs:
+  if isinstance(sign, asl.Sign):
+    if sign not in sign_to_period_to_occurrences:
+      continue
     with open("syllabary/akk/" + sign.names[0].replace("|", "").replace("/", "-") + ".html", mode="w", encoding="utf-8") as f:
-      print("""
-            <html>
-            <head>
-            <style>
-            table {
-              border-collapse: collapse;
-            }
-            th {
-              border: 1px solid;
-              text-align: center;
-            }
-            td {
-              border: 1px solid;
-              text-align: center;
-            }
-            tr.𒆍𒀭𒊏𒆠 {
-              border-bottom: 3px double;
-            }
-            </style>
-            <script>
-            function update_from_query() {
-              params = (new URL(document.location)).searchParams;
-              document.querySelector('input[id="count-artefact"]').checked = params.get("count") === "artefact";
-              document.querySelector('input[id="over-homophones"]').checked = params.get("over") === "homophones";
-              document.querySelector('input[id="over-sign"]').checked = params.get("over") === "sign";
-              update_visibilities(false);
-            }
-
-            function update_visibilities(push_history = true) {
-              over_homophones = document.querySelector('input[id="over-homophones"]').checked;
-              over_sign = document.querySelector('input[id="over-sign"]').checked;
-              count = !over_homophones && !over_sign;
-              count_artefacts = document.querySelector('input[id="count-artefact"]').checked;
-              if (push_history) {
-                let query = [`count=${count_artefacts?"artefact":"occurrence"}`];
-                if (over_homophones) {
-                  query.push("over=homophones");
-                } else if (over_sign) {
-                  query.push("over=sign");
-                }
-                var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?' + query.join("&");
-                window.history.pushState({ path: newurl }, '', newurl);
-              }
-              for (var div of document.getElementsByTagName("div")) {
-                if (div.className === "over-homophones") {
-                  div.style = over_homophones ? "" : "display:none";
-                }
-                if (div.className === "over-sign") {
-                  div.style = over_sign ? "" : "display:none";
-                }
-                if (div.className === "count") {
-                  div.style = count ? "" : "display:none";
-                }
-                if (div.className === "count-artefact") {
-                  div.style = count_artefacts ? "" : "display:none";
-                }
-                if (div.className === "count-occurrence") {
-                  div.style = count_artefacts ? "display:none" : "";
-                }
-              }
-            }
-            window.onload = function () {
-              for (var input of document.getElementsByTagName("input")) {
-                input.onclick = update_visibilities;
-              }
-              update_from_query();
-            }
-            </script>
-            </head>
-            <body>
-            """,
+      print(HEAD,
             file=f)
-      print(f"<h1>akk values of {sign.unicode_cuneiform.text if sign.unicode_cuneiform else sign.names[0]}</h1>", file=f)
-      print(f"<p>Based on transliterations from CDLI and Oracc projects {', '.join(ORACC_PROJECTS)}.</p>", file=f)
-      print(f"""
-            <p>
-            <input type="radio" name="count" value="occurrence" id="count-occurrence" checked>
-            <label for="count-occurrence">Count occurrences</label>
-            </p>
-            <p>
-            <input type="radio" name="count" value="artefact" id="count-artefact">
-            <label for="count-artefact">Count artefacts</label>
-            </p>""", file=f)
-      print(f"""
-            <p>
-            <input type="radio" name="over" value="1" id="count" checked>
-            <label for="count">Show count</label>
-            </p>
-            <p>
-            <input type="radio" name="over" value="homophones" id="over-homophones">
-            <label for="over-homophones">Show count as a proportion of homophones in same period (e.g., qi₂ as a percentage of all qi, qi₂, qi₃, etc. in MA)</label>
-            </p>
-            <p>
-            <input type="radio" name="over" value="sign" id="over-sign">
-            <label for="over-sign">Show count as a proportion of usages of the sign in same period (e.g., qi₂ as a percentage of Akkadian syllabic 𒆠 in MA)</label>
-            </p>""", file=f)
-      print("""
-            <table>
-            <tr>
-            <th rowspan="2"></th>
-            <th rowspan="2">OAkk</th>
-            <th colspan="2">OA</th>
-            <th>MA</th>
-            <th colspan="2">NA</th>
-            </tr>
-            <tr class="𒆍𒀭𒊏𒆠">
-            <th>Early OB</th>
-            <th>OB</th>
-            <th>MB</th>
-            <th>Early NB</th>
-            <th>NB</th>
-            </tr>
-            """,
-            file=f)
+      print(f"<h1>Akkadian syllabic values of {sign.unicode_cuneiform.text if sign.unicode_cuneiform else sign.names[0]}</h1>", file=f)
+      print(SOURCE, file=f)
+      print(COUNT_SELECTOR, file=f)
+      print(RATIO_SELECTOR, file=f)
+      print(TABLE_PERIODS, file=f)
 
-      sign_total = 0
       for value in sign.values:
-        period_to_occurrences = value_to_period_to_occurrences[value.text]
-        value_total = 0
-        periods : set[str] = set()
-        for period, occurrences in period_to_occurrences.items():
-          periods.add(period)
-          value_total += len(occurrences)
-        sign_total += value_total
-        if not value_total:
+        if not value_to_period_to_occurrences[value.text]:
           continue
+        print(table_row(value, sign, sign_specific_table=True), file=f)
 
-        def entry(period: str):
-          sign_occurrences = sign_occurrences_by_period[period]
-          homophone_occurrences = value_to_homophone_occurrences_by_period[value.text][period]
-          occurrences = period_to_occurrences[period]
-          if len(occurrences) == 0:
-            return "&nbsp;"
-          else:
-            return f"""
-                <div class="count-occurrence">
-                <div class="count">{len(occurrences)}</div>
-                <div class="over-homophones">{len(occurrences) / len(homophone_occurrences):0.0%}</div>
-                <div class="over-sign">{len(occurrences) / len(sign_occurrences):0.0%}</div>
-                </div>
-                <div class="count-artefact">
-                <div class="count">{len(set(occurrences))}</div>
-                <div class="over-homophones">{len(set(occurrences)) / len(set(homophone_occurrences)):0.0%}</div>
-                <div class="over-sign">{len(set(occurrences)) / len(set(sign_occurrences)):0.0%}</div>
-                </div>"""
-        print(f"""
-              <tr>
-              <th rowspan="2">{value.text}</th>
-              <td rowspan="2">{entry("OAkk")}</td>
-              <td colspan="2">{entry("OA")}</td>
-              <td>{entry("MA")}</td>
-              <td colspan="2">{entry("NA")}</td>
-              </tr>
-              <tr class="𒆍𒀭𒊏𒆠">
-              <td>{entry("Early OB")}</td>
-              <td>{entry("OB")}</td>
-              <td>{entry("MB")}</td>
-              <td>{entry("Early NB")}</td>
-              <td>{entry("NB")}</td>
-              </tr>
-              """,
-              file=f)
       print("</table></body></html>", file=f)
-      if sign_total:
-        syllabary_index.append(sign)
+
+for base, signs_and_values in base_to_signs_and_values.items():
+  if not any(value_to_period_to_occurrences[value.text] for _, value in signs_and_values):
+    continue
+  with open("syllabary/akk/homophones/" + base + ".html", mode="w", encoding="utf-8") as f:
+    print(HEAD,
+          file=f)
+    print(f"<h1>Akkadian syllabic homophones of {base}</h1>", file=f)
+    print(SOURCE, file=f)
+    print(COUNT_SELECTOR, file=f)
+    print(RATIO_SELECTOR, file=f)
+    print(TABLE_PERIODS, file=f)
+
+    for sign, value in sorted(signs_and_values, key=lambda sv: sv[1].text):
+      if not value_to_period_to_occurrences[value.text]:
+        continue
+      print(table_row(value, sign, sign_specific_table=False), file=f)
+
+    print("</table></body></html>", file=f)
 
 with open("syllabary/akk/index.html", mode="w", encoding="utf-8") as f:
   print("<ul>", file=f)
-  for sign in syllabary_index:
-    print(f"<li><a href='{urllib.parse.quote(sign.names[0].replace('|', '').replace('/', '-'))}.html'>{sign.unicode_cuneiform.text if sign.unicode_cuneiform else ''} {sign.names[0]}</a></li>",
-          file=f)
+  for sign in asl.osl.signs:
+    if isinstance(sign, asl.Sign):
+      if sign not in sign_to_period_to_occurrences:
+        continue
+      print(f"<li><a href='{urllib.parse.quote(sign.names[0].replace('|', '').replace('/', '-'))}.html'>{sign.unicode_cuneiform.text if sign.unicode_cuneiform else ''} {sign.names[0]}</a></li>",
+            file=f)
   print("</ul>", file=f)
