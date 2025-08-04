@@ -370,7 +370,7 @@ for base, signs_and_values in base_to_signs_and_values.items():
   with open("syllabary/akk/homophones/" + ("syllable-" if base == "nul" else "") + base + ".html", mode="w", encoding="utf-8") as f:
     print(HEAD,
           file=f)
-    print(f"<h1>Akkadian syllabic homophones of {base}</h1>", file=f)
+    print(f"<h1>Akkadian spellings of /{base}/</h1>", file=f)
     print(SOURCE, file=f)
     print(COUNT_SELECTOR, file=f)
     print(RATIO_SELECTOR, file=f)
