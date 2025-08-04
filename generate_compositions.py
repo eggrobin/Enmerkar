@@ -81,7 +81,7 @@ for name, forms in osl.forms_by_name.items():
           continue
         if "-" in value.text:
           continue
-        if "?" in value.text:
+        if value.uncertain:
           continue
         if "@" in value.text:
           continue

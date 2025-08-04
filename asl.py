@@ -271,15 +271,16 @@ class Value(Tag):
   text: str
   notes: list[Note]
 
-  def __init__(self, text, language: Optional[str] = None, deprecated: bool = False) -> None:
+  def __init__(self, text, language: Optional[str] = None, deprecated: bool = False, uncertain: bool = False) -> None:
     self.deprecated = deprecated
+    self.uncertain = uncertain
     self.language = language
     self.text = text
     self.notes = []
 
   def __str__(self):
     return "\n".join((
-      f"@v{'-' if self.deprecated else ''}\t{'%'+self.language + ' ' if self.language else ''}{self.text}",
+      f"@v{'-' if self.deprecated else ''}\t{'%'+self.language + ' ' if self.language else ''}{self.text}{'?' if self.uncertain else ''}",
       *(str(note) for note in self.notes)))
 
   @classmethod
@@ -290,7 +291,9 @@ class Value(Tag):
     if args.startswith('%'):
       language, args = args.split(maxsplit=1)
       language = language[1:]
-    result = Value(args, language, entry.deprecated)
+    uncertain = args.endswith("?")
+    args = args.removesuffix("?")
+    result = Value(args, language, entry.deprecated, uncertain)
     while entry := parser.peek():
       for entry_type in (Note, *Note.__subclasses__()):
         if entry.tag == entry_type.tag:

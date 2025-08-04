@@ -14,8 +14,14 @@ language_to_value_to_period_to_occurrences : dict[
         lambda: defaultdict(
           lambda: defaultdict(list)))
 
-def get_base(value: str):
-  return value.rstrip("₀₁₂₃₄₅₆₇₈₉")
+def get_base(value: str) -> str:
+  if "-" in value:
+    cv, vc = value.split("-")
+    if not is_cv(cv) and is_vc(vc) and get_vowel(cv) == get_vowel(vc):
+      raise ValueError(value)
+    return get_base(cv) + get_base(vc)[1:]
+  else:
+    return value.rstrip("₀₁₂₃₄₅₆₇₈₉")
 def is_consonant(letter: str):
   return letter in set("ʾbdghklmnpqrsṣštṭvwyz")
 def is_vowel(letter: str):
@@ -29,7 +35,7 @@ def is_vc(value: str):
 def is_cvc(value: str):
   base = get_base(value)
   return len(base) == 3 and is_consonant(base[0]) and is_vowel(base[1]) and is_consonant(base[2])
-def vowel(syllable_value: str):
+def get_vowel(syllable_value: str):
   base = get_base(syllable_value)
   vowel, = (v for v in base if is_vowel(v))
   return vowel
@@ -66,7 +72,7 @@ def index_values(text_json: Any,
     if consecutive_values is not None:
       if consecutive_values:
         preceding = consecutive_values[-1]
-        if is_cv(preceding) and is_vc(text_json["v"]) and vowel(preceding) == vowel(text_json["v"]):
+        if is_cv(preceding) and is_vc(text_json["v"]) and get_vowel(preceding) == get_vowel(text_json["v"]):
           language_to_value_to_period_to_occurrences[
             lang][preceding + "-" + text_json["v"]][period].append(artefact)
       if text_json.get("delim") == "-":
@@ -262,7 +268,8 @@ TABLE_PERIODS = """
 value_to_period_to_occurrences = language_to_value_to_period_to_occurrences["akk"]
 sign_to_period_to_occurrences : dict[asl.Sign, dict[str, list[str]]] = defaultdict(lambda: defaultdict(list))
 base_to_period_to_occurrences : dict[str, dict[str, list[str]]] = defaultdict(lambda: defaultdict(list))
-base_to_signs_and_values : dict[str, list[tuple[asl.Sign, asl.Value]]] = defaultdict(list)
+base_to_signs_and_values : dict[str, list[tuple[tuple[asl.Sign, ...], tuple[asl.Value, ...]]]] = defaultdict(list)
+text_to_value : dict[str, asl.Value] = {}
 values_to_signs : dict[asl.Value, asl.Sign] = {}
 
 for sign in asl.osl.signs:
@@ -279,6 +286,7 @@ for sign in asl.osl.signs:
       # - in OSL values is an oddity which we ignore (otherwise it is
       # ambiguous whether a sequence of values is one or two signs).
       continue
+    text_to_value[value.text] = value
     values_to_signs[value] = sign
     usage = value_to_period_to_occurrences[value.text]
     for period, occurrences in usage.items():
@@ -286,17 +294,24 @@ for sign in asl.osl.signs:
         raise ValueError(value.text, occurrences)
       sign_to_period_to_occurrences[sign][period] += occurrences
     base = get_base(value.text)
-    base_to_signs_and_values[base].append((sign, value))
+    base_to_signs_and_values[base].append(((sign,), (value,)))
 
 for value, period_to_occurrences in value_to_period_to_occurrences.items():
-  base = get_base(value)
+  if "-" in value:
+    base = get_base(value)
+    cv, vc = value.split("-")
+    base_to_signs_and_values[base].append(
+      ((values_to_signs[text_to_value[cv]], values_to_signs[text_to_value[vc]]),
+       (text_to_value[cv], text_to_value[vc])))
+  else:
+    base = get_base(value)
   for period, occurrences in period_to_occurrences.items():
     base_to_period_to_occurrences[base][period] += occurrences
 
-def entry(period: str, value: asl.Value, sign: asl.Sign):
-  sign_occurrences = sign_to_period_to_occurrences[sign][period]
-  homophone_occurrences = base_to_period_to_occurrences[get_base(value.text)][period]
-  occurrences = value_to_period_to_occurrences[value.text][period]
+def entry(period: str, values: tuple[asl.Value, ...], sign: asl.Sign|None):
+  sign_occurrences = sign_to_period_to_occurrences[sign][period] if sign else None
+  homophone_occurrences = base_to_period_to_occurrences[get_base("-".join(v.text for v in values))][period]
+  occurrences = value_to_period_to_occurrences["-".join(v.text for v in values)][period]
   if len(occurrences) == 0:
     return "&nbsp;"
   else:
@@ -304,19 +319,23 @@ def entry(period: str, value: asl.Value, sign: asl.Sign):
         <div class="count-occurrence">
         <div class="count">{len(occurrences)}</div>
         <div class="over-homophones">{len(occurrences) / len(homophone_occurrences):0.0%}</div>
-        <div class="over-sign">{len(occurrences) / len(sign_occurrences):0.0%}</div>
+        {f'<div class="over-sign">{len(occurrences) / len(sign_occurrences):0.0%}</div>'
+         if sign_occurrences else ''}
         </div>
         <div class="count-artefact">
         <div class="count">{len(set(occurrences))}</div>
         <div class="over-homophones">{len(set(occurrences)) / len(set(homophone_occurrences)):0.0%}</div>
-        <div class="over-sign">{len(set(occurrences)) / len(set(sign_occurrences)):0.0%}</div>
+        {f'<div class="over-sign">{len(set(occurrences)) / len(set(sign_occurrences)):0.0%}</div>'
+         if sign_occurrences else ''}
         </div>"""
 
-def table_row(value: asl.Value, sign: asl.Sign, sign_specific_table: bool):
-  base = get_base(value.text)
+def table_row(values: tuple[asl.Value, ...], signs: tuple[asl.Sign, ...], sign_specific_table: bool):
+  text = "-".join(v.text for v in values)
+  base = get_base(text)
+  only_sign = signs[0] if len(signs) == 1 else None
   return f"""
       <tr>
-      <th rowspan="2"><a href="{
+      <th rowspan="2">{"-".join(f'''<a href="{
         f"homophones/{base}.html" if sign_specific_table else
         f'../{sign.names[0].replace("|", "").replace("/", "-")}.html'
       }">{
@@ -324,18 +343,18 @@ def table_row(value: asl.Value, sign: asl.Sign, sign_specific_table: bool):
       }{
         "" if sign_specific_table else
         f"({sign.unicode_cuneiform.text if sign.unicode_cuneiform else sign.names[0]})"
-      }</a></th>
-      <td rowspan="2">{entry("OAkk", value, sign)}</td>
-      <td colspan="2">{entry("OA", value, sign)}</td>
-      <td>{entry("MA", value, sign)}</td>
-      <td colspan="2">{entry("NA", value, sign)}</td>
+      }</a>''' for value, sign in zip(values, signs, strict=True))}</th>
+      <td rowspan="2">{entry("OAkk", values, only_sign)}</td>
+      <td colspan="2">{entry("OA", values, only_sign)}</td>
+      <td>{entry("MA", values, only_sign)}</td>
+      <td colspan="2">{entry("NA", values, only_sign)}</td>
       </tr>
       <tr class="𒆍𒀭𒊏𒆠">
-      <td>{entry("Early OB", value, sign)}</td>
-      <td>{entry("OB", value, sign)}</td>
-      <td>{entry("MB", value, sign)}</td>
-      <td>{entry("Early NB", value, sign)}</td>
-      <td>{entry("NB", value, sign)}</td>
+      <td>{entry("Early OB", values, only_sign)}</td>
+      <td>{entry("OB", values, only_sign)}</td>
+      <td>{entry("MB", values, only_sign)}</td>
+      <td>{entry("Early NB", values, only_sign)}</td>
+      <td>{entry("NB", values, only_sign)}</td>
       </tr>
       """
 
@@ -359,12 +378,12 @@ for sign in asl.osl.signs:
           continue
         if not value_to_period_to_occurrences[value.text]:
           continue
-        print(table_row(value, sign, sign_specific_table=True), file=f)
+        print(table_row((value,), (sign,), sign_specific_table=True), file=f)
 
       print("</table></body></html>", file=f)
 
 for base, signs_and_values in base_to_signs_and_values.items():
-  if not any(value_to_period_to_occurrences[value.text] for _, value in signs_and_values):
+  if not any(value_to_period_to_occurrences["-".join(v.text for v in values)] for _, values in signs_and_values):
     continue
   with open("syllabary/akk/homophones/" + base + ".html", mode="w", encoding="utf-8") as f:
     print(HEAD,
@@ -375,10 +394,10 @@ for base, signs_and_values in base_to_signs_and_values.items():
     print(RATIO_SELECTOR, file=f)
     print(TABLE_PERIODS, file=f)
 
-    for sign, value in sorted(signs_and_values, key=lambda sv: sv[1].text):
-      if not value_to_period_to_occurrences[value.text]:
+    for signs, values in sorted(signs_and_values, key=lambda sv: (len(sv[1]), "-".join (v.text for v in sv[1]))):
+      if not value_to_period_to_occurrences["-".join(v.text for v in values)]:
         continue
-      print(table_row(value, sign, sign_specific_table=False), file=f)
+      print(table_row(values, signs, sign_specific_table=False), file=f)
 
     print("</table></body></html>", file=f)
 
