@@ -222,7 +222,7 @@ RATIO_SELECTOR = """
 </p>
 <p>
 <input type="radio" name="over" value="homophones" id="over-homophones">
-<label for="over-homophones">Show count as a proportion of homophones in same period (e.g., qi₂ as a percentage of all qi, qi₂, qi₃, etc. in MA). For CVC values, CV-VC sequences are counted, e.g., taš₃ as a percentage of all taš, taš₂, taš₃, ta-aš, ta-aš₂, etc. in MA.</label>
+<label for="over-homophones">Show count as a proportion of homophones in same period (e.g., qi₂ as a percentage of all qi, qi₂, qi₃, etc. in MA). For CVC values, CV-VC and CV-V-VC sequences are counted, e.g., taš₃ as a percentage of all taš, taš₂, taš₃, ta-aš, ta-aš₂, etc. in MA.</label>
 </p>
 <p>
 <input type="radio" name="over" value="sign" id="over-sign">
@@ -284,9 +284,13 @@ for value, period_to_occurrences in value_to_period_to_occurrences.items():
     base = atf.get_base(value)
     subvalues = value.split("-")
     # We should check that these error paths are CDLI-only (Oracc values should be in OSL).
+    unknown_values = False
     for v in subvalues:
       if v not in text_to_value:
         print(f"*** Unknown value {v} in {value}")
+        unknown_values = True
+    if unknown_values:
+      continue
     base_to_signs_and_values[base].append(
       (tuple(values_to_signs[text_to_value[v]] for v in subvalues),
        tuple(text_to_value[v] for v in subvalues)))
