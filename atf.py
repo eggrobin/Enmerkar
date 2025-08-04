@@ -54,7 +54,7 @@ class SpanAttribute(enum.Enum):
     return self.name
 
 def parse_transliteration(source: str, language: str):
-  graphemes : list[tuple[str, str, set[SpanAttribute]]] = []
+  graphemes : list[tuple[str, str, set[SpanAttribute], str|None]] = []
   i = 0
   after_delimiter = " "
   delimiter_before_determinative = None
@@ -79,7 +79,7 @@ def parse_transliteration(source: str, language: str):
           attribute_run_lengths.get(SpanAttribute.IMPLIED) != 0 and
           attribute_run_lengths.get(SpanAttribute.LINGUISTIC_GLOSS) != 0):
         raise SyntaxError(f"Missing delimiter: {source[:i]}☞{source[i:]}")
-      graphemes.append((match.group(), language, set(attribute_run_lengths)))
+      graphemes.append((match.group(), language, set(attribute_run_lengths), after_delimiter))
       i = match.end()
       after_delimiter = None
       continue
@@ -171,6 +171,32 @@ def parse_transliteration(source: str, language: str):
         raise SyntaxError(f"Syntax error: {source[:i]}☞{source[i:]}")
   return graphemes
 
+def get_base(value: str) -> str:
+  if "-" in value:
+    cv, vc = value.split("-")
+    if not is_cv(cv) and is_vc(vc) and get_vowel(cv) == get_vowel(vc):
+      raise ValueError(value)
+    return get_base(cv) + get_base(vc)[1:]
+  else:
+    return value.rstrip("₀₁₂₃₄₅₆₇₈₉")
+def is_consonant(letter: str):
+  return letter in set("ʾbdghklmnpqrsṣštṭvwyz")
+def is_vowel(letter: str):
+  return letter in set("aeui")
+def is_cv(value: str):
+  base = get_base(value)
+  return len(base) == 2 and is_consonant(base[0]) and is_vowel(base[1])
+def is_vc(value: str):
+  base = get_base(value)
+  return len(base) == 2 and is_vowel(base[0]) and is_consonant(base[1])
+def is_cvc(value: str):
+  base = get_base(value)
+  return len(base) == 3 and is_consonant(base[0]) and is_vowel(base[1]) and is_consonant(base[2])
+def get_vowel(syllable_value: str):
+  base = get_base(syllable_value)
+  vowel, = (v for v in base if is_vowel(v))
+  return vowel
+
 def get_value_counts(file: str, target_language: str, exclude: set[SpanAttribute]):
   with open(file, encoding="utf-8") as f:
     lines = f.readlines()
@@ -210,20 +236,27 @@ def get_value_counts(file: str, target_language: str, exclude: set[SpanAttribute
         error_title = e.msg.split(":")[0]
         erroneous_texts[error_title].append(artefact)
         continue
-      for grapheme, grapheme_language, attributes in graphemes:
+      previous_grapheme : str|None = None
+      for grapheme, grapheme_language, attributes, after_delimiter in graphemes:
         grapheme = grapheme.rstrip("#?!*")
         if not grapheme.strip():
+          previous_grapheme = None
           continue
 
         if any(c.isupper() for c in grapheme):
+          previous_grapheme = None
           continue
         if "/" in grapheme or "(" in grapheme:
+          previous_grapheme = None
           continue
         if grapheme in ("x", "n"):
+          previous_grapheme = None
           continue
         if grapheme_language != target_language:
+          previous_grapheme = None
           continue
         if any(attribute in exclude for attribute in attributes):
+          previous_grapheme = None
           continue
         grapheme = grapheme.replace("sz", "š").replace("s,", "ṣ").replace("t,", "ṭ")
         grapheme = grapheme.replace(
@@ -238,6 +271,11 @@ def get_value_counts(file: str, target_language: str, exclude: set[SpanAttribute
             "8", "₈").replace(
             "9", "₉")
         occurrences[grapheme].append(artefact)
+        if (after_delimiter == "-" and previous_grapheme and
+            is_cv(previous_grapheme) and is_vc(grapheme) and
+            get_vowel(previous_grapheme) == get_vowel(grapheme)):
+          occurrences[previous_grapheme+"-"+grapheme].append(artefact)
+        previous_grapheme = grapheme
 
     for error_title, error_occurrences in erroneous_texts.items():
       print(f"*** {error_title}: {len(error_occurrences)} in {len(set(error_occurrences))} texts")

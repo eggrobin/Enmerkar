@@ -14,32 +14,6 @@ language_to_value_to_period_to_occurrences : dict[
         lambda: defaultdict(
           lambda: defaultdict(list)))
 
-def get_base(value: str) -> str:
-  if "-" in value:
-    cv, vc = value.split("-")
-    if not is_cv(cv) and is_vc(vc) and get_vowel(cv) == get_vowel(vc):
-      raise ValueError(value)
-    return get_base(cv) + get_base(vc)[1:]
-  else:
-    return value.rstrip("₀₁₂₃₄₅₆₇₈₉")
-def is_consonant(letter: str):
-  return letter in set("ʾbdghklmnpqrsṣštṭvwyz")
-def is_vowel(letter: str):
-  return letter in set("aeui")
-def is_cv(value: str):
-  base = get_base(value)
-  return len(base) == 2 and is_consonant(base[0]) and is_vowel(base[1])
-def is_vc(value: str):
-  base = get_base(value)
-  return len(base) == 2 and is_vowel(base[0]) and is_consonant(base[1])
-def is_cvc(value: str):
-  base = get_base(value)
-  return len(base) == 3 and is_consonant(base[0]) and is_vowel(base[1]) and is_consonant(base[2])
-def get_vowel(syllable_value: str):
-  base = get_base(syllable_value)
-  vowel, = (v for v in base if is_vowel(v))
-  return vowel
-
 def index_values(text_json: Any,
                  artefact: str,
                  period: str,
@@ -72,7 +46,8 @@ def index_values(text_json: Any,
     if consecutive_values is not None:
       if consecutive_values:
         preceding = consecutive_values[-1]
-        if is_cv(preceding) and is_vc(text_json["v"]) and get_vowel(preceding) == get_vowel(text_json["v"]):
+        if (atf.is_cv(preceding) and atf.is_vc(text_json["v"]) and
+            atf.get_vowel(preceding) == atf.get_vowel(text_json["v"])):
           language_to_value_to_period_to_occurrences[
             lang][preceding + "-" + text_json["v"]][period].append(artefact)
       if text_json.get("delim") == "-":
@@ -293,24 +268,31 @@ for sign in asl.osl.signs:
       if "ₓ" in value.text:
         raise ValueError(value.text, occurrences)
       sign_to_period_to_occurrences[sign][period] += occurrences
-    base = get_base(value.text)
+    base = atf.get_base(value.text)
     base_to_signs_and_values[base].append(((sign,), (value,)))
 
 for value, period_to_occurrences in value_to_period_to_occurrences.items():
   if "-" in value:
-    base = get_base(value)
+    base = atf.get_base(value)
     cv, vc = value.split("-")
+    # We should check that these error paths are CDLI-only (Oracc values should be in OSL).
+    if cv not in text_to_value:
+      print(f"*** Unknown value {cv} in {cv}-{vc}")
+      continue
+    if vc not in text_to_value:
+      print(f"*** Unknown value {vc} in {cv}-{vc}")
+      continue
     base_to_signs_and_values[base].append(
       ((values_to_signs[text_to_value[cv]], values_to_signs[text_to_value[vc]]),
        (text_to_value[cv], text_to_value[vc])))
   else:
-    base = get_base(value)
+    base = atf.get_base(value)
   for period, occurrences in period_to_occurrences.items():
     base_to_period_to_occurrences[base][period] += occurrences
 
 def entry(period: str, values: tuple[asl.Value, ...], sign: asl.Sign|None):
   sign_occurrences = sign_to_period_to_occurrences[sign][period] if sign else None
-  homophone_occurrences = base_to_period_to_occurrences[get_base("-".join(v.text for v in values))][period]
+  homophone_occurrences = base_to_period_to_occurrences[atf.get_base("-".join(v.text for v in values))][period]
   occurrences = value_to_period_to_occurrences["-".join(v.text for v in values)][period]
   if len(occurrences) == 0:
     return "&nbsp;"
@@ -331,7 +313,7 @@ def entry(period: str, values: tuple[asl.Value, ...], sign: asl.Sign|None):
 
 def table_row(values: tuple[asl.Value, ...], signs: tuple[asl.Sign, ...], sign_specific_table: bool):
   text = "-".join(v.text for v in values)
-  base = get_base(text)
+  base = atf.get_base(text)
   only_sign = signs[0] if len(signs) == 1 else None
   return f"""
       <tr>
