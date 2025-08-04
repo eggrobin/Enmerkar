@@ -173,8 +173,12 @@ def parse_transliteration(source: str, language: str):
 
 def get_base(value: str) -> str:
   if "-" in value:
-    cv, vc = value.split("-")
-    if not is_cv(cv) and is_vc(vc) and get_vowel(cv) == get_vowel(vc):
+    v = None
+    cv, vc = value.split("-", maxsplit=1)
+    if "-" in vc:
+      v, vc = vc.split("-")
+    if not is_cv(cv) and is_vc(vc) and get_vowel(cv) == get_vowel(vc) and (
+      not v or (is_v(v) and get_vowel(v) == get_vowel(vc))):
       raise ValueError(value)
     return get_base(cv) + get_base(vc)[1:]
   else:
@@ -183,6 +187,9 @@ def is_consonant(letter: str):
   return letter in set("ʾbdghklmnpqrsṣštṭvwyz")
 def is_vowel(letter: str):
   return letter in set("aeui")
+def is_v(value: str):
+  base = get_base(value)
+  return len(base) == 1 and is_vowel(base[0])
 def is_cv(value: str):
   base = get_base(value)
   return len(base) == 2 and is_consonant(base[0]) and is_vowel(base[1])
@@ -192,8 +199,10 @@ def is_vc(value: str):
 def is_cvc(value: str):
   base = get_base(value)
   return len(base) == 3 and is_consonant(base[0]) and is_vowel(base[1]) and is_consonant(base[2])
-def get_vowel(syllable_value: str):
+def get_vowel(syllable_value: str, *args: None):
   base = get_base(syllable_value)
+  if args:
+    return next((v for v in base if is_vowel(v)), *args)
   vowel, = (v for v in base if is_vowel(v))
   return vowel
 
@@ -236,27 +245,29 @@ def get_value_counts(file: str, target_language: str, exclude: set[SpanAttribute
         error_title = e.msg.split(":")[0]
         erroneous_texts[error_title].append(artefact)
         continue
-      previous_grapheme : str|None = None
+      previous_graphemes : list[str] = []
       for grapheme, grapheme_language, attributes, after_delimiter in graphemes:
+        if after_delimiter != "":
+          previous_graphemes = []
         grapheme = grapheme.rstrip("#?!*")
         if not grapheme.strip():
-          previous_grapheme = None
+          previous_graphemes = []
           continue
 
         if any(c.isupper() for c in grapheme):
-          previous_grapheme = None
+          previous_graphemes = []
           continue
         if "/" in grapheme or "(" in grapheme:
-          previous_grapheme = None
+          previous_graphemes = []
           continue
         if grapheme in ("x", "n"):
-          previous_grapheme = None
+          previous_graphemes = []
           continue
         if grapheme_language != target_language:
-          previous_grapheme = None
+          previous_graphemes = []
           continue
         if any(attribute in exclude for attribute in attributes):
-          previous_grapheme = None
+          previous_graphemes = []
           continue
         grapheme = grapheme.replace("sz", "š").replace("s,", "ṣ").replace("t,", "ṭ")
         grapheme = grapheme.replace(
@@ -271,11 +282,17 @@ def get_value_counts(file: str, target_language: str, exclude: set[SpanAttribute
             "8", "₈").replace(
             "9", "₉")
         occurrences[grapheme].append(artefact)
-        if (after_delimiter == "-" and previous_grapheme and
-            is_cv(previous_grapheme) and is_vc(grapheme) and
-            get_vowel(previous_grapheme) == get_vowel(grapheme)):
-          occurrences[previous_grapheme+"-"+grapheme].append(artefact)
-        previous_grapheme = grapheme
+        if previous_graphemes and is_vc(grapheme):
+          this_vowel = get_vowel(grapheme)
+          previous_grapheme = previous_graphemes[-1]
+          if get_vowel(previous_grapheme, None) == this_vowel:
+            if is_cv(previous_grapheme):
+              occurrences[previous_grapheme + "-" + grapheme].append(artefact)
+            elif is_v(previous_grapheme) and len(previous_graphemes) >= 2:
+              if is_cv(previous_graphemes[-2]) and get_vowel(previous_graphemes[-2]) == this_vowel:
+                occurrences[previous_graphemes[-2] + "-" + previous_grapheme + "-" + grapheme].append(artefact)
+
+        previous_graphemes.append(grapheme)
 
     for error_title, error_occurrences in erroneous_texts.items():
       print(f"*** {error_title}: {len(error_occurrences)} in {len(set(error_occurrences))} texts")

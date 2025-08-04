@@ -44,12 +44,20 @@ def index_values(text_json: Any,
   # We do not go down into "qualified" for now (the index is on default values).
   if "v" in text_json:
     if consecutive_values is not None:
-      if consecutive_values:
+      if consecutive_values and atf.is_vc(text_json["v"]):
         preceding = consecutive_values[-1]
-        if (atf.is_cv(preceding) and atf.is_vc(text_json["v"]) and
-            atf.get_vowel(preceding) == atf.get_vowel(text_json["v"])):
-          language_to_value_to_period_to_occurrences[
-            lang][preceding + "-" + text_json["v"]][period].append(artefact)
+        this_vowel = atf.get_vowel(text_json["v"])
+        if atf.get_vowel(preceding, None) == this_vowel:
+          if atf.is_cv(preceding):
+            language_to_value_to_period_to_occurrences[
+              lang][preceding + "-" + text_json["v"]][period].append(artefact)
+          elif atf.is_v(preceding) and len(consecutive_values) >= 2:
+            if atf.is_cv(consecutive_values[-2]) and atf.get_vowel(consecutive_values[-2]) == this_vowel:
+              language_to_value_to_period_to_occurrences[
+                lang][consecutive_values[-2] + "-" +
+                      preceding + "-" +
+                      text_json["v"]][period].append(artefact)
+
       if text_json.get("delim") == "-":
         consecutive_values.append(text_json["v"])
       else:
@@ -274,17 +282,14 @@ for sign in asl.osl.signs:
 for value, period_to_occurrences in value_to_period_to_occurrences.items():
   if "-" in value:
     base = atf.get_base(value)
-    cv, vc = value.split("-")
+    subvalues = value.split("-")
     # We should check that these error paths are CDLI-only (Oracc values should be in OSL).
-    if cv not in text_to_value:
-      print(f"*** Unknown value {cv} in {cv}-{vc}")
-      continue
-    if vc not in text_to_value:
-      print(f"*** Unknown value {vc} in {cv}-{vc}")
-      continue
+    for v in subvalues:
+      if v not in text_to_value:
+        print(f"*** Unknown value {v} in {value}")
     base_to_signs_and_values[base].append(
-      ((values_to_signs[text_to_value[cv]], values_to_signs[text_to_value[vc]]),
-       (text_to_value[cv], text_to_value[vc])))
+      (tuple(values_to_signs[text_to_value[v]] for v in subvalues),
+       tuple(text_to_value[v] for v in subvalues)))
   else:
     base = atf.get_base(value)
   for period, occurrences in period_to_occurrences.items():
