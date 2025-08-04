@@ -14,8 +14,35 @@ language_to_value_to_period_to_occurrences : dict[
         lambda: defaultdict(
           lambda: defaultdict(list)))
 
-def index_values(text_json: Any, artefact: str, period: str, genre: str, lang: str = "und"):
+def get_base(value: str):
+  return value.rstrip("₀₁₂₃₄₅₆₇₈₉")
+def is_consonant(letter: str):
+  return letter in set("ʾbdghklmnpqrsṣštṭvwyz")
+def is_vowel(letter: str):
+  return letter in set("aeui")
+def is_cv(value: str):
+  base = get_base(value)
+  return len(base) == 2 and is_consonant(base[0]) and is_vowel(base[1])
+def is_vc(value: str):
+  base = get_base(value)
+  return len(base) == 2 and is_vowel(base[0]) and is_consonant(base[1])
+def is_cvc(value: str):
+  base = get_base(value)
+  return len(base) == 3 and is_consonant(base[0]) and is_vowel(base[1]) and is_consonant(base[2])
+def vowel(syllable_value: str):
+  base = get_base(syllable_value)
+  vowel, = (v for v in base if is_vowel(v))
+  return vowel
+
+def index_values(text_json: Any,
+                 artefact: str,
+                 period: str,
+                 genre: str,
+                 lang: str = "und",
+                 consecutive_values:list[str]|None=None):
   if "det" in text_json:
+    if consecutive_values:
+      consecutive_values.clear()
     return
   if "lang" in text_json:
     lang = text_json["lang"].split("-")[0]
@@ -25,8 +52,9 @@ def index_values(text_json: Any, artefact: str, period: str, genre: str, lang: s
   if "f" in text_json:
       index_values(text_json["f"], artefact, period, genre, lang)
   if "gdl" in text_json:
+     gdl_values : list[str] = []
      for node in text_json["gdl"]:
-      index_values(node, artefact, period, genre, lang)
+      index_values(node, artefact, period, genre, lang, gdl_values)
   if "group" in text_json:
      for node in text_json["group"]:
       index_values(node, artefact, period, genre, lang)
@@ -35,8 +63,20 @@ def index_values(text_json: Any, artefact: str, period: str, genre: str, lang: s
       index_values(node, artefact, period, genre, lang)
   # We do not go down into "qualified" for now (the index is on default values).
   if "v" in text_json:
+    if consecutive_values is not None:
+      if consecutive_values:
+        preceding = consecutive_values[-1]
+        if is_cv(preceding) and is_vc(text_json["v"]) and vowel(preceding) == vowel(text_json["v"]):
+          language_to_value_to_period_to_occurrences[
+            lang][preceding + "-" + text_json["v"]][period].append(artefact)
+      if text_json.get("delim") == "-":
+        consecutive_values.append(text_json["v"])
+      else:
+        consecutive_values.clear()
     language_to_value_to_period_to_occurrences[
       lang][text_json["v"]][period].append(artefact)
+  elif consecutive_values:
+    consecutive_values.clear()
 
 def index(directory: str):
   listing = os.listdir(directory)
@@ -221,8 +261,9 @@ TABLE_PERIODS = """
 
 value_to_period_to_occurrences = language_to_value_to_period_to_occurrences["akk"]
 sign_to_period_to_occurrences : dict[asl.Sign, dict[str, list[str]]] = defaultdict(lambda: defaultdict(list))
-value_to_period_to_homophone_occurrences : dict[str, dict[str, list[str]]] = defaultdict(lambda: defaultdict(list))
+base_to_period_to_occurrences : dict[str, dict[str, list[str]]] = defaultdict(lambda: defaultdict(list))
 base_to_signs_and_values : dict[str, list[tuple[asl.Sign, asl.Value]]] = defaultdict(list)
+values_to_signs : dict[asl.Value, asl.Sign] = {}
 
 for sign in asl.osl.signs:
   if not isinstance(sign, asl.Sign) or sign.deprecated:
@@ -234,22 +275,27 @@ for sign in asl.osl.signs:
       # A garbage value which somehow sneaks in unqualified in a few places in
       # Oracc.
       continue
+    if "-" in value.text:
+      # - in OSL values is an oddity which we ignore (otherwise it is
+      # ambiguous whether a sequence of values is one or two signs).
+      continue
+    values_to_signs[value] = sign
     usage = value_to_period_to_occurrences[value.text]
     for period, occurrences in usage.items():
       if "ₓ" in value.text:
         raise ValueError(value.text, occurrences)
       sign_to_period_to_occurrences[sign][period] += occurrences
-    base = value.text.rstrip("₀₁₂₃₄₅₆₇₈₉")
+    base = get_base(value.text)
     base_to_signs_and_values[base].append((sign, value))
-    for other_value, period_to_occurrences in value_to_period_to_occurrences.items():
-      if other_value.rstrip("₀₁₂₃₄₅₆₇₈₉") != base:
-        continue
-      for period, occurrences in period_to_occurrences.items():
-        value_to_period_to_homophone_occurrences[value.text][period] += occurrences
+
+for value, period_to_occurrences in value_to_period_to_occurrences.items():
+  base = get_base(value)
+  for period, occurrences in period_to_occurrences.items():
+    base_to_period_to_occurrences[base][period] += occurrences
 
 def entry(period: str, value: asl.Value, sign: asl.Sign):
   sign_occurrences = sign_to_period_to_occurrences[sign][period]
-  homophone_occurrences = value_to_period_to_homophone_occurrences[value.text][period]
+  homophone_occurrences = base_to_period_to_occurrences[get_base(value.text)][period]
   occurrences = value_to_period_to_occurrences[value.text][period]
   if len(occurrences) == 0:
     return "&nbsp;"
@@ -267,7 +313,7 @@ def entry(period: str, value: asl.Value, sign: asl.Sign):
         </div>"""
 
 def table_row(value: asl.Value, sign: asl.Sign, sign_specific_table: bool):
-  base = value.text.rstrip("₀₁₂₃₄₅₆₇₈₉")
+  base = get_base(value.text)
   return f"""
       <tr>
       <th rowspan="2"><a href="{
