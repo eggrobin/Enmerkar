@@ -239,7 +239,7 @@ RATIO_SELECTOR = """
 </p>
 <p>
 <input type="radio" name="over" value="homophones" id="over-homophones">
-<label for="over-homophones">Show count as a proportion of homophones in same period (e.g., qi₂ as a percentage of all qi, qi₂, qi₃, etc. in MA)</label>
+<label for="over-homophones">Show count as a proportion of homophones in same period (e.g., qi₂ as a percentage of all qi, qi₂, qi₃, etc. in MA). For CVC values, CV-VC sequences are counted, e.g., taš₃ as a percentage of all taš, taš₂, taš₃, ta-aš, ta-aš₂, etc. in MA.</label>
 </p>
 <p>
 <input type="radio" name="over" value="sign" id="over-sign">
