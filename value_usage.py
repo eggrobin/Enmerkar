@@ -225,18 +225,21 @@ value_to_period_to_homophone_occurrences : dict[str, dict[str, list[str]]] = def
 base_to_signs_and_values : dict[str, list[tuple[asl.Sign, asl.Value]]] = defaultdict(list)
 
 for sign in asl.osl.signs:
-  if isinstance(sign, asl.Sign):
-    for value in sign.values:
-      usage = value_to_period_to_occurrences[value.text]
-      for period, occurrences in usage.items():
-        sign_to_period_to_occurrences[sign][period] += occurrences
-      base = value.text.rstrip("₀₁₂₃₄₅₆₇₈₉")
-      base_to_signs_and_values[base].append((sign, value))
-      for other_value, period_to_occurrences in value_to_period_to_occurrences.items():
-        if other_value.rstrip("₀₁₂₃₄₅₆₇₈₉") != base:
-          continue
-        for period, occurrences in period_to_occurrences.items():
-          value_to_period_to_homophone_occurrences[value.text][period] += occurrences
+  if not isinstance(sign, asl.Sign) or sign.deprecated:
+    continue
+  for value in sign.values:
+    if value.deprecated:
+      continue
+    usage = value_to_period_to_occurrences[value.text]
+    for period, occurrences in usage.items():
+      sign_to_period_to_occurrences[sign][period] += occurrences
+    base = value.text.rstrip("₀₁₂₃₄₅₆₇₈₉")
+    base_to_signs_and_values[base].append((sign, value))
+    for other_value, period_to_occurrences in value_to_period_to_occurrences.items():
+      if other_value.rstrip("₀₁₂₃₄₅₆₇₈₉") != base:
+        continue
+      for period, occurrences in period_to_occurrences.items():
+        value_to_period_to_homophone_occurrences[value.text][period] += occurrences
 
 def entry(period: str, value: asl.Value, sign: asl.Sign):
   sign_occurrences = sign_to_period_to_occurrences[sign][period]
@@ -298,6 +301,8 @@ for sign in asl.osl.signs:
       print(TABLE_PERIODS, file=f)
 
       for value in sign.values:
+        if value.deprecated:
+          continue
         if not value_to_period_to_occurrences[value.text]:
           continue
         print(table_row(value, sign, sign_specific_table=True), file=f)
