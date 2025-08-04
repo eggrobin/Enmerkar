@@ -336,7 +336,7 @@ def table_row(values: tuple[asl.Value, ...], signs: tuple[asl.Sign, ...], sign_s
   return f"""
       <tr>
       <th rowspan="2">{"-".join(f'''<a href="{
-        f"homophones/{base}.html" if sign_specific_table else
+        f"homophones/{('syllable-' if base == 'nul' else '')}{base}.html" if sign_specific_table else
         f'../{sign.names[0].replace("|", "").replace("/", "-")}.html'
       }">{
         value.text
@@ -385,7 +385,7 @@ for sign in asl.osl.signs:
 for base, signs_and_values in base_to_signs_and_values.items():
   if not any(value_to_period_to_occurrences["-".join(v.text for v in values)] for _, values in signs_and_values):
     continue
-  with open("syllabary/akk/homophones/" + base + ".html", mode="w", encoding="utf-8") as f:
+  with open("syllabary/akk/homophones/" + ("syllable-" if base == "nul" else "") + base + ".html", mode="w", encoding="utf-8") as f:
     print(HEAD,
           file=f)
     print(f"<h1>Akkadian syllabic homophones of {base}</h1>", file=f)
