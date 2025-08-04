@@ -230,8 +230,14 @@ for sign in asl.osl.signs:
   for value in sign.values:
     if value.deprecated:
       continue
+    if value.text == "xₓ":
+      # A garbage value which somehow sneaks in unqualified in a few places in
+      # Oracc.
+      continue
     usage = value_to_period_to_occurrences[value.text]
     for period, occurrences in usage.items():
+      if "ₓ" in value.text:
+        raise ValueError(value.text, occurrences)
       sign_to_period_to_occurrences[sign][period] += occurrences
     base = value.text.rstrip("₀₁₂₃₄₅₆₇₈₉")
     base_to_signs_and_values[base].append((sign, value))
@@ -302,6 +308,8 @@ for sign in asl.osl.signs:
 
       for value in sign.values:
         if value.deprecated:
+          continue
+        if value.text == "xₓ":
           continue
         if not value_to_period_to_occurrences[value.text]:
           continue
