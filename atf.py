@@ -20,8 +20,9 @@ NUMBER = re.compile(
   fr"(?:(?:n|[\d/]+)\((?:{VALUE.pattern}(?:@(?:90|[cvt]))*|{NAME.pattern}|{COMPOUND.pattern})\))"
 )
 
+# TODO(egg): Should a value really be allowed as a correction?
 ALTERNATIVE = re.compile(
-  fr"(?:(?:{NUMBER.pattern}|{QUALIFIED.pattern}|{VALUE.pattern}|{NAME.pattern}|{COMPOUND.pattern})[#?!*]*)"
+  fr"(?:(?:{NUMBER.pattern}|{QUALIFIED.pattern}|{VALUE.pattern}|{NAME.pattern}|{COMPOUND.pattern})(?:!\((?:{VALUE.pattern}|{NAME.pattern}|{COMPOUND.pattern})\)|[#?!*])*)"
 )
 
 GRAPHEME = re.compile(
@@ -29,7 +30,7 @@ GRAPHEME = re.compile(
 )
 
 PUNCTUATION = re.compile(
-  r"""(?:(?<= )|^)(?:\*|:|:'|:"|:.|::|/) """
+  r"""(?:(?<= )|^)(?:\*|:|:'|:"|:.|::|/)(?: |$)"""
 )
 
 print(GRAPHEME.pattern)
@@ -57,22 +58,28 @@ def parse_transliteration(source: str, language: str):
   i = 0
   after_delimiter = " "
   delimiter_before_determinative = None
-  attributes : set[SpanAttribute] = set()
+  delimiter_before_linguistic_gloss = None
+  attribute_run_lengths : dict[SpanAttribute, int] = {}
   def start_span(attribute: SpanAttribute):
-    if attribute in attributes:
+    if attribute in attribute_run_lengths:
       raise SyntaxError(f"Nested {attribute}: {source[:i]}☞{source[i:]}")
-    attributes.add(attribute)
+    attribute_run_lengths[attribute] = 0
   def end_span(attribute: SpanAttribute):
-    if attribute not in attributes:
+    if attribute not in attribute_run_lengths:
       raise SyntaxError(f"Unstarted {attribute}: {source[:i]}☞{source[i:]}")
-    attributes.remove(attribute)
+    del attribute_run_lengths[attribute]
   while i < len(source):
     while source[i] == " ":
       i += 1
       after_delimiter = " "
     match = GRAPHEME.match(source, i)
     if match:
-      graphemes.append((match.group(), language, set(attributes)))
+      if (not after_delimiter and
+          attribute_run_lengths.get(SpanAttribute.DETERMINATIVE) != 0 and
+          attribute_run_lengths.get(SpanAttribute.IMPLIED) != 0 and
+          attribute_run_lengths.get(SpanAttribute.LINGUISTIC_GLOSS) != 0):
+        raise SyntaxError(f"Missing delimiter: {source[:i]}☞{source[i:]}")
+      graphemes.append((match.group(), language, set(attribute_run_lengths)))
       i = match.end()
       after_delimiter = None
       continue
@@ -98,7 +105,7 @@ def parse_transliteration(source: str, language: str):
       i = match.end()
       continue
     if source.startswith("...", i):
-      if SpanAttribute.BROKEN not in attributes:
+      if SpanAttribute.BROKEN not in attribute_run_lengths:
         raise SyntaxError(f"... outside breakage brackets: {source[:i]}☞{source[i:]}")
       after_delimiter = None
       i += 3
@@ -126,7 +133,6 @@ def parse_transliteration(source: str, language: str):
       i = source.index("$)", i + 2) + 2
       continue
     for attribute in (
-        SpanAttribute.LINGUISTIC_GLOSS,
         SpanAttribute.DOCUMENT_GLOSS,
         SpanAttribute.IMPLIED,
         SpanAttribute.EXCISED,
@@ -139,10 +145,18 @@ def parse_transliteration(source: str, language: str):
         break
       elif source.startswith(attribute.close, i):
         end_span(attribute)
-        i += len(attribute.open)
+        i += len(attribute.close)
         break
     else:
-      if source[i] == "{":
+      if source.startswith(SpanAttribute.LINGUISTIC_GLOSS.open, i):
+        start_span(SpanAttribute.LINGUISTIC_GLOSS)
+        delimiter_before_linguistic_gloss = after_delimiter
+        i += len(SpanAttribute.LINGUISTIC_GLOSS.open)
+      elif source.startswith(SpanAttribute.LINGUISTIC_GLOSS.close, i):
+        end_span(SpanAttribute.LINGUISTIC_GLOSS)
+        after_delimiter = delimiter_before_linguistic_gloss
+        i += len(SpanAttribute.LINGUISTIC_GLOSS.close)
+      elif source[i] == "{":
         start_span(SpanAttribute.DETERMINATIVE)
         delimiter_before_determinative = after_delimiter
         i += 1
