@@ -247,7 +247,7 @@ def get_value_counts(file: str, target_language: str, exclude: set[SpanAttribute
         continue
       previous_graphemes : list[str] = []
       for grapheme, grapheme_language, attributes, after_delimiter in graphemes:
-        if after_delimiter != "":
+        if after_delimiter != "-":
           previous_graphemes = []
         grapheme = grapheme.rstrip("#?!*")
         if not grapheme.strip():
