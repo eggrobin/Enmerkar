@@ -1,9 +1,13 @@
+from collections import defaultdict
 import json
 import os
 import re
 from typing import Any
+import unicodedata
 
 import asl
+
+occurrences : dict[str, int] = defaultdict(int)
 
 class Line:
   def __init__(self, source: str, ref: str, label: str, xsux: str):
@@ -35,7 +39,7 @@ def get_xsux(oracc_json: Any, source : str|None = None, result: list[Line]|None 
     if "label" in oracc_json:
       result.append(Line(source, oracc_json["ref"], oracc_json["label"], ""))
     else:
-       print(f"*** Line with no label: {oracc_json['ref']}")
+       print(f"*** Line with no label: {oracc_json.get('ref', 'no ref')}")
   if "cdl" in oracc_json:
      for node in oracc_json["cdl"]:
         get_xsux(node, source, result)
@@ -51,6 +55,8 @@ def get_xsux(oracc_json: Any, source : str|None = None, result: list[Line]|None 
      for node in oracc_json["seq"]:
         get_xsux(node, source, result)
   if "utf8" in oracc_json:
+     for c in oracc_json["utf8"]:
+        occurrences[c] += 1
      result[-1].xsux += oracc_json["utf8"]
   return result
 
@@ -80,7 +86,7 @@ def get_corpus_lines(directory: str):
         get_corpus_lines(directory + "/" + filename)
 
 for top_level in ("atae", "riao", "rinap", "saao",
-                  "tcma",
+                  "tcma", "blms"
                   ):
   get_corpus_lines("oracc/" + top_level)
 
@@ -117,3 +123,9 @@ with open("out.html", "w", encoding="utf-8") as f:
     print(f"<td class='xsux query'>{query}</td>", file=f)
     print(f"<td class='xsux post'>{post}</td>", file=f)
   print("</table></body>", file=f)
+
+with open("sign_usage.txt", mode="w", encoding="utf-8") as f:
+   for i, (s, count) in enumerate(sorted(occurrences.items(), key=lambda kv: -kv[1])):
+      if ord(s) < 0x12000 or ord(s) > 0x12EFF:
+         continue
+      print(f"{i+1}\tU+{ord(s):04X}\t{s}\t{unicodedata.name(s)}\t{count}", file=f)
