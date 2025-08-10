@@ -1,0 +1,129 @@
+from collections import defaultdict
+import json
+import os
+from typing import Any
+import unicodedata
+
+def list_signs(text_json: Any, signs: list[str]):
+  if "cdl" in text_json:
+    for node in text_json["cdl"]:
+      list_signs(node, signs)
+  if "f" in text_json:
+      list_signs(text_json["f"], signs)
+  if "gdl" in text_json:
+     for node in text_json["gdl"]:
+      list_signs(node, signs)
+  if "group" in text_json:
+     for node in text_json["group"]:
+      list_signs(node, signs)
+  if "seq" in text_json:
+     for node in text_json["seq"]:
+      list_signs(node, signs)
+  # We do not go down into "qualified" for now (the index is on default values).
+  if "utf8" in text_json:
+    for c in text_json["utf8"]:
+      if ord(c) >= 0x12000 and ord(c) <= 0x1268F:
+        signs.append(c)
+
+
+class FontCorpusCoverage:
+  def __init__(self, code_points_covered : set[str]) -> None:
+    self.code_points_covered = code_points_covered
+    self.texts : set[str] = set()
+    self.texts_covered : set[str] = set()
+    self.sign_occurrences : list[str] = []
+    self.covered_sign_occurrences : list[str] = []
+
+  def add_text(self, name: str, text: list[str]):
+    if name in self.texts:
+      raise ValueError(name)
+    self.texts.add(name)
+    covered_signs = [c for c in text if c in self.code_points_covered]
+    if len(covered_signs) == len(text):
+      self.texts_covered.add(name)
+    self.sign_occurrences += text
+    self.covered_sign_occurrences += covered_signs
+
+  def print_most_common_uncovered(self):
+    occurrences_by_sign : dict[str, int] = defaultdict(int)
+    for s in self.sign_occurrences:
+      if s not in self.code_points_covered:
+        occurrences_by_sign[s] += 1
+    max = 20
+    for i, (sign, occurrences) in enumerate(
+      sorted(occurrences_by_sign.items(),
+             key=lambda kv: -kv[1])):
+      if i > max:
+        print(f"({len(occurrences_by_sign) - max} more...)")
+        break
+      print(f"{i:3} {occurrences:5} U+{ord(sign):5X} {unicodedata.name(sign):50} {sign}")
+
+  def __str__(self):
+    return f"""
+        {len(self.texts_covered)}/{len(self.texts)} texts ({
+          len(self.texts_covered)/len(self.texts):0.2%}),
+        {len(self.covered_sign_occurrences)}/{
+          len(self.sign_occurrences)} sign occurrences ({
+            len(self.covered_sign_occurrences)/
+            len(self.sign_occurrences)
+          :0.2%}),
+        {len(set(self.covered_sign_occurrences))}/{
+          len(set(self.sign_occurrences))} unique signs ({
+            len(set(self.covered_sign_occurrences))/
+            len(set(self.sign_occurrences))
+          :0.2%})"""
+
+def compute_coverage(directory: str,
+                     coverage_by_font: dict[str, FontCorpusCoverage]):
+  listing = os.listdir(directory)
+  if "catalogue.json" in listing:
+    with open(directory + "/catalogue.json", encoding="utf-8") as f:
+      catalogue = json.loads(f.read())
+    files = [
+        (cdli_number,
+         directory + "/corpusjson/" + cdli_number + ".json",
+         metadata)
+        for cdli_number, metadata in catalogue["members"].items()
+        if os.path.isfile(directory + "/corpusjson/" + cdli_number + ".json")]
+    print(f"Indexing {len(files)} texts in {directory}...")
+    skipped : list[str] = []
+    for i, (cdli_number, text_file, metadata) in enumerate(files):
+      if i > 0 and i % 1000 == 0:
+        print(f"    {i}/{len(files)}...")
+      with open(text_file, encoding="utf-8") as f:
+        source = f.read()
+        if not source:
+          skipped.append(text_file)
+          continue
+        text = json.loads(source)
+      text_signs : list[str] = []
+      list_signs(text, text_signs)
+      for coverage in coverage_by_font.values():
+        coverage.add_text(cdli_number, text_signs)
+    if skipped:
+      if len(skipped) < 10:
+        for file in skipped:
+          print(f"*** {file} was empty, skipped.")
+      else:
+        print(f"*** Skipped {len(skipped)} empty files.")
+  for f in listing:
+    if os.path.isdir(directory + "/" + f) and f != "corpusjson":
+      compute_coverage(directory + "/" + f, coverage_by_font)
+
+coverage_by_font: dict[str, FontCorpusCoverage] = {}
+
+for font in ("Nabuninuaihsus", "CuneiformNAOutline"):
+  with open(f"../Nabuninuaihsus/{font}_coverage.txt",
+            encoding="utf8") as f:
+    covered_code_points : set[str] = set()
+    for line in f.readlines():
+      covered_code_points.add(chr(int(line, base=16)))
+    coverage_by_font[font] = FontCorpusCoverage(covered_code_points)
+
+compute_coverage("oracc/saao", coverage_by_font)
+
+for font, coverage in coverage_by_font.items():
+  print(f"Most common missing signs in {font}:")
+  coverage.print_most_common_uncovered()
+for font, coverage in coverage_by_font.items():
+  print(font, coverage)
