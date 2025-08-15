@@ -4,6 +4,8 @@ import os
 from typing import Any
 import unicodedata
 
+import asl
+
 def list_signs(text_json: Any, signs: list[str]):
   if "cdl" in text_json:
     for node in text_json["cdl"]:
@@ -49,7 +51,7 @@ class FontCorpusCoverage:
     for s in self.sign_occurrences:
       if s not in self.code_points_covered:
         occurrences_by_sign[s] += 1
-    max = 20
+    max = 100
     for i, (sign, occurrences) in enumerate(
       sorted(occurrences_by_sign.items(),
              key=lambda kv: -kv[1])):
@@ -127,3 +129,48 @@ for font, coverage in coverage_by_font.items():
   coverage.print_most_common_uncovered()
 for font, coverage in coverage_by_font.items():
   print(font, coverage)
+
+signlist : list[str] = []
+
+unnumbered_signs : list[str] = []
+
+def get_list_number(xsux: str, list_name: str):
+  numbers : set[asl.SourceRange] = set()
+  for form in asl.osl.forms_by_source[asl.osl.sources["U+"]][asl.SourceRange("0x%X" % ord(xsux))]:
+    for source_reference in form.sources:
+      if source_reference.source.abbreviation == list_name:
+        numbers.add(source_reference.number)
+  if len(numbers) > 1:
+    print("*** Multiple", list_name, "numbers", xsux, [str(n) for n in numbers])
+  if not numbers:
+    unnumbered_signs.append(xsux)
+    return None
+  return min(n.first for n in numbers)
+sorted_signs = sorted((c for c in coverage_by_font["Nabuninuaihsus"].code_points_covered if ord(c) >= 0x12000), key=lambda c: get_list_number(c, "MZL") or ord(c))
+print(len(unnumbered_signs), "unnumbered signs:", " ".join(unnumbered_signs))
+
+with open("../Nabuninuaihsus/index.html", encoding="utf8") as f:
+  index_lines = f.readlines()
+
+
+with open("../Nabuninuaihsus/index.html", mode="w", encoding="utf8") as f:
+  in_sign_list = False
+  for line in index_lines:
+    line = line.rstrip("\n")
+    if line.strip() == "<!--end GENERATED SIGN LIST;-->":
+      in_sign_list = False
+    if not in_sign_list:
+      print(line, file=f)
+    if line.strip() == "<!--GENERATED SIGN LIST: begin-->":
+      in_sign_list = True
+      print("\n".join(f"""<tr><td>U+{ord(c):04X}</td><td class="nabuninuaihsus">{c}</td><td class="nabuninuaihsus-sans">{c}</td><td>{
+          asl.osl.forms_by_source[asl.osl.sources["U+"]][asl.SourceRange("0x%X" % ord(c))][0].names[0]}</td><td>{
+          f"MZL {get_list_number(c, 'MZL'):03}" if get_list_number(c, "MZL") else ""
+          }</td><td>{
+          f"Sya {get_list_number(c, 'SYA'):03}" if get_list_number(c, "SYA") else ""
+          }</td><td>{
+          f"ASy {get_list_number(c, 'ASY'):03}" if get_list_number(c, "ASY") else ""
+          }</td><td>{
+          f"ŠL/MÉA {get_list_number(c, 'SLLHA'):03}" if get_list_number(c, "SLLHA") else ""
+          }</td></tr>""" for c in sorted_signs),
+          file=f)
