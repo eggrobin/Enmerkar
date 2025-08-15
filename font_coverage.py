@@ -169,7 +169,7 @@ for sign_list in "MZL", "SYA", "ASY", "SLLHA":
       number_at_i = str(number_at_i)
       if number_at_i > inserted_number:
         continue
-      if not next_down or number_at_i > next_down:
+      if not next_down or number_at_i >= next_down:
         next_down = number_at_i
         i_next_down = i
     sorted_signs.insert(i_next_down + 1, c)
