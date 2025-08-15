@@ -132,22 +132,49 @@ for font, coverage in coverage_by_font.items():
 
 signlist : list[str] = []
 
-unnumbered_signs : list[str] = []
-
 def get_list_number(xsux: str, list_name: str):
   numbers : set[asl.SourceRange] = set()
   for form in asl.osl.forms_by_source[asl.osl.sources["U+"]][asl.SourceRange("0x%X" % ord(xsux))]:
     for source_reference in form.sources:
       if source_reference.source.abbreviation == list_name:
         numbers.add(source_reference.number)
-  if len(numbers) > 1:
-    print("*** Multiple", list_name, "numbers", xsux, [str(n) for n in numbers])
   if not numbers:
-    unnumbered_signs.append(xsux)
     return None
-  return min(n.first for n in numbers)
-sorted_signs = sorted((c for c in coverage_by_font["Nabuninuaihsus"].code_points_covered if ord(c) >= 0x12000), key=lambda c: get_list_number(c, "MZL") or ord(c))
-print(len(unnumbered_signs), "unnumbered signs:", " ".join(unnumbered_signs))
+  return sorted(numbers, key=str)[0]
+
+def get_pretty_list_number(xsux: str, list_name: str):
+  number = get_list_number(xsux, list_name)
+  if not number:
+    return None
+  return {"MZL" : "MZL", "SYA": "SyA", "ASY" : "ASy", "SLLHA": "ŠL/MÉA"}[list_name] + ' ' + str(number)
+
+def sort_key(c : str, list_name : str):
+  number = get_list_number(c, list_name)
+  return str(number)
+
+signs = [c for c in coverage_by_font["Nabuninuaihsus"].code_points_covered if ord(c) >= 0x12000]
+
+sorted_signs : list[str] = []
+
+for sign_list in "MZL", "SYA", "ASY", "SLLHA":
+  for c in sorted((c for c in signs if get_list_number(c, sign_list) and c not in sorted_signs),
+                  key=lambda c: str(get_list_number(c, sign_list))):
+    inserted_number = str(get_list_number(c, sign_list))
+    next_down = None
+    i_next_down = len(sorted_signs) - 1
+    for i in range(len(sorted_signs)):
+      number_at_i = get_list_number(sorted_signs[i], sign_list)
+      if not number_at_i:
+        continue
+      number_at_i = str(number_at_i)
+      if number_at_i > inserted_number:
+        continue
+      if not next_down or number_at_i > next_down:
+        next_down = number_at_i
+        i_next_down = i
+    sorted_signs.insert(i_next_down + 1, c)
+
+sorted_signs += sorted(c for c in signs if c not in sorted_signs)
 
 with open("../Nabuninuaihsus/index.html", encoding="utf8") as f:
   index_lines = f.readlines()
@@ -165,12 +192,12 @@ with open("../Nabuninuaihsus/index.html", mode="w", encoding="utf8") as f:
       in_sign_list = True
       print("\n".join(f"""<tr><td>U+{ord(c):04X}</td><td class="nabuninuaihsus">{c}</td><td class="nabuninuaihsus-sans">{c}</td><td>{
           asl.osl.forms_by_source[asl.osl.sources["U+"]][asl.SourceRange("0x%X" % ord(c))][0].names[0]}</td><td>{
-          f"MZL {get_list_number(c, 'MZL'):03}" if get_list_number(c, "MZL") else ""
+            get_pretty_list_number(c, "SYA") or ""
           }</td><td>{
-          f"Sya {get_list_number(c, 'SYA'):03}" if get_list_number(c, "SYA") else ""
+            get_pretty_list_number(c, "ASY") or ""
           }</td><td>{
-          f"ASy {get_list_number(c, 'ASY'):03}" if get_list_number(c, "ASY") else ""
+            get_pretty_list_number(c, "SLLHA") or ""
           }</td><td>{
-          f"ŠL/MÉA {get_list_number(c, 'SLLHA'):03}" if get_list_number(c, "SLLHA") else ""
+            get_pretty_list_number(c, "MZL") or ""
           }</td></tr>""" for c in sorted_signs),
           file=f)
