@@ -158,7 +158,7 @@ sorted_signs : list[str] = []
 
 for sign_list in "MZL", "SYA", "ASY", "SLLHA":
   for c in sorted((c for c in signs if get_list_number(c, sign_list) and c not in sorted_signs),
-                  key=lambda c: str(get_list_number(c, sign_list))):
+                  key=lambda c: (str(get_list_number(c, sign_list)), c)):
     inserted_number = str(get_list_number(c, sign_list))
     next_down = None
     i_next_down = len(sorted_signs) - 1
