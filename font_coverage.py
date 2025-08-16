@@ -152,7 +152,13 @@ def sort_key(c : str, list_name : str):
   number = get_list_number(c, list_name)
   return str(number)
 
-signs = [c for c in coverage_by_font["Nabuninuaihsus"].code_points_covered if ord(c) >= 0x12000]
+EXCLUDED_SIGNS = {
+  0x12153, # IMIN = 7(diš@v)
+  0x12357, # UŠ₂ = TIL
+  0x121F9, # LIMMU₂ = 4(aš)
+}
+
+signs = [c for c in coverage_by_font["Nabuninuaihsus"].code_points_covered if ord(c) >= 0x12000 and ord(c) not in EXCLUDED_SIGNS]
 
 sorted_signs : list[str] = []
 
