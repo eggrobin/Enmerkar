@@ -130,7 +130,27 @@ for font, coverage in coverage_by_font.items():
 for font, coverage in coverage_by_font.items():
   print(font, coverage)
 
-signlist : list[str] = []
+PRETTY_LIST_NAME = {"MZL" : "MZL", "SYA": "SyA", "ASY" : "ASy", "SLLHA": "ŠL/MÉA"}
+
+def get_pretty_list_number(xsux: str, list_name: str):
+  number = get_list_number(xsux, list_name)
+  if not number:
+    return None
+  return PRETTY_LIST_NAME[list_name] + ' ' + str(number)
+
+for sign_list in "MZL", "SYA", "ASY", "SLLHA":
+  total = 0
+  missing_signs : dict[asl.SourceRange, str] = {}
+  for number, forms in asl.osl.forms_by_source[asl.osl.sources[sign_list]].items():
+    if forms[0].unicode_cuneiform:
+      total += 1
+      if not all(c in coverage_by_font["Nabuninuaihsus"].code_points_covered for c in forms[0].unicode_cuneiform.text):
+        missing_signs[number] = forms[0].unicode_cuneiform.text
+  print(f"{total - len(missing_signs)}/{total} ({(total - len(missing_signs))/total:0.2%}) of {PRETTY_LIST_NAME[sign_list]}")
+  if (len(missing_signs) < 40):
+    print("    Missing:")
+    for number, sign in missing_signs.items():
+      print("   ", str(number), sign)
 
 def get_list_number(xsux: str, list_name: str):
   numbers : set[asl.SourceRange] = set()
@@ -141,12 +161,6 @@ def get_list_number(xsux: str, list_name: str):
   if not numbers:
     return None
   return sorted(numbers, key=str)[0]
-
-def get_pretty_list_number(xsux: str, list_name: str):
-  number = get_list_number(xsux, list_name)
-  if not number:
-    return None
-  return {"MZL" : "MZL", "SYA": "SyA", "ASY" : "ASy", "SLLHA": "ŠL/MÉA"}[list_name] + ' ' + str(number)
 
 def sort_key(c : str, list_name : str):
   number = get_list_number(c, list_name)
