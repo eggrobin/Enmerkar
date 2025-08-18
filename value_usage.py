@@ -1,11 +1,15 @@
 from collections import defaultdict
 import json
 import os
+import time
 import urllib.parse
 from typing import Any
 
 import atf
 import asl
+
+time_reading_oracc_file = 0
+time_loading_json = 0
 
 language_to_value_to_period_to_occurrences : dict[
   str, dict[
@@ -68,6 +72,8 @@ def index_values(text_json: Any,
     consecutive_values.clear()
 
 def index(directory: str):
+  global time_reading_oracc_file
+  global time_loading_json
   listing = os.listdir(directory)
   if "catalogue.json" in listing:
     with open(directory + "/catalogue.json", encoding="utf-8") as f:
@@ -84,11 +90,15 @@ def index(directory: str):
       if i > 0 and i % 1000 == 0:
         print(f"    {i}/{len(files)}...")
       with open(text_file, encoding="utf-8") as f:
+        start = time.time()
         source = f.read()
+        time_reading_oracc_file += time.time() - start
         if not source:
           skipped.append(text_file)
           continue
+        start = time.time()
         text = json.loads(source)
+        time_loading_json += time.time() - start
       index_values(
         text,
         cdli_number,
@@ -108,15 +118,27 @@ def index(directory: str):
 
 ORACC_PROJECTS = ("akklove", "atae", "babcity", "balt", "blms", "dcclt", "riao", "ribo", "rinap", "saao", "tcma")
 
+start = time.time()
 for project in ORACC_PROJECTS:
   index(f"oracc/{project}")
+time_indexing_oracc_values = time.time() - start
 
+cdli_occurrences : list[str] = []
+
+oracc_occurrences = [o
+                     for l in language_to_value_to_period_to_occurrences
+                     for v in language_to_value_to_period_to_occurrences[l]
+                     for p in language_to_value_to_period_to_occurrences[l][v]
+                     for o in language_to_value_to_period_to_occurrences[l][v][p]]
+
+start = time.time()
 for file in ("OAkk", "Early OB", "OA", "OB akk", "MA", "MB", "Early NB", "NA", "NB"):
   covered_by_oracc : set[str] = set()
   for v, occurrences in atf.get_value_counts(
       f"cdli/{file}.atf",
       "akk",
       set((atf.SpanAttribute.DETERMINATIVE, atf.SpanAttribute.LOGOGRAM))).items():
+    cdli_occurrences += occurrences
     oracc_texts = set(language_to_value_to_period_to_occurrences["akk"][v][file.removesuffix(" akk")])
     for occurrence in occurrences:
       if occurrence in oracc_texts:
@@ -124,6 +146,12 @@ for file in ("OAkk", "Early OB", "OA", "OB akk", "MA", "MB", "Early NB", "NA", "
       else:
         language_to_value_to_period_to_occurrences["akk"][v][file.removesuffix(" akk")].append(occurrence)
   print(f"--- {len(covered_by_oracc)} artefacts already covered by Oracc in {file}")
+time_indexing_cdli_values = time.time() - start
+
+print(f"--- Indexed {len(oracc_occurrences)} occurrences from {len(set(oracc_occurrences))} Oracc texts in {time_indexing_oracc_values} s")
+print(f"--- Whereof {time_reading_oracc_file} s reading files")
+print(f"--- Whereof {time_loading_json} s parsing JSON")
+print(f"--- Indexed {len(cdli_occurrences)} occurrences from {len(set(cdli_occurrences))} CDLI texts in {time_indexing_cdli_values} s")
 
 syllabary_index : list[asl.Sign] = []
 base_to_values : dict[str, list[str]] = defaultdict(list)
