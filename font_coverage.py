@@ -152,16 +152,6 @@ for sign_list in "MZL", "SYA", "ASY", "SLLHA":
     for number, sign in missing_signs.items():
       print("   ", str(number), sign)
 
-def get_list_number(xsux: str, list_name: str):
-  numbers : set[asl.SourceRange] = set()
-  for form in asl.osl.forms_by_source[asl.osl.sources["U+"]][asl.SourceRange("0x%X" % ord(xsux))]:
-    for source_reference in form.sources:
-      if source_reference.source.abbreviation == list_name:
-        numbers.add(source_reference.number)
-  if not numbers:
-    return None
-  return sorted(numbers, key=str)[0]
-
 def sort_key(c : str, list_name : str):
   number = get_list_number(c, list_name)
   return str(number)
@@ -174,25 +164,57 @@ EXCLUDED_SIGNS = {
 
 signs = [c for c in coverage_by_font["Nabuninuaihsus"].code_points_covered if ord(c) >= 0x12000 and ord(c) not in EXCLUDED_SIGNS]
 
+EXCLUDED_SEQUENCES = {
+  "𒀸𒀸",  # Should be merged with 𒐀.
+}
+
 sorted_signs : list[str] = []
 
+xsux_to_forms : dict[str, list[asl.Form]] = defaultdict(list)
+
+for forms in asl.osl.forms_by_name.values():
+  for form in forms:
+    if form.unicode_cuneiform:
+      xsux = form.unicode_cuneiform.text
+      xsux_to_forms[xsux].append(form)
+
+def get_list_number(xsux: str, list_name: str):
+  numbers : set[asl.SourceRange] = set()
+  for form in xsux_to_forms[xsux]:
+    for source_reference in form.sources:
+      if source_reference.source.abbreviation == list_name:
+          numbers.add(source_reference.number)
+  if not numbers:
+    return None
+  return sorted(numbers, key=str)[0]
+
 for sign_list in "MZL", "SYA", "ASY", "SLLHA":
-  for c in sorted((c for c in signs if get_list_number(c, sign_list) and c not in sorted_signs),
-                  key=lambda c: (str(get_list_number(c, sign_list)), c)):
-    inserted_number = str(get_list_number(c, sign_list))
-    next_down = None
-    i_next_down = len(sorted_signs) - 1
-    for i in range(len(sorted_signs)):
-      number_at_i = get_list_number(sorted_signs[i], sign_list)
-      if not number_at_i:
+  for number, forms in sorted(asl.osl.forms_by_source[asl.osl.sources[sign_list]].items(),
+                              key=lambda kv: str(kv[0])):
+    for form in forms:
+      if not form.unicode_cuneiform:
         continue
-      number_at_i = str(number_at_i)
-      if number_at_i > inserted_number:
+      xsux = form.unicode_cuneiform.text
+      if xsux in EXCLUDED_SEQUENCES:
         continue
-      if not next_down or number_at_i >= next_down:
-        next_down = number_at_i
-        i_next_down = i
-    sorted_signs.insert(i_next_down + 1, c)
+      if xsux in sorted_signs:
+        continue
+      if not all(c in signs for c in xsux):
+        continue
+      inserted_number = str(number)
+      next_down = None
+      i_next_down = len(sorted_signs) - 1
+      for i in range(len(sorted_signs)):
+        number_at_i = get_list_number(sorted_signs[i], sign_list)
+        if not number_at_i:
+          continue
+        number_at_i = str(number_at_i)
+        if number_at_i > inserted_number:
+          continue
+        if not next_down or number_at_i >= next_down:
+          next_down = number_at_i
+          i_next_down = i
+      sorted_signs.insert(i_next_down + 1, xsux)
 
 sorted_signs += sorted(c for c in signs if c not in sorted_signs)
 
@@ -210,14 +232,21 @@ with open("../Nabuninuaihsus/index.html", mode="w", encoding="utf8") as f:
       print(line, file=f)
     if line.strip() == "<!--GENERATED SIGN LIST: begin-->":
       in_sign_list = True
-      print("\n".join(f"""<tr><td>U+{ord(c):04X}</td><td class="nabuninuaihsus">{c}</td><td class="nabuninuaihsus-sans">{c}</td><td>{
-          asl.osl.forms_by_source[asl.osl.sources["U+"]][asl.SourceRange("0x%X" % ord(c))][0].names[0]}</td><td>{
-            get_pretty_list_number(c, "SYA") or ""
+      print("\n".join(f"""<tr><td>{
+            ','.join(f'U+{ord(cp):04X}' for cp in xsux)
+          }</td><td class="nabuninuaihsus">{
+            xsux
+          }</td><td class="nabuninuaihsus-sans">{
+            xsux
           }</td><td>{
-            get_pretty_list_number(c, "ASY") or ""
+            xsux_to_forms[xsux][0].names[0]
           }</td><td>{
-            get_pretty_list_number(c, "SLLHA") or ""
+            get_pretty_list_number(xsux, "SYA") or ""
           }</td><td>{
-            get_pretty_list_number(c, "MZL") or ""
-          }</td></tr>""" for c in sorted_signs),
+            get_pretty_list_number(xsux, "ASY") or ""
+          }</td><td>{
+            get_pretty_list_number(xsux, "SLLHA") or ""
+          }</td><td>{
+            get_pretty_list_number(xsux, "MZL") or ""
+          }</td></tr>""" for xsux in sorted_signs),
           file=f)
