@@ -26,7 +26,7 @@ ALTERNATIVE = re.compile(
 )
 
 GRAPHEME = re.compile(
-  fr"(?:{ALTERNATIVE.pattern}(?:/{ALTERNATIVE.pattern})*|x\??)"
+  fr"(?:{ALTERNATIVE.pattern}(?:/{ALTERNATIVE.pattern})*|x[#?]*)"
 )
 
 PUNCTUATION = re.compile(
