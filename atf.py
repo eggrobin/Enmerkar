@@ -2,13 +2,13 @@ from collections import defaultdict
 import re
 import enum
 
-VALUE_LETTER = re.compile(r"(?:sz|s,|t,|[abdeghiklmnpqrstuvwyz'])")
-VALUE_INDEX = re.compile(r"(?:[0-9]+|x)")
+VALUE_LETTER = re.compile(r"(?:sz|s,|t,|[abdeghiklmnpqrstuvwyz'šṣṭʾŋ])")
+VALUE_INDEX = re.compile(r"(?:[0-9₀-₉]+|x|ₓ)")
 VALUE = re.compile(fr"(?:{VALUE_LETTER.pattern}+{VALUE_INDEX.pattern}?)")
 
 
-NAME_LETTER = re.compile(r"(?:SZ|S,|T,|[ABDEGHIKLMNPQRSTUVWYZ'])")
-NAME_INDEX = re.compile(r"(?:[0-9]+|X)")
+NAME_LETTER = re.compile(r"(?:SZ|S,|T,|[ABDEGHIKLMNPQRSTUVWYZ'ŠṢṬʾŊ])")
+NAME_INDEX = re.compile(r"(?:[0-9₀-₉]+|X|ₓ)")
 MODIFIER = re.compile(r"(?:\d+|[fgstnzkrhv])")
 NAME = re.compile(fr"(?:[A-Z][A-Z][A-Z]+\d\d\d|{NAME_LETTER.pattern}+{NAME_INDEX.pattern}?(?:@{MODIFIER.pattern})*)")
 COMPOUND = re.compile(r"(?:\|[^|<>{}\[\] -]+\|)")
@@ -30,8 +30,11 @@ GRAPHEME = re.compile(
 )
 
 PUNCTUATION = re.compile(
-  r"""(?:(?<= )|^)(?:\*|:|:'|:"|:.|::|/)(?:\(P[1-9]\))?(?: |$)"""
+  r"""(?:(?<= )|^)(?:\*|:|:'|:"|:.|::|/)(?:\(P[1-9₁-₉]\))?(?: |$)"""
 )
+
+ASCII_DIGRAPHS = re.compile(r"(sz|s,|t,|SZ|S,|T,)")
+NON_ASCII = re.compile(r"[^\x00-\x7F]")
 
 print(GRAPHEME.pattern)
 
@@ -53,7 +56,29 @@ class SpanAttribute(enum.Enum):
   def __str__(self) -> str:
     return self.name
 
-def parse_transliteration(source: str, language: str):
+# https://oracc.org/doc/help/editinginatf/primer/inlinetutorial/index.html#h_languages
+INLINE_LANGUAGE_CODES = {
+  "a"    : "akk",
+  "akk"  : "akk",
+  "eakk" : "akk-x-earakk",
+  "oakk" : "akk-x-oldakk",
+  "oa"   : "akk-x-oldass",
+  "ob"   : "akk-x-oldbab",
+  "ma"   : "akk-x-midass",
+  "mb"   : "akk-x-midbab",
+  "na"   : "akk-x-neoass",
+  "nb"   : "akk-x-neobab",
+  "sb"   : "akk-x-stdbab",
+  "a/n"  : "akk-x-norm",
+  "s"    : "sux",
+  "e"    : "sux-x-emesal",
+}
+
+class Extension(enum.Enum):
+  DOT_AS_DELIMITER = 0,
+  UNICODE = 1,
+
+def parse_transliteration(source: str, language: str, extensions: set[Extension] = set()):
   graphemes : list[tuple[str, str, set[SpanAttribute], str|None]] = []
   i = 0
   after_delimiter = " "
@@ -74,6 +99,10 @@ def parse_transliteration(source: str, language: str):
       after_delimiter = " "
     match = GRAPHEME.match(source, i)
     if match:
+      if Extension.UNICODE in extensions and ASCII_DIGRAPHS.search(match.group()):
+        raise SyntaxError(f"ASCII digraphs: {source[:i]}☞{source[i:]}")
+      if Extension.UNICODE not in extensions and NON_ASCII.search(match.group()):
+        raise SyntaxError(f"Non-ASCII grapheme: {source[:i]}☞{source[i:]}")
       if (not after_delimiter and
           attribute_run_lengths.get(SpanAttribute.DETERMINATIVE) != 0 and
           attribute_run_lengths.get(SpanAttribute.IMPLIED) != 0 and
@@ -83,7 +112,13 @@ def parse_transliteration(source: str, language: str):
       i = match.end()
       after_delimiter = None
       continue
-    if source[i] in ("-", ":"):
+    if source.startswith("...", i):
+      if SpanAttribute.BROKEN not in attribute_run_lengths:
+        raise SyntaxError(f"... outside breakage brackets: {source[:i]}☞{source[i:]}")
+      after_delimiter = None
+      i += 3
+      continue
+    if source[i] in ("-", ":") or Extension.DOT_AS_DELIMITER in extensions and source[i] == ".":
       if after_delimiter:
         raise SyntaxError(f"Double delimiter: {source[:i]}☞{source[i:]}")
       after_delimiter = source[i]
@@ -104,30 +139,19 @@ def parse_transliteration(source: str, language: str):
     if match:
       i = match.end()
       continue
-    if source.startswith("...", i):
-      if SpanAttribute.BROKEN not in attribute_run_lengths:
-        raise SyntaxError(f"... outside breakage brackets: {source[:i]}☞{source[i:]}")
-      after_delimiter = None
-      i += 3
-      continue
     if (source.startswith(
       ("# ", '" ', "~ ", "| ", "= ", "^ ", "@ ", "& "), i) and
       (i == 0 or source[i-1] == " ")):
       # Column in lexical text.
       i += 2
       continue
-    found = False
-    for abbreviation, language_tag in (
-        ("a", "akk"),
-        ("s", "sux"),
-        ("a/n", "akk-x-norm")):
-      if source.startswith(f"%{abbreviation} ", i):
-        i += len(abbreviation) + 2
-        after_delimiter = " "
-        language = language_tag
-        found = True
-        break
-    if found:
+    if source[i] == "%":
+      inline_code = source[i+1:].split(" ", maxsplit=1)[0]
+      if inline_code not in INLINE_LANGUAGE_CODES and inline_code not in INLINE_LANGUAGE_CODES.values():
+        raise NameError(f"Unknown inline language code: {source[:i]}☞{source[i:]}", name=inline_code)
+      i += len(inline_code) + 2
+      after_delimiter = " "
+      language = INLINE_LANGUAGE_CODES.get(inline_code, inline_code)
       continue
     if source.startswith("($", i):
       i = source.index("$)", i + 2) + 2
@@ -240,9 +264,9 @@ def get_value_counts(file: str, target_language: str, exclude: set[SpanAttribute
       text = text.strip()
       try:
         graphemes = parse_transliteration(text, language)
-      except SyntaxError as e:
-        print("***", e.msg, file=log)
-        error_title = e.msg.split(":")[0]
+      except (SyntaxError, NameError) as e:
+        print("***", str(e), file=log)
+        error_title = str(e).split(":")[0]
         erroneous_texts[error_title].append(artefact)
         continue
       previous_graphemes : list[str] = []
