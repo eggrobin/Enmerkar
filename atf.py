@@ -30,7 +30,7 @@ GRAPHEME = re.compile(
 )
 
 PUNCTUATION = re.compile(
-  r"""(?:(?<= )|^)(?:\*|:|:'|:"|:.|::|/)(?: |$)"""
+  r"""(?:(?<= )|^)(?:\*|:|:'|:"|:.|::|/)(?:\(P[1-9]\))?(?: |$)"""
 )
 
 print(GRAPHEME.pattern)
