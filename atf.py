@@ -75,6 +75,10 @@ INLINE_LANGUAGE_CODES = {
 }
 
 class Extension(enum.Enum):
+  # https://oracc.museum.upenn.edu/ns/gdl/1.0/gdltut.html#Words
+  # In ATF words are separated by spaces, and graphemes within words are joined
+  # by hyphens. Note that periods (.) are only permitted inside compound
+  # graphemes.
   DOT_AS_DELIMITER = 0,
   UNICODE = 1,
 
