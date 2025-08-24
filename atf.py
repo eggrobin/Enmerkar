@@ -123,6 +123,8 @@ class Extension(enum.Enum):
   # graphemes.
   DOT_AS_DELIMITER = 0,
   UNICODE = 1,
+  # SAAo em dash, represented as --.
+  EM_DASH = 2,
 
 def parse_transliteration(source: str, language: str, extensions: set[Extension] = set()):
   graphemes : list[tuple[str, str, set[SpanAttribute], str|None]] = []
@@ -164,7 +166,14 @@ def parse_transliteration(source: str, language: str, extensions: set[Extension]
       after_delimiter = None
       i += 3
       continue
-    if source[i] in ("-", ":") or Extension.DOT_AS_DELIMITER in extensions and source[i] == ".":
+    if Extension.EM_DASH in extensions and source.startswith("--", i):
+      if after_delimiter:
+        raise SyntaxError(f"Double delimiter: {source[:i]}☞{source[i:]}")
+      after_delimiter = "--"
+      i += 2
+      continue
+    if (source[i] in ("-", ":") or
+        Extension.DOT_AS_DELIMITER in extensions and source[i] == ".") :
       if after_delimiter:
         raise SyntaxError(f"Double delimiter: {source[:i]}☞{source[i:]}")
       after_delimiter = source[i]
