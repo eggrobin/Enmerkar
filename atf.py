@@ -2,7 +2,7 @@ from collections import defaultdict
 import re
 import enum
 
-VALUE_LETTER = re.compile(r"(?:sz|s,|t,|[abdeghiklmnpqrstuvwyz'šṣṭʾŋ])")
+VALUE_LETTER = re.compile(r"(?:sz|s,|t,|[abdeghiklmnpqrstuvwyz'šṣṭʾŋ])",)
 VALUE_INDEX = re.compile(r"(?:[0-9₀-₉]+|x|ₓ)")
 VALUE = re.compile(fr"(?:{VALUE_LETTER.pattern}+{VALUE_INDEX.pattern}?)")
 
@@ -10,23 +10,65 @@ VALUE = re.compile(fr"(?:{VALUE_LETTER.pattern}+{VALUE_INDEX.pattern}?)")
 NAME_LETTER = re.compile(r"(?:SZ|S,|T,|[ABDEGHIKLMNPQRSTUVWYZ'ŠṢṬʾŊ])")
 NAME_INDEX = re.compile(r"(?:[0-9₀-₉]+|X|ₓ)")
 MODIFIER = re.compile(r"(?:\d+|[fgstnzkrhv])")
-NAME = re.compile(fr"(?:[A-Z][A-Z][A-Z]+\d\d\d|{NAME_LETTER.pattern}+{NAME_INDEX.pattern}?(?:@{MODIFIER.pattern})*)")
+ALLOGRAPH = re.compile(r"(?:~[a-wyz0-9]+)")
+FORMVARIANT = re.compile(r"(?:\\[a-z0-9]+)")
+NAME = re.compile(
+  fr"""(?:
+      [A-Z][A-Z][A-Z]+\d\d\d
+    | {NAME_LETTER.pattern}+{NAME_INDEX.pattern}?(?:@{MODIFIER.pattern})*(?:{ALLOGRAPH.pattern})?
+  )""",
+  re.VERBOSE)
 COMPOUND = re.compile(r"(?:\|[^|<>{}\[\] -]+\|)")
 QUALIFIED =  re.compile(
-  fr"(?:{VALUE.pattern}\((?:{NAME.pattern}|{COMPOUND.pattern})\))"
+  fr"""(?:
+    {VALUE.pattern}
+    \(
+    (?:{NAME.pattern}
+      |{COMPOUND.pattern})
+    \)
+  )""",
+  re.VERBOSE
 )
 
 NUMBER = re.compile(
-  fr"(?:(?:n|[\d/]+)\((?:{VALUE.pattern}(?:@(?:90|[cvt]))*|{NAME.pattern}|{COMPOUND.pattern})\))"
+  fr"""(?:
+      (?:n|[\d/]+)
+      \(
+        (?:{VALUE.pattern}(?:@(?:90|[cvt]))*
+          |{NAME.pattern}
+          |{COMPOUND.pattern})
+      \)
+  )""",
+  re.VERBOSE
 )
 
 # TODO(egg): Should a value really be allowed as a correction?
 ALTERNATIVE = re.compile(
-  fr"(?:(?:{NUMBER.pattern}|{QUALIFIED.pattern}|{VALUE.pattern}|{NAME.pattern}|{COMPOUND.pattern})(?:!\((?:{VALUE.pattern}|{NAME.pattern}|{COMPOUND.pattern})\)|[#?!*])*)"
+  fr"""(?:
+      (?:{NUMBER.pattern}
+        |{QUALIFIED.pattern}
+        |{VALUE.pattern}
+        |{NAME.pattern}
+        |{COMPOUND.pattern})
+      (?: !
+          \(
+          (?:{VALUE.pattern}
+            |{NAME.pattern}
+            |{COMPOUND.pattern})
+          \)
+        | [#?!*]
+        | {FORMVARIANT.pattern}
+      )*
+  )""",
+  re.VERBOSE
 )
 
 GRAPHEME = re.compile(
-  fr"(?:{ALTERNATIVE.pattern}(?:/{ALTERNATIVE.pattern})*|x[#?]*)"
+  fr"""(?:
+      {ALTERNATIVE.pattern}(?:/{ALTERNATIVE.pattern})*
+    | x[#?]*
+  )""",
+  re.VERBOSE
 )
 
 PUNCTUATION = re.compile(
