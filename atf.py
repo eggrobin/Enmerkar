@@ -42,6 +42,8 @@ NUMBER = re.compile(
   re.VERBOSE
 )
 
+DIŠLESS_NUMBER = re.compile(r"[0-5]?[0-9]")
+
 # TODO(egg): Should a value really be allowed as a correction?
 ALTERNATIVE = re.compile(
   fr"""(?:
@@ -125,6 +127,9 @@ class Extension(enum.Enum):
   UNICODE = 1,
   # SAAo em dash, represented as --.
   EM_DASH = 2,
+  # + between separate ligatured graphemes.
+  PLUS_AS_DELIMITER = 3,
+  DIŠLESS_NUMBERS = 4,
 
 def parse_transliteration(source: str, language: str, extensions: set[Extension] = set()):
   graphemes : list[tuple[str, str, set[SpanAttribute], str|None]] = []
@@ -160,6 +165,11 @@ def parse_transliteration(source: str, language: str, extensions: set[Extension]
       i = match.end()
       after_delimiter = None
       continue
+    match = DIŠLESS_NUMBER.match(source, i)
+    if match:
+      i = match.end()
+      after_delimiter = None
+      continue
     if source.startswith("...", i):
       if SpanAttribute.BROKEN not in attribute_run_lengths:
         raise SyntaxError(f"... outside breakage brackets: {source[:i]}☞{source[i:]}")
@@ -173,7 +183,8 @@ def parse_transliteration(source: str, language: str, extensions: set[Extension]
       i += 2
       continue
     if (source[i] in ("-", ":") or
-        Extension.DOT_AS_DELIMITER in extensions and source[i] == ".") :
+        Extension.DOT_AS_DELIMITER in extensions and source[i] == "." or
+        Extension.PLUS_AS_DELIMITER in extensions and source[i] == "+") :
       if after_delimiter:
         raise SyntaxError(f"Double delimiter: {source[:i]}☞{source[i:]}")
       after_delimiter = source[i]
