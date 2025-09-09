@@ -1,6 +1,7 @@
 from collections import defaultdict
 import re
 import enum
+import time
 
 VALUE_LETTER = re.compile(r"(?:sz|s,|t,|[abdeghiklmnpqrstuvwyz'šṣṭʾŋ])",)
 VALUE_INDEX = re.compile(r"(?:[0-9₀-₉]+|x|ₓ)")
@@ -147,15 +148,27 @@ class Bracket(Token):
 class LanguageShift(Token):
   pass
 
-TOKENS : list[tuple[re.Pattern[str], type[Token]]] = [
-  (COMMENT, Comment),
-  (GRAPHEME, Grapheme),
-  (re.compile(r"%[a-z]+"), LanguageShift),
-  (re.compile(r" +"), Space),
-  (re.compile(re.escape("...")), UnknownMissing),
-  (INTRAWORD_DELIMITER, Delimiter),
-] + [(re.compile(re.escape(c)), FieldSeparator) for c in ("#", '"', "~", "|", "=", "^", "@", "&")
-] + [(re.compile(re.escape(t)), Bracket) for a in SpanAttribute for t in ((a.open, a.close) if a.open != a.close else (a.open,))]
+BRACKETS = re.compile("|".join(
+  re.escape(t) for t in sorted(
+    [t for a in SpanAttribute for t in (a.open, a.close)] + ["{+", "{-"],
+    key=lambda t: -len(t))))
+
+TOKEN = re.compile(
+  fr"""
+      (?P<Comment>        {COMMENT.pattern})
+    | (?P<Grapheme>       {GRAPHEME.pattern})
+    | (?P<LanguageShift>  %[a-z]+)
+    | (?P<Space>          \ +)
+    | (?P<UnknownMissing> \.\.\.)
+    | (?P<Delimiter>      {INTRAWORD_DELIMITER.pattern})
+    | (?P<Bracket>        {BRACKETS.pattern})
+    | (?P<FieldSeparator> [#"~|=^@&])
+    | (?P<EndOfText>      $)
+  """,
+  re.VERBOSE
+)
+
+TOKENS = [t for t in Token.__subclasses__() if t != EndOfText]
 
 # https://oracc.org/doc/help/editinginatf/primer/inlinetutorial/index.html#h_languages
 INLINE_LANGUAGE_CODES = {
@@ -176,6 +189,8 @@ INLINE_LANGUAGE_CODES = {
 }
 
 class Lexer:
+  time_lexing = 0
+
   def __init__(self, source: str):
     self.source = source
     self.i = 0
@@ -201,20 +216,17 @@ class Lexer:
     self.ahead = None
 
   def _next(self) -> Token:
+    start = time.time()
     if self.i == len(self.source):
       return EndOfText("", self.i)
-    matches : list[tuple[re.Match[str], type[Token]]] = []
-    for pattern, t in TOKENS:
-      match = pattern.match(self.source, self.i)
-      if match:
-        matches.append((match, t))
-    if not matches:
+    match = TOKEN.match(self.source, self.i)
+    if not match:
       self._raise_error(f"Could not recognize token")
-    if len(matches) > 1:
-      matches = sorted(matches, key=lambda mt: -len(mt[0].group(0)))
-      #print(f"Multiple matching tokens {', '.join(f'{token.__name__} {match.group(0)}' for match, token in matches)}: {self.source[:self.i]}☞{self.source[self.i:]}")
-    match, t = matches[0]
-    return t(match.group(), match.end())
+    for t in TOKENS:
+      if match.group(t.__name__):
+        Lexer.time_lexing += time.time() - start
+        return t(match.group(), match.end())
+    self._raise_error(f"Undefined token type: {[key for key in match.groupdict() if match.group(key)]}")
 
   def _raise_error(self, message: str):
     raise SyntaxError(f"{message}: {self.source[:self.i]}☞{self.source[self.i:]}")
@@ -266,7 +278,7 @@ def parse_delimited_text(lexer: Lexer):
     pass
 
 def accept_determinative(lexer: Lexer):
-  if lexer.accept(Bracket, "{"):
+  if lexer.accept(Bracket, "{") or lexer.accept(Bracket, "{+") or lexer.accept(Bracket, "{-"):
     if lexer.accept(LanguageShift):
       if not lexer.accept(Space):
         lexer.raise_syntax_error("Expected space after language shift")

@@ -1,10 +1,13 @@
 import atf
 import re
+import time
+
+time_parsing = 0
 
 for filename, extensions in (
-  ("oracc-atf/saao/saa01/SAA01_01.atf",
-   {atf.Extension.EM_DASH, atf.Extension.DOT_AS_DELIMITER, atf.Extension.PLUS_AS_DELIMITER}),
-  ("cdli/OB akk.atf", set())):
+  #("oracc-atf/saao/saa01/SAA01_01.atf",
+  #{atf.Extension.EM_DASH, atf.Extension.DOT_AS_DELIMITER, atf.Extension.PLUS_AS_DELIMITER}),
+  ("cdli/OB akk.atf", set()),):
   with open(filename, encoding="utf-8") as f:
     lines = f.readlines()
 
@@ -44,10 +47,14 @@ for filename, extensions in (
           print("*** Bad line number", repr(number), "in", line)
       text = text.strip()
       try:
+        start = time.time()
         graphemes = atf.parse_transliteration(text)
+        time_parsing += time.time() - start
       except (SyntaxError, NameError) as e:
         print("***", artefact, e)
-        continue  
+        continue
+    print(f"{atf.Lexer.time_lexing} s lexing")
+    print(f"{time_parsing} s lexing + parsing")
 
 INVALID_LINES = """
 1. 1(asz@c) {gesz}kabx(|KAxMASZ)? e2-an-da
