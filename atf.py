@@ -111,7 +111,7 @@ class SpanAttribute(enum.Enum):
   def __str__(self) -> str:
     return self.name
 
-INTRAWORD_DELIMITER = re.compile("[-:.+]")
+INTRAWORD_DELIMITER = re.compile(r"--|[-:.+]")
 SHIFT = re.compile("%[a-z/-]+")
 COMMENT = re.compile(r"\(\#(?:[^#]|\#[^)])*\#\)|\(\$(?:[^$]|\$[^)])*\$\)")
 
@@ -120,10 +120,19 @@ class Token:
     self.text = text
     self.after = after
 
+class EndOfText(Token):
+  pass
+
 class Grapheme(Token):
   pass
 
+class UnknownMissing(Token):
+  pass
+
 class Comment(Token):
+  pass
+
+class Space(Token):
   pass
 
 class Delimiter(Token):
@@ -135,10 +144,15 @@ class FieldSeparator(Token):
 class Bracket(Token):
   pass
 
+class LanguageShift(Token):
+  pass
+
 TOKENS : list[tuple[re.Pattern[str], type[Token]]] = [
   (COMMENT, Comment),
   (GRAPHEME, Grapheme),
-  (re.compile(" "), Delimiter),
+  (re.compile(r"%[a-z]+"), LanguageShift),
+  (re.compile(r" +"), Space),
+  (re.compile(re.escape("...")), UnknownMissing),
   (INTRAWORD_DELIMITER, Delimiter),
 ] + [(re.compile(re.escape(c)), FieldSeparator) for c in ("#", '"', "~", "|", "=", "^", "@", "&")
 ] + [(re.compile(re.escape(t)), Bracket) for a in SpanAttribute for t in ((a.open, a.close) if a.open != a.close else (a.open,))]
@@ -175,11 +189,10 @@ class Lexer:
       return True
     return False
 
-  def lookahead(self) -> Token|None:
+  def lookahead(self) -> Token:
     if self.ahead is None:
       self.ahead = self._next()
-    if self.ahead:
-      return self.ahead
+    return self.ahead
 
   def advance(self):
     self.lookahead()
@@ -187,71 +200,109 @@ class Lexer:
       self.i = self.ahead.after
     self.ahead = None
 
-  def _next(self) -> Token|None:
+  def _next(self) -> Token:
     if self.i == len(self.source):
-      return None
+      return EndOfText("", self.i)
     matches : list[tuple[re.Match[str], type[Token]]] = []
     for pattern, t in TOKENS:
       match = pattern.match(self.source, self.i)
       if match:
         matches.append((match, t))
     if not matches:
-      self.raise_syntax_error(f"Could not recognize token")
+      self._raise_error(f"Could not recognize token")
     if len(matches) > 1:
       matches = sorted(matches, key=lambda mt: -len(mt[0].group(0)))
       #print(f"Multiple matching tokens {', '.join(f'{token.__name__} {match.group(0)}' for match, token in matches)}: {self.source[:self.i]}☞{self.source[self.i:]}")
     match, t = matches[0]
     return t(match.group(), match.end())
 
-  def raise_syntax_error(self, message: str):
+  def _raise_error(self, message: str):
     raise SyntaxError(f"{message}: {self.source[:self.i]}☞{self.source[self.i:]}")
+
+  def raise_syntax_error(self, message: str):
+    self._raise_error(f"{message}, got {type(self.lookahead()).__name__}")
 
 def parse_transliteration(source: str):
   lexer = Lexer(source)
   while True:
     parse_word(lexer)
-    if not lexer.accept(Delimiter, " "):
-      if lexer.lookahead() is None:
+    if not lexer.accept(Space):
+      if lexer.accept(EndOfText):
         break
       lexer.raise_syntax_error("Expected space between words")
     continue
 
 def parse_word(lexer: Lexer):
-  parse_decorated_grapheme(lexer)
-  while lexer.accept(Delimiter, "-"):
-    parse_decorated_grapheme(lexer)
+  if lexer.accept(FieldSeparator):
+    return
+  if lexer.accept(LanguageShift):
+    return
+  parse_delimited_text(lexer)
+  while lexer.accept(Delimiter):
+    parse_delimited_text(lexer)
 
-def parse_decorated_grapheme(lexer: Lexer):
-  parse_textual_span_openings(lexer)
-  parse_optional_determinative(lexer)
-  if not lexer.accept(Grapheme):
-    lexer.raise_syntax_error("Expected Grapheme")
-  parse_optional_determinative(lexer)
-  parse_textual_span_closings(lexer)
+def parse_delimited_text(lexer: Lexer):
+  while accept_textual_span_opening(lexer):
+    pass
+  while accept_determinative(lexer):
+    while accept_textual_span_opening(lexer) or accept_textual_span_closing_bracket(lexer):
+      pass
+  if lexer.accept(Grapheme):
+    pass
+  elif lexer.accept(UnknownMissing):
+    pass
+  elif lexer.accept(Comment):
+    pass
+  else:
+    lexer.raise_syntax_error("Expected Grapheme or ...")
+  while accept_textual_span_closure(lexer):
+    pass
+  if accept_textual_span_opening_bracket(lexer):
+    if not accept_determinative(lexer):
+      lexer.raise_syntax_error("Expected Determinative")
+  while accept_determinative(lexer):
+    pass
+  while accept_textual_span_closure(lexer):
+    pass
 
-def parse_optional_determinative(lexer: Lexer):
+def accept_determinative(lexer: Lexer):
   if lexer.accept(Bracket, "{"):
-    if not lexer.accept(Grapheme):
-      lexer.raise_syntax_error("Expected Grapheme")
-    while lexer.accept(Delimiter, "-"):
-      if not lexer.accept(Grapheme):
-        lexer.raise_syntax_error("Expected Grapheme")
+    if lexer.accept(LanguageShift):
+      if not lexer.accept(Space):
+        lexer.raise_syntax_error("Expected space after language shift")
+    parse_delimited_determinative_text(lexer)
+    while lexer.accept(Delimiter):
+      parse_delimited_determinative_text(lexer)
     if not lexer.accept(Bracket, "}"):
       lexer.raise_syntax_error("Expected }")
+    return True
+  return False
 
-def parse_textual_span_openings(lexer: Lexer):
-  while True:
-    for bracket in ("_", "[", "(", "<", "<<"):
-      if lexer.accept(Bracket, bracket):
-        continue
-    break
+def parse_delimited_determinative_text(lexer: Lexer):
+  while accept_textual_span_opening(lexer):
+    pass
+  if not lexer.accept(Grapheme):
+    lexer.raise_syntax_error("Expected Grapheme")
+  while accept_textual_span_closure(lexer):
+    pass
 
-def parse_textual_span_closings(lexer: Lexer):
-  while True:
-    for bracket in ("_", "]", ")", ">", ">>"):
-      if lexer.accept(Bracket, bracket):
-        continue
-    break
+def accept_textual_span_opening(lexer: Lexer):
+  return lexer.accept(Bracket, "_") or accept_textual_span_opening_bracket(lexer)
+
+def accept_textual_span_closure(lexer: Lexer):
+  return lexer.accept(Bracket, "_") or accept_textual_span_closing_bracket(lexer)
+
+def accept_textual_span_opening_bracket(lexer: Lexer):
+  for bracket in ("[", "(", "<", "<<"):
+    if lexer.accept(Bracket, bracket):
+      return True
+  return False
+
+def accept_textual_span_closing_bracket(lexer: Lexer):
+  for bracket in ("]", ")", ">", ">>"):
+    if lexer.accept(Bracket, bracket):
+      return True
+  return False
 
 def get_base(value: str) -> str:
   if "-" in value:
