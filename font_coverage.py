@@ -216,6 +216,10 @@ for sign_list in "MZL", "SYA", "ASY", "SLLHA":
           i_next_down = i
       sorted_signs.insert(i_next_down + 1, xsux)
 
+# TODO(egg): Make this systematic…
+sorted_signs.insert(sorted_signs.index("𒀭") + 1, "𒀭‍𒂗")
+xsux_to_forms["𒀭‍𒂗"] = [asl.Form("|AN+EN|")]
+
 sorted_signs += sorted(c for c in signs if c not in sorted_signs)
 
 with open("../Nabuninuaihsus/index.html", encoding="utf8") as f:
