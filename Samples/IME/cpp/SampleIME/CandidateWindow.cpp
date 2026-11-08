@@ -12,7 +12,7 @@
 #include "BaseWindow.h"
 #include "CandidateWindow.h"
 
-#include "𒂗𒈨𒅕𒃸/transcription.h"
+#include "𒂗𒈨𒅕𒃸/transliteration.h"
 
 COLORREF _AdjustTextColor(_In_ COLORREF crColor, _In_ COLORREF crBkColor);
 
@@ -680,7 +680,7 @@ void CCandidateWindow::_DrawList(_In_ HDC dcHandle, _In_ UINT iIndex, _In_ RECT 
         }
         {
           HFONT const old_font = (HFONT)SelectObject(dcHandle, Global::LatinFont);
-          std::wstring const hint = 𒂗𒈨𒅕𒃸::PrettyTranscriptionHint(composition, composition.size() - tail.size()) + Global::trace;
+          std::wstring const hint = 𒂗𒈨𒅕𒃸::PrettyTransliterationHint(composition, composition.size() - tail.size()) + Global::trace;
           ExtTextOut(dcHandle, StringPosition * cxLine, pageCount * cyLine + cyOffset, ETO_OPAQUE, &rc, hint.data(), hint.size(), NULL);
           SelectObject(dcHandle, old_font);
         }

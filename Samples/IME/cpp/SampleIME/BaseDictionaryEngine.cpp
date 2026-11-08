@@ -9,7 +9,7 @@
 #include "BaseDictionaryEngine.h"
 #include "Globals.h"
 
-#include "𒂗𒈨𒅕𒃸/transcription.h"
+#include "𒂗𒈨𒅕𒃸/transliteration.h"
 
 //+---------------------------------------------------------------------------
 // ctor

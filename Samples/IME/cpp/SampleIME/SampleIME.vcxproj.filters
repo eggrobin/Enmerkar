@@ -159,7 +159,7 @@
     <ClInclude Include="𒂗𒈨𒅕𒃸\settings.h">
       <Filter>Header Files\𒂊𒂗𒈨𒅕𒃸</Filter>
     </ClInclude>
-    <ClInclude Include="𒂗𒈨𒅕𒃸\transcription.h">
+    <ClInclude Include="𒂗𒈨𒅕𒃸\transliteration.h">
       <Filter>Header Files\𒂊𒂗𒈨𒅕𒃸</Filter>
     </ClInclude>
     <ClInclude Include="𒂗𒈨𒅕𒃸\registry.h">
@@ -308,7 +308,7 @@
     <ClCompile Include="𒂗𒈨𒅕𒃸\settings.cpp">
       <Filter>Source Files\𒂊𒂗𒈨𒅕𒃸</Filter>
     </ClCompile>
-    <ClCompile Include="𒂗𒈨𒅕𒃸\transcription.cpp">
+    <ClCompile Include="𒂗𒈨𒅕𒃸\transliteration.cpp">
       <Filter>Source Files\𒂊𒂗𒈨𒅕𒃸</Filter>
     </ClCompile>
     <ClCompile Include="𒂗𒈨𒅕𒃸\registry.cpp">

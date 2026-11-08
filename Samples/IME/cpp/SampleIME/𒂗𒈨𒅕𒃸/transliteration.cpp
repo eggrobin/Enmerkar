@@ -1,4 +1,4 @@
-﻿#include "𒂗𒈨𒅕𒃸/transcription.h"
+﻿#include "𒂗𒈨𒅕𒃸/transliteration.h"
 
 #include <algorithm>
 #include <array>
@@ -243,7 +243,7 @@ std::wstring PrettyListHint(std::wstring_view composition_input,
   return result;
 }
 
-std::wstring PrettyTranscriptionHint(std::wstring_view composition_input,
+std::wstring PrettyTransliterationHint(std::wstring_view composition_input,
                                      int entered_size) {
   if (composition_input.front() == 'x') {
     return PrettyListHint(composition_input.substr(1), entered_size - 1);

@@ -42,7 +42,7 @@ adjustments:
 — the letter [x] is typed as subscript.
 When the shift key is held with caps lock on, the characters from the uppercase
 layout are typed.  The intent is that caps lock be used for writing
-transcriptions and transliterated Akkadian.
+transliterations and normalized Akkadian.
 
 Superscript one [¹] stands for a dead key with the following effect on the next
 keypress:

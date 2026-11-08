@@ -73,7 +73,7 @@
     <ClInclude Include="TipCandidateString.h" />
     <ClInclude Include="𒂗𒈨𒅕𒃸\registry.h" />
     <ClInclude Include="𒂗𒈨𒅕𒃸\settings.h" />
-    <ClInclude Include="𒂗𒈨𒅕𒃸\transcription.h" />
+    <ClInclude Include="𒂗𒈨𒅕𒃸\transliteration.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ActiveLanguageProfileNotifySink.cpp" />
@@ -124,7 +124,7 @@
     <ClCompile Include="TipCandidateString.cpp" />
     <ClCompile Include="𒂗𒈨𒅕𒃸\registry.cpp" />
     <ClCompile Include="𒂗𒈨𒅕𒃸\settings.cpp" />
-    <ClCompile Include="𒂗𒈨𒅕𒃸\transcription.cpp" />
+    <ClCompile Include="𒂗𒈨𒅕𒃸\transliteration.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SampleIME.rc" />
