@@ -26,9 +26,33 @@ std::map<wchar_t, int> const& Alphabet() {
   return alphabetical_order;
 }
 
+bool IsTransliterationLetter(wchar_t const c) {
+  static const std::set<wchar_t>& letters = ([]() -> auto const& {
+    auto& result = *new std::set<wchar_t>();
+    for (wchar_t c : std::wstring_view{
+             L"abdegŋḫijklmnpqrsṣšśtṭuwzABDEGŊḪIJKLMNPQRSṢŠŚTṬUWZ"}) {
+      result.insert(c);
+    }
+    return result;
+  })();
+  return letters.contains(c);
+}
+
+bool IsSubscriptDigit(wchar_t const c) {
+  return c >= L'₀' && c <= '₉';
+}
+
 // Like std::isdigit but with less UB.
 constexpr bool IsDigit(wchar_t const c) {
   return c >= '0' && c <= '9';
+}
+
+wchar_t ToSubscript(wchar_t const c) {
+  return c == L'x' ? L'ₓ' : IsDigit(c) ? L'₀' + (c - '0') : c;
+}
+
+bool IsSubscriptable(wchar_t const c) {
+  return c == L'x' || IsDigit(c);
 }
 
 std::tuple<std::vector<std::vector<int>>, std::vector<std::vector<int>>, int>

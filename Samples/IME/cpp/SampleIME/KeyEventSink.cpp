@@ -104,10 +104,6 @@ BOOL CSampleIME::_IsKeyEaten(_In_ ITfContext *pContext, UINT codeIn, _Out_ UINT 
     CCompositionProcessorEngine *pCompositionProcessorEngine;
     pCompositionProcessorEngine = _pCompositionProcessorEngine;
 
-    if (GetKeyState(VK_CAPITAL) & 1) {
-      return FALSE;
-    }
-
     if (isOpen)
     {
       //

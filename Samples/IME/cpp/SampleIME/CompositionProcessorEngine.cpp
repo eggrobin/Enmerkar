@@ -19,6 +19,7 @@
 #include "RegKey.h"
 
 #include "𒂗𒈨𒅕𒃸/settings.h"
+#include "𒂗𒈨𒅕𒃸/transliteration.h"
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -1581,6 +1582,18 @@ BOOL CCompositionProcessorEngine::IsVirtualKeyNeed(UINT uCode, _In_reads_(1) WCH
         pKeyState->Function = FUNCTION_BACKSPACE;
       }
       return true;
+    }
+
+    if (pwch && 𒂗𒈨𒅕𒃸::IsSubscriptable(*pwch) && ((GetKeyState(VK_CAPITAL) & 1) || GetKeyState(VK_SHIFT))) {
+      if (pKeyState) {
+        pKeyState->Category = CATEGORY_COMPOSING;
+        pKeyState->Function = FUNCTION_INPUT;
+      }
+      return true;
+    }
+
+    if (GetKeyState(VK_CAPITAL) & 1) {
+      return false;
     }
 
     if (candidateMode == CANDIDATE_ORIGINAL || candidateMode == CANDIDATE_PHRASE || candidateMode == CANDIDATE_WITH_NEXT_COMPOSITION)

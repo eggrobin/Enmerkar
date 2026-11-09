@@ -5,6 +5,8 @@
 #include <array>
 #include <string>
 
+#include <fstream>
+
 #include <Windows.h>
 #include <WinUser.h>
 
@@ -26,6 +28,19 @@ struct Font {
 
 Font GetUserLatinFont();
 Font GetUserCuneiformFont();
+
+inline void log(std::wstring_view file, int line, std::wstring const& s) {
+  std::wofstream(R"(C:\Users\robin\Desktop\Enmerkar.log)",
+                 std::ios_base::app | std::ios_base::out)
+      << file << L":" << line << L"]"
+      << s << L"\n";
+
+}
+
+#define WIDEN(s) L ## s
+#define WIDEN_EXPANSION(s) WIDEN(s)
+
+#define LOG(message) 𒂗𒈨𒅕𒃸::log(WIDEN_EXPANSION(__FILE__), __LINE__, (message))
 
 class LatinLayout {
  public:

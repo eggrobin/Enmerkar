@@ -11,6 +11,8 @@
 #include "SampleIME.h"
 #include "CandidateListUIPresenter.h"
 #include "CompositionProcessorEngine.h"
+#include "𒂗𒈨𒅕𒃸/transliteration.h"
+#include "𒂗𒈨𒅕𒃸/settings.h"
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -127,6 +129,60 @@ HRESULT CSampleIME::_HandleCompositionInput(TfEditCookie ec, _In_ ITfContext *pC
     // Start the new (std::nothrow) compositon if there is no composition.
     if (!_IsComposing())
     {
+      if (𒂗𒈨𒅕𒃸::IsSubscriptable(wch) && ((GetKeyState(VK_CAPITAL) & 1) || GetKeyState(VK_SHIFT))) {
+          LOG(L"context-dependent digit");
+          if (pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &fetched) != S_OK || fetched != 1)
+          {
+            return S_FALSE;
+          }
+          LOG(L"got selection");
+          ITfRange* lookbehind = nullptr;
+          if (tfSelection.range->Clone(&lookbehind) != S_OK) {
+            tfSelection.range->Release();
+            return S_FALSE;
+          }
+          LOG(L"cloned");
+          bool afterLetter = true;
+          LONG shifted = 0;
+          if (lookbehind->ShiftStart(ec, -1, &shifted, nullptr) == S_OK && shifted < 0) {
+            LOG(L"shifted");
+            wchar_t previous;
+            ULONG read;
+            if (lookbehind->GetText(ec, 0, &previous, 1, &read) == S_OK && read == 1) {
+              LOG(L"got text");
+              LOG(std::to_wstring(previous));
+              LOG(std::wstring()+previous);
+              afterLetter = 𒂗𒈨𒅕𒃸::IsTransliterationLetter(previous) || 𒂗𒈨𒅕𒃸::IsSubscriptDigit(previous);
+              LOG(afterLetter ? L"after letter" : L"not after letter");
+            }
+          } else {
+            if (ITfRange* start = nullptr; pContext->GetStart(ec, &start) == S_OK) {
+              LONG comparison;
+              if (start->CompareStart(ec, tfSelection.range, TF_ANCHOR_START, &comparison) == S_OK && comparison == 0) {
+                afterLetter = false;
+              }
+              if (ITfRange* end = nullptr; pContext->GetEnd(ec, &end) == S_OK) {
+                // Either an empty document, or something that does not give us context.  Assume the latter.
+                if (start->CompareEnd(ec, end, TF_ANCHOR_START, &comparison) == S_OK && comparison == 0) {
+                  afterLetter = true;
+                }
+                end->Release();
+              }
+              start->Release();
+            }
+          }
+          lookbehind->Release();
+          LOG(L"released");
+          if (afterLetter) {
+            wchar_t const subscript = 𒂗𒈨𒅕𒃸::ToSubscript(wch);
+            LOG(L"setting subscript text");
+            tfSelection.range->SetText(ec, 0, &subscript, 1);
+          } else {
+            LOG(L"setting normal text");
+            tfSelection.range->SetText(ec, 0, &wch, 1);
+          }
+          goto Exit;
+        }
         _StartComposition(pContext);
     }
 
