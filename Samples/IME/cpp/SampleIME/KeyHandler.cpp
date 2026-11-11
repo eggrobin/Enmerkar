@@ -182,6 +182,7 @@ HRESULT CSampleIME::_HandleCompositionInput(TfEditCookie ec, _In_ ITfContext *pC
             LOG(L"setting normal text");
             tfSelection.range->SetText(ec, 0, &wch, 1);
           }
+          Received¹ = false;
           goto Exit;
         }
         _StartComposition(pContext);
