@@ -6,6 +6,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved
 
 #include <string>
+#include <sstream>
 
 #include "Private.h"
 #include "Globals.h"
@@ -90,7 +91,9 @@ BOOL CSampleIME::_IsKeyEaten(_In_ ITfContext *pContext, UINT codeIn, _Out_ UINT 
     //
     // Map virtual key to character code
     //
-    WCHAR wch = 𒂗𒈨𒅕𒃸::LatinLayout::GetCharacter(codeIn);
+    WCHAR wch = ((GetKeyState(VK_CAPITAL) & 1) && (GetKeyState(VK_SHIFT) & 0x8000))
+        ? 𒂗𒈨𒅕𒃸::LatinLayout::GetShiftedCharacter(codeIn)
+        : 𒂗𒈨𒅕𒃸::LatinLayout::GetCharacter(codeIn);
     *pCodeOut = codeIn;// VKeyFromVKPacketAndWchar(codeIn, wch);
 
     if (pwch)
@@ -344,13 +347,6 @@ STDAPI CSampleIME::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam,
                 : wch == L'-' ? L'⁻'
                 : wch == L'v' ? L'ᵛ'
                               : wch;
-          } else {
-            if (wch >= L'0' && wch <= L'9') {
-              wch = L'₀' + wch - L'0';
-            }
-            if (wch == L'x') {
-              wch = L'ₓ';
-            }
           }
           INPUT input = {
             .type = INPUT_KEYBOARD,

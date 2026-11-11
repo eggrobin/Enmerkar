@@ -129,7 +129,8 @@ HRESULT CSampleIME::_HandleCompositionInput(TfEditCookie ec, _In_ ITfContext *pC
     // Start the new (std::nothrow) compositon if there is no composition.
     if (!_IsComposing())
     {
-      if (𒂗𒈨𒅕𒃸::IsSubscriptable(wch) && ((GetKeyState(VK_CAPITAL) & 1) || GetKeyState(VK_SHIFT))) {
+      if (𒂗𒈨𒅕𒃸::IsSubscriptable(wch) &&
+          ((GetKeyState(VK_CAPITAL) & 1) || (GetKeyState(VK_SHIFT) & 0x8000))) {
           LOG(L"context-dependent digit");
           if (pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &fetched) != S_OK || fetched != 1)
           {
@@ -173,7 +174,7 @@ HRESULT CSampleIME::_HandleCompositionInput(TfEditCookie ec, _In_ ITfContext *pC
           }
           lookbehind->Release();
           LOG(L"released");
-          if (afterLetter) {
+          if (afterLetter != Received¹) {
             wchar_t const subscript = 𒂗𒈨𒅕𒃸::ToSubscript(wch);
             LOG(L"setting subscript text");
             tfSelection.range->SetText(ec, 0, &subscript, 1);

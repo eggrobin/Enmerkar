@@ -1584,7 +1584,8 @@ BOOL CCompositionProcessorEngine::IsVirtualKeyNeed(UINT uCode, _In_reads_(1) WCH
       return true;
     }
 
-    if (pwch && 𒂗𒈨𒅕𒃸::IsSubscriptable(*pwch) && ((GetKeyState(VK_CAPITAL) & 1) || GetKeyState(VK_SHIFT))) {
+    if (pwch && 𒂗𒈨𒅕𒃸::IsSubscriptable(*pwch) &&
+        ((GetKeyState(VK_CAPITAL) & 1) || (GetKeyState(VK_SHIFT) & 0x8000))) {
       if (pKeyState) {
         pKeyState->Category = CATEGORY_COMPOSING;
         pKeyState->Function = FUNCTION_INPUT;
